@@ -531,5 +531,79 @@ updateWelcome();
   }
 })();
 </script>
+
+<!-- CampusKit Google Login -->
+<div id="campuskit-auth" style="position:fixed;top:16px;right:16px;z-index:9999;background:#17152b;color:white;padding:12px 16px;border-radius:14px;font-family:Arial,sans-serif;box-shadow:0 4px 20px #0003">
+  <button id="ck-google-login" style="padding:10px 14px;border:0;border-radius:9px;background:#fff;color:#222;font-weight:bold;cursor:pointer">
+    Continue with Google
+  </button>
+  <span id="ck-user" style="display:none;align-items:center;gap:8px">
+    <img id="ck-avatar" alt="Profile" style="width:32px;height:32px;border-radius:50%">
+    <span id="ck-name"></span>
+    <button id="ck-logout" style="padding:7px;border:0;border-radius:7px;cursor:pointer">Sign out</button>
+  </span>
+  <p id="ck-status" style="font-size:12px;margin:8px 0 0"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",
+    authDomain: "campuskit-11f47.firebaseapp.com",
+    projectId: "campuskit-11f47",
+    storageBucket: "campuskit-11f47.firebasestorage.app",
+    messagingSenderId: "900160377191",
+    appId: "1:900160377191:web:44a0220ce9fb85f4391fc2",
+    measurementId: "G-CM5NHSY03B"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const loginBtn = document.getElementById("ck-google-login");
+  const userBox = document.getElementById("ck-user");
+  const status = document.getElementById("ck-status");
+
+  loginBtn.addEventListener("click", async () => {
+    status.textContent = "Opening Google sign-in...";
+    try {
+      await signInWithPopup(auth, provider);
+      status.textContent = "";
+    } catch (error) {
+      status.textContent = error.message;
+      console.error("Google sign-in error:", error);
+    }
+  });
+
+  document.getElementById("ck-logout").addEventListener("click", async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      status.textContent = error.message;
+    }
+  });
+
+  onAuthStateChanged(auth, user => {
+    loginBtn.style.display = user ? "none" : "inline-block";
+    userBox.style.display = user ? "flex" : "none";
+
+    if (user) {
+      document.getElementById("ck-name").textContent =
+        user.displayName || user.email || "Student";
+      const avatar = document.getElementById("ck-avatar");
+      avatar.src = user.photoURL || "";
+      avatar.style.display = user.photoURL ? "block" : "none";
+    }
+  });
+</script>
 </body>
 </html>
