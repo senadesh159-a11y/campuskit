@@ -1,0 +1,544 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusKit</title>
+
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f2ff;
+  color: #24213b;
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg, #6846d9, #4338ca);
+  color: white;
+  text-align: center;
+  padding: 30px 16px;
+}
+
+header h1 {
+  color: white;
+  margin: 0;
+  font-size: 32px;
+}
+
+header p {
+  margin-bottom: 0;
+}
+
+main {
+  max-width: 900px;
+  width: 100%;
+  margin: 28px auto;
+  padding: 0 18px;
+}
+
+main > h2 {
+  color: #4f35a8;
+}
+
+.tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.card {
+  min-width: 0;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid #e5defc;
+  box-shadow: 0 6px 22px rgba(60, 40, 120, 0.09);
+}
+
+.card h3 {
+  color: #4f35a8;
+  margin-top: 0;
+}
+
+input,
+textarea {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #d9d1f5;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+}
+
+input:focus,
+textarea:focus {
+  outline: 2px solid #a99aef;
+  border-color: #6846d9;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  padding: 11px 16px;
+  margin: 5px 4px 5px 0;
+  border: none;
+  border-radius: 10px;
+  background: #6846d9;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4f35a8;
+}
+
+.delete-btn {
+  background: #dc2626;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}
+
+li {
+  margin: 10px 0;
+  padding: 12px;
+  background: #f7f5ff;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.note-item {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #e5defc;
+  border-radius: 12px;
+  background: #faf9ff;
+  overflow-wrap: anywhere;
+}
+
+.note-item h4 {
+  margin-top: 0;
+  color: #4f35a8;
+}
+
+footer {
+  padding: 24px 16px;
+  text-align: center;
+  color: #68617c;
+}
+
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 26px;
+  }
+
+  main {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+
+  .card {
+    padding: 17px;
+  }
+}
+
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 8px;
+  background: #f0ebff;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.stat-box strong {
+  font-size: 26px;
+  color: #6846d9;
+}
+
+.stat-box span {
+  font-size: 13px;
+}
+
+@media (max-width: 360px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+  <h1>🎓 CampusKit</h1>
+  <p>Your College Life, Organized!</p>
+</header>
+
+<main>
+
+<div class="card" id="dashboard">
+  <h3>📊 My Dashboard</h3>
+  <p>Welcome back! Here's your study space.</p>
+
+  <div class="dashboard-stats">
+    <div class="stat-box">
+      <strong id="assignmentCount">0</strong>
+      <span>Assignments</span>
+    </div>
+
+    <div class="stat-box">
+      <strong id="classCount">0</strong>
+      <span>Classes</span>
+    </div>
+
+    <div class="stat-box">
+      <strong id="notesCount">0</strong>
+      <span>Notes</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>🔎 Quick Search</h3>
+  <input
+    type="search"
+    id="campusSearch"
+    placeholder="Search assignments, classes, notes..."
+  >
+  <p id="searchMessage">Type something to search.</p>
+</div>
+
+  <h2>Welcome, Student! 👋</h2>
+  <p>Your study tools, all in one place.</p>
+
+  <div class="tools">
+
+
+<div class="card">
+  <h3>📅 Class Timetable</h3>
+  <p>Organize your daily classes.</p>
+
+  <form id="timetableForm">
+    <input type="text" id="subject" placeholder="Subject name" required>
+    <input type="text" id="day" placeholder="Day (e.g. Monday)" required>
+    <input type="text" id="classTime" placeholder="Time (e.g. 10 AM)" required>
+    <button type="submit">Add Class</button>
+  </form>
+
+  <ul id="timetableList"></ul>
+</div>
+
+    <div class="card">
+      <h3>📝 Assignment Tracker</h3>
+
+      <form id="assignmentForm">
+        <input
+          id="assignmentName"
+          placeholder="Assignment name"
+          required
+        >
+
+        <input
+          id="deadline"
+          type="date"
+          required
+        >
+
+        <button type="submit">+ Add Assignment</button>
+      </form>
+
+      <ul id="assignmentList"></ul>
+    </div>
+
+
+<div class="card">
+  <h3>📚 Study Notes</h3>
+  <p>Save your important study notes.</p>
+
+  <form id="notesForm">
+    <input type="text" id="noteSubject" placeholder="Subject name" required>
+    <textarea id="noteText" placeholder="Write your notes here..." required></textarea>
+    <button type="submit">Save Note</button>
+  </form>
+
+  <div id="notesList"></div>
+</div>
+
+  </div>
+</main>
+
+<footer>Made for Students ❤️ | CampusKit</footer>
+
+<script>
+const form = document.getElementById("assignmentForm");
+const nameInput = document.getElementById("assignmentName");
+const dateInput = document.getElementById("deadline");
+const list = document.getElementById("assignmentList");
+
+const STORAGE_KEY = "campuskitAssignments";
+
+let savedAssignments = [];
+
+try {
+  const storedData = localStorage.getItem(STORAGE_KEY);
+  savedAssignments = storedData ? JSON.parse(storedData) : [];
+
+  if (!Array.isArray(savedAssignments)) {
+    savedAssignments = [];
+  }
+} catch (error) {
+  savedAssignments = [];
+}
+
+function saveAssignments() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(savedAssignments)
+    );
+  } catch (error) {
+    alert("Unable to save data in this browser.");
+  }
+}
+
+function displayAssignments() {
+  list.replaceChildren();
+
+  savedAssignments.forEach(function(assignment, index) {
+    const item = document.createElement("li");
+
+    item.appendChild(
+      document.createTextNode(
+        assignment.name + " — Due: " + assignment.date + " "
+      )
+    );
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Delete";
+    removeButton.type = "button";
+    removeButton.className = "delete-btn";
+
+    removeButton.addEventListener("click", function() {
+      savedAssignments.splice(index, 1);
+      saveAssignments();
+      displayAssignments();
+      updateDashboard();
+    });
+
+    item.appendChild(removeButton);
+    list.appendChild(item);
+  });
+}
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const name = nameInput.value.trim();
+  const date = dateInput.value;
+
+  if (!name || !date) {
+    return;
+  }
+
+  savedAssignments.push({
+    name: name,
+    date: date
+  });
+
+  saveAssignments();
+  displayAssignments();
+  updateDashboard();
+  form.reset();
+});
+
+// Load saved assignments whenever the page opens.
+displayAssignments();
+
+const timetableForm = document.getElementById("timetableForm");
+const timetableList = document.getElementById("timetableList");
+
+let timetable = JSON.parse(localStorage.getItem("campusTimetable")) || [];
+
+function displayTimetable() {
+  timetableList.innerHTML = "";
+
+  timetable.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.day} - ${item.subject} - ${item.time} `;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+
+    deleteBtn.onclick = function () {
+      timetable.splice(index, 1);
+      localStorage.setItem("campusTimetable", JSON.stringify(timetable));
+      displayTimetable();
+      updateDashboard();
+    };
+
+    li.appendChild(deleteBtn);
+    timetableList.appendChild(li);
+  });
+}
+
+timetableForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const subject = document.getElementById("subject").value.trim();
+  const day = document.getElementById("day").value.trim();
+  const time = document.getElementById("classTime").value.trim();
+
+  if (!subject || !day || !time) return;
+
+  timetable.push({ subject, day, time });
+  localStorage.setItem("campusTimetable", JSON.stringify(timetable));
+
+  displayTimetable();
+  updateDashboard();
+  timetableForm.reset();
+});
+
+displayTimetable();
+
+const notesForm = document.getElementById("notesForm");
+const notesList = document.getElementById("notesList");
+
+let savedNotes = JSON.parse(localStorage.getItem("campusNotes")) || [];
+
+function displayNotes() {
+  notesList.innerHTML = "";
+
+  savedNotes.forEach((note, index) => {
+    const card = document.createElement("div");
+    card.className = "note-item";
+
+    const heading = document.createElement("h4");
+    heading.textContent = note.subject;
+
+    const content = document.createElement("p");
+    content.textContent = note.text;
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+
+    deleteButton.onclick = function () {
+      savedNotes.splice(index, 1);
+      localStorage.setItem("campusNotes", JSON.stringify(savedNotes));
+      displayNotes();
+      updateDashboard();
+    };
+
+    card.appendChild(heading);
+    card.appendChild(content);
+    card.appendChild(deleteButton);
+    notesList.appendChild(card);
+  });
+}
+
+notesForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const subject = document.getElementById("noteSubject").value.trim();
+  const noteText = document.getElementById("noteText").value.trim();
+
+  if (!subject || !noteText) return;
+
+  savedNotes.push({ subject: subject, text: noteText });
+
+  localStorage.setItem("campusNotes", JSON.stringify(savedNotes));
+
+  displayNotes();
+  updateDashboard();
+  notesForm.reset();
+});
+
+displayNotes();
+
+function updateDashboard() {
+  const assignments = JSON.parse(
+    localStorage.getItem("campuskitAssignments") || "[]"
+  );
+
+  const classes = JSON.parse(
+    localStorage.getItem("campusTimetable") || "[]"
+  );
+
+  const notes = JSON.parse(
+    localStorage.getItem("campusNotes") || "[]"
+  );
+
+  document.getElementById("assignmentCount").textContent =
+    assignments.length;
+
+  document.getElementById("classCount").textContent =
+    classes.length;
+
+  document.getElementById("notesCount").textContent =
+    notes.length;
+}
+
+updateDashboard();
+
+const campusSearch = document.getElementById("campusSearch");
+const searchMessage = document.getElementById("searchMessage");
+
+campusSearch.addEventListener("input", function () {
+  const query = campusSearch.value.trim().toLowerCase();
+
+  const searchableItems = document.querySelectorAll(
+    "#assignmentList li, #timetableList li, #notesList .note-item"
+  );
+
+  let visibleCount = 0;
+
+  searchableItems.forEach(function (item) {
+    const matches = item.textContent.toLowerCase().includes(query);
+
+    item.style.display = matches ? "" : "none";
+
+    if (matches) {
+      visibleCount++;
+    }
+  });
+
+  if (query === "") {
+    searchMessage.textContent = "Type something to search.";
+  } else {
+    searchMessage.textContent =
+      visibleCount + " matching item(s) found.";
+  }
+});
+
+</script>
+
+</body>
+</html>
