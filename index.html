@@ -1,544 +1,535 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampusKit</title>
-
-
+<meta name="theme-color" content="#08091f">
+<title>CampusKit | Student Dashboard</title>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f2ff;
-  color: #24213b;
-  line-height: 1.6;
-}
-
-header {
-  background: linear-gradient(135deg, #6846d9, #4338ca);
-  color: white;
-  text-align: center;
-  padding: 30px 16px;
-}
-
-header h1 {
-  color: white;
-  margin: 0;
-  font-size: 32px;
-}
-
-header p {
-  margin-bottom: 0;
-}
-
-main {
-  max-width: 900px;
-  width: 100%;
-  margin: 28px auto;
-  padding: 0 18px;
-}
-
-main > h2 {
-  color: #4f35a8;
-}
-
-.tools {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 20px;
-  align-items: start;
-}
-
-.card {
-  min-width: 0;
-  background: #ffffff;
-  padding: 22px;
-  border-radius: 18px;
-  border: 1px solid #e5defc;
-  box-shadow: 0 6px 22px rgba(60, 40, 120, 0.09);
-}
-
-.card h3 {
-  color: #4f35a8;
-  margin-top: 0;
-}
-
-input,
-textarea {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #d9d1f5;
-  border-radius: 10px;
-  background: #fff;
-  font: inherit;
-}
-
-input:focus,
-textarea:focus {
-  outline: 2px solid #a99aef;
-  border-color: #6846d9;
-}
-
-textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-button {
-  padding: 11px 16px;
-  margin: 5px 4px 5px 0;
-  border: none;
-  border-radius: 10px;
-  background: #6846d9;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #4f35a8;
-}
-
-.delete-btn {
-  background: #dc2626;
-}
-
-.delete-btn:hover {
-  background: #b91c1c;
-}
-
-li {
-  margin: 10px 0;
-  padding: 12px;
-  background: #f7f5ff;
-  border-radius: 10px;
-  overflow-wrap: anywhere;
-}
-
-.note-item {
-  margin-top: 14px;
-  padding: 14px;
-  border: 1px solid #e5defc;
-  border-radius: 12px;
-  background: #faf9ff;
-  overflow-wrap: anywhere;
-}
-
-.note-item h4 {
-  margin-top: 0;
-  color: #4f35a8;
-}
-
-footer {
-  padding: 24px 16px;
-  text-align: center;
-  color: #68617c;
-}
-
-@media (max-width: 480px) {
-  header h1 {
-    font-size: 26px;
-  }
-
-  main {
-    margin: 20px auto;
-    padding: 0 12px;
-  }
-
-  .card {
-    padding: 17px;
-  }
-}
-
-.dashboard-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.stat-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 8px;
-  background: #f0ebff;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.stat-box strong {
-  font-size: 26px;
-  color: #6846d9;
-}
-
-.stat-box span {
-  font-size: 13px;
-}
-
-@media (max-width: 360px) {
-  .dashboard-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
+*{box-sizing:border-box}
+:root{--purple:#8b5cf6;--lavender:#d8c8ff;--muted:#d0cbea;--panel:rgba(20,19,49,.72);--border:rgba(173,150,255,.3)}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;font-family:Arial,sans-serif;background:#08091f;color:#f2efff;line-height:1.6;background-image:radial-gradient(ellipse at 15% 20%,rgba(139,92,246,.25),transparent 45%),radial-gradient(ellipse at 85% 30%,rgba(59,130,246,.22),transparent 45%),radial-gradient(ellipse at 50% 90%,rgba(168,85,247,.18),transparent 50%);background-size:200% 200%;animation:auroraMove 16s ease-in-out infinite alternate}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.7) 50%,transparent 100%),radial-gradient(2px 2px at 70% 60%,rgba(167,139,250,.8) 50%,transparent 100%),radial-gradient(3px 3px at 40% 80%,rgba(96,165,250,.7) 50%,transparent 100%),radial-gradient(2px 2px at 85% 15%,rgba(255,255,255,.6) 50%,transparent 100%);background-size:250px 250px;animation:particleFloat 20s linear infinite}
+@keyframes auroraMove{from{background-position:0 0}to{background-position:100% 100%}}
+@keyframes particleFloat{from{background-position:0 0}to{background-position:250px -250px}}
+header,main,footer{position:relative;z-index:1}
+header{text-align:center;padding:27px 16px;background:linear-gradient(135deg,rgba(104,70,217,.82),rgba(35,43,115,.78));border-bottom:1px solid rgba(190,170,255,.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+header h1{color:#fff;margin:0;font-size:clamp(26px,4vw,36px);letter-spacing:.3px}
+header p{margin:4px 0 0;color:#f1edff}
+main{max-width:1000px;width:100%;margin:26px auto;padding:0 18px}
+h2{color:var(--lavender);margin:0 0 4px}
+p{color:var(--muted)}
+.card{min-width:0;padding:22px;border-radius:18px;background:var(--panel);color:#f4f0ff;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:border-color .25s ease,transform .25s ease;margin-bottom:20px}
+.card:hover{border-color:rgba(180,155,255,.6)}
+.card h3{color:#cdbaff;margin:0 0 8px}
+.card>p{margin-top:4px}
+.hero{padding:25px;background:linear-gradient(120deg,rgba(101,69,201,.25),rgba(36,104,190,.15)),var(--panel)}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#bca8ff;font-weight:bold}
+#todayDate{font-size:13px;color:#d0cbea;margin-top:5px}
+.quote{margin:12px 0 0;color:#e3dcff}
+.dashboard-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.stat-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:rgba(126,92,220,.16);border:1px solid rgba(180,155,255,.22);border-radius:12px;text-align:center}
+.stat-box strong{font-size:clamp(23px,4vw,30px);line-height:1.25;color:#c3adff;text-shadow:0 0 14px rgba(157,117,255,.3)}
+.stat-box span{font-size:13px;color:#e0d8ff}
+.progress-section{margin-top:20px}
+.progress-label{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#e7e0ff;margin-bottom:8px}
+.progress-track{height:11px;background:rgba(255,255,255,.1);border:1px solid rgba(190,170,255,.2);border-radius:99px;overflow:hidden}
+#progressFill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#8b5cf6,#42a5ff);transition:width .45s ease}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:18px;align-items:start}
+.tools .card{margin:0}
+input,textarea{display:block;width:100%;padding:12px;margin:10px 0;border:1px solid rgba(165,145,230,.38);border-radius:10px;background:rgba(9,12,34,.75);color:#fff;font:inherit}
+input::placeholder,textarea::placeholder{color:#b8b2d0}
+input:focus,textarea:focus{outline:2px solid #a78bfa;border-color:#c4b5fd}
+textarea{min-height:100px;resize:vertical}
+button{padding:10px 14px;margin:5px 5px 5px 0;border:1px solid transparent;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#5b50d9);color:#fff;font-weight:bold;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(104,70,217,.2);transition:transform .15s ease,filter .15s ease}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.delete-btn{background:#be3455}
+.delete-btn:hover{background:#e04769}
+.complete-btn{background:linear-gradient(135deg,#0f9f79,#087f8c)}
+.complete-btn.is-complete{background:rgba(126,145,167,.3);border-color:rgba(200,210,230,.3)}
+li{margin:10px 0;padding:12px;background:rgba(105,85,170,.15);border:1px solid rgba(170,150,235,.23);border-radius:10px;color:#eeeaff;overflow-wrap:anywhere}
+li.done .assignment-title{text-decoration:line-through;color:#b5abc9}
+.item-meta{display:block;font-size:13px;color:#c8bee9;margin-top:3px}
+.note-item{margin-top:14px;padding:14px;border:1px solid rgba(170,150,235,.23);border-radius:12px;background:rgba(105,85,170,.15);overflow-wrap:anywhere}
+.note-item h4{margin:0 0 6px;color:#cdbaff}
+.note-item p{white-space:pre-wrap}
+.empty-state{color:#bdb4da;font-size:14px;padding:8px 2px}
+#searchMessage{font-size:13px;margin-bottom:0}
+footer{padding:24px 16px;text-align:center;color:#c0b7df}
+#neural-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.65}
+@media(max-width:480px){header{padding:22px 12px}main{margin:20px auto;padding:0 12px}.card{padding:17px}.dashboard-stats{gap:8px}.stat-box{padding:13px 5px}.stat-box span{font-size:12px}}
+@media(max-width:360px){.dashboard-stats{grid-template-columns:1fr}.hero-top{display:block}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 </style>
-
 </head>
-
 <body>
-
 <header>
   <h1>🎓 CampusKit</h1>
   <p>Your College Life, Organized!</p>
 </header>
 
 <main>
-
-<div class="card" id="dashboard">
-  <h3>📊 My Dashboard</h3>
-  <p>Welcome back! Here's your study space.</p>
-
-  <div class="dashboard-stats">
-    <div class="stat-box">
-      <strong id="assignmentCount">0</strong>
-      <span>Assignments</span>
+  <section class="card hero" id="dashboard" aria-labelledby="dashboardTitle">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Your student workspace</div>
+        <h2 id="dashboardTitle">Welcome back, Student! 👋</h2>
+        <p class="quote" id="dailyQuote">Small progress every day adds up.</p>
+      </div>
+      <div id="todayDate" aria-live="polite"></div>
     </div>
-
-    <div class="stat-box">
-      <strong id="classCount">0</strong>
-      <span>Classes</span>
+    <div class="dashboard-stats">
+      <div class="stat-box"><strong id="assignmentCount">0</strong><span>Total Assignments</span></div>
+      <div class="stat-box"><strong id="pendingCount">0</strong><span>Pending</span></div>
+      <div class="stat-box"><strong id="completedCount">0</strong><span>Completed</span></div>
     </div>
-
-    <div class="stat-box">
-      <strong id="notesCount">0</strong>
-      <span>Notes</span>
+    <div class="progress-section">
+      <div class="progress-label"><span>Assignment progress</span><strong id="progressText">0%</strong></div>
+      <div class="progress-track" role="progressbar" aria-label="Assignment completion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div id="progressFill"></div></div>
     </div>
-  </div>
-</div>
+    <div class="dashboard-stats">
+      <div class="stat-box"><strong id="classCount">0</strong><span>Classes Saved</span></div>
+      <div class="stat-box"><strong id="notesCount">0</strong><span>Study Notes</span></div>
+      <div class="stat-box"><strong id="dueSoonCount">0</strong><span>Due in 3 Days</span></div>
+    </div>
+  </section>
 
-<div class="card">
-  <h3>🔎 Quick Search</h3>
-  <input
-    type="search"
-    id="campusSearch"
-    placeholder="Search assignments, classes, notes..."
-  >
-  <p id="searchMessage">Type something to search.</p>
-</div>
+  <section class="card" aria-labelledby="searchTitle">
+    <h3 id="searchTitle">🔎 Quick Search</h3>
+    <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
+    <p id="searchMessage" aria-live="polite">Type something to search.</p>
+    <button type="button" id="clearSearchBtn">Clear Search</button>
+  </section>
 
-  <h2>Welcome, Student! 👋</h2>
-  <p>Your study tools, all in one place.</p>
+  <h2>My Study Tools</h2>
+  <p>Everything you need for college, in one place.</p>
 
   <div class="tools">
+    <section class="card" aria-labelledby="timetableTitle">
+      <h3 id="timetableTitle">📅 Class Timetable</h3>
+      <p>Organize your classes and practicals.</p>
+      <form id="timetableForm">
+        <input type="text" id="subject" placeholder="Subject name" required maxlength="100">
+        <input type="text" id="day" placeholder="Day (e.g. Monday)" required maxlength="30">
+        <input type="text" id="classTime" placeholder="Time (e.g. 10 AM)" required maxlength="50">
+        <button type="submit">+ Add Class</button>
+      </form>
+      <ul id="timetableList"></ul>
+    </section>
 
-
-<div class="card">
-  <h3>📅 Class Timetable</h3>
-  <p>Organize your daily classes.</p>
-
-  <form id="timetableForm">
-    <input type="text" id="subject" placeholder="Subject name" required>
-    <input type="text" id="day" placeholder="Day (e.g. Monday)" required>
-    <input type="text" id="classTime" placeholder="Time (e.g. 10 AM)" required>
-    <button type="submit">Add Class</button>
-  </form>
-
-  <ul id="timetableList"></ul>
-</div>
-
-    <div class="card">
-      <h3>📝 Assignment Tracker</h3>
-
+    <section class="card" aria-labelledby="assignmentTitle">
+      <h3 id="assignmentTitle">📝 Assignment Tracker</h3>
+      <p>Add deadlines and mark work as complete.</p>
       <form id="assignmentForm">
-        <input
-          id="assignmentName"
-          placeholder="Assignment name"
-          required
-        >
-
-        <input
-          id="deadline"
-          type="date"
-          required
-        >
-
+        <input id="assignmentName" type="text" placeholder="Assignment name" required maxlength="150">
+        <label for="deadline">Deadline</label>
+        <input id="deadline" type="date" required>
         <button type="submit">+ Add Assignment</button>
       </form>
-
       <ul id="assignmentList"></ul>
-    </div>
+    </section>
 
-
-<div class="card">
-  <h3>📚 Study Notes</h3>
-  <p>Save your important study notes.</p>
-
-  <form id="notesForm">
-    <input type="text" id="noteSubject" placeholder="Subject name" required>
-    <textarea id="noteText" placeholder="Write your notes here..." required></textarea>
-    <button type="submit">Save Note</button>
-  </form>
-
-  <div id="notesList"></div>
-</div>
-
+    <section class="card" aria-labelledby="notesTitle">
+      <h3 id="notesTitle">📚 Study Notes</h3>
+      <p>Save important notes for quick revision.</p>
+      <form id="notesForm">
+        <input type="text" id="noteSubject" placeholder="Subject name" required maxlength="100">
+        <textarea id="noteText" placeholder="Write your notes here..." required maxlength="10000"></textarea>
+        <button type="submit">Save Note</button>
+      </form>
+      <div id="notesList"></div>
+    </section>
   </div>
 </main>
 
 <footer>Made for Students ❤️ | CampusKit</footer>
+<canvas id="neural-bg" aria-hidden="true"></canvas>
 
 <script>
-const form = document.getElementById("assignmentForm");
-const nameInput = document.getElementById("assignmentName");
-const dateInput = document.getElementById("deadline");
-const list = document.getElementById("assignmentList");
+"use strict";
 
-const STORAGE_KEY = "campuskitAssignments";
+const STORAGE_KEYS = {
+  assignments: "campuskitAssignments",
+  timetable: "campusTimetable",
+  notes: "campusNotes"
+};
 
-let savedAssignments = [];
-
-try {
-  const storedData = localStorage.getItem(STORAGE_KEY);
-  savedAssignments = storedData ? JSON.parse(storedData) : [];
-
-  if (!Array.isArray(savedAssignments)) {
-    savedAssignments = [];
+function loadArray(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn("Could not read saved data for", key, error);
+    return [];
   }
-} catch (error) {
-  savedAssignments = [];
 }
 
-function saveAssignments() {
+function saveArray(key, value) {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(savedAssignments)
-    );
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
   } catch (error) {
-    alert("Unable to save data in this browser.");
+    alert("Your browser could not save the latest changes. Please check available storage.");
+    return false;
   }
+}
+
+let savedAssignments = loadArray(STORAGE_KEYS.assignments).map(item => ({
+  ...item,
+  completed: item.completed === true
+}));
+let timetable = loadArray(STORAGE_KEYS.timetable);
+let savedNotes = loadArray(STORAGE_KEYS.notes);
+
+const assignmentForm = document.getElementById("assignmentForm");
+const assignmentName = document.getElementById("assignmentName");
+const dateInput = document.getElementById("deadline");
+const assignmentList = document.getElementById("assignmentList");
+const timetableForm = document.getElementById("timetableForm");
+const timetableList = document.getElementById("timetableList");
+const notesForm = document.getElementById("notesForm");
+const notesList = document.getElementById("notesList");
+const campusSearch = document.getElementById("campusSearch");
+const searchMessage = document.getElementById("searchMessage");
+
+function makeEmptyMessage(container, message) {
+  const p = document.createElement("p");
+  p.className = "empty-state";
+  p.textContent = message;
+  container.appendChild(p);
+}
+
+function createButton(label, className, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  if (className) button.className = className;
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "No deadline";
+  const date = new Date(dateString + "T00:00:00");
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 }
 
 function displayAssignments() {
-  list.replaceChildren();
-
-  savedAssignments.forEach(function(assignment, index) {
-    const item = document.createElement("li");
-
-    item.appendChild(
-      document.createTextNode(
-        assignment.name + " — Due: " + assignment.date + " "
-      )
-    );
-
-    const removeButton = document.createElement("button");
-    removeButton.textContent = "Delete";
-    removeButton.type = "button";
-    removeButton.className = "delete-btn";
-
-    removeButton.addEventListener("click", function() {
-      savedAssignments.splice(index, 1);
-      saveAssignments();
-      displayAssignments();
-      updateDashboard();
-    });
-
-    item.appendChild(removeButton);
-    list.appendChild(item);
-  });
-}
-
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const name = nameInput.value.trim();
-  const date = dateInput.value;
-
-  if (!name || !date) {
+  assignmentList.replaceChildren();
+  if (savedAssignments.length === 0) {
+    makeEmptyMessage(assignmentList, "No assignments yet. Add your first assignment above.");
     return;
   }
 
-  savedAssignments.push({
-    name: name,
-    date: date
-  });
+  savedAssignments.forEach((assignment, index) => {
+    const item = document.createElement("li");
+    if (assignment.completed) item.classList.add("done");
 
-  saveAssignments();
-  displayAssignments();
-  updateDashboard();
-  form.reset();
+    const title = document.createElement("strong");
+    title.className = "assignment-title";
+    title.textContent = assignment.name || "Untitled assignment";
+    item.appendChild(title);
+
+    const meta = document.createElement("span");
+    meta.className = "item-meta";
+    meta.textContent = "Due: " + formatDate(assignment.date);
+    item.appendChild(meta);
+
+    const toggleButton = createButton(
+      assignment.completed ? "✓ Completed" : "Mark Complete",
+      "complete-btn" + (assignment.completed ? " is-complete" : ""),
+      () => {
+        savedAssignments[index].completed = !savedAssignments[index].completed;
+        if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+          displayAssignments();
+          updateDashboard();
+          applySearch();
+        } else {
+          savedAssignments[index].completed = !savedAssignments[index].completed;
+        }
+      }
+    );
+    toggleButton.setAttribute("aria-pressed", String(assignment.completed));
+    item.appendChild(toggleButton);
+
+    item.appendChild(createButton("Delete", "delete-btn", () => {
+      const removed = savedAssignments.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+        displayAssignments();
+        updateDashboard();
+        applySearch();
+      } else {
+        savedAssignments.splice(index, 0, ...removed);
+      }
+    }));
+    assignmentList.appendChild(item);
+  });
+}
+
+assignmentForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const name = assignmentName.value.trim();
+  const date = dateInput.value;
+  if (!name || !date) return;
+
+  savedAssignments.push({ name, date, completed: false });
+  if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+    displayAssignments();
+    updateDashboard();
+    applySearch();
+    assignmentForm.reset();
+  } else {
+    savedAssignments.pop();
+  }
 });
 
-// Load saved assignments whenever the page opens.
-displayAssignments();
-
-const timetableForm = document.getElementById("timetableForm");
-const timetableList = document.getElementById("timetableList");
-
-let timetable = JSON.parse(localStorage.getItem("campusTimetable")) || [];
-
 function displayTimetable() {
-  timetableList.innerHTML = "";
-
+  timetableList.replaceChildren();
+  if (timetable.length === 0) {
+    makeEmptyMessage(timetableList, "No classes added yet.");
+    return;
+  }
   timetable.forEach((item, index) => {
     const li = document.createElement("li");
-    li.textContent = `${item.day} - ${item.subject} - ${item.time} `;
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-
-    deleteBtn.onclick = function () {
-      timetable.splice(index, 1);
-      localStorage.setItem("campusTimetable", JSON.stringify(timetable));
-      displayTimetable();
-      updateDashboard();
-    };
-
-    li.appendChild(deleteBtn);
+    li.textContent = `${item.day || ""} — ${item.subject || ""} — ${item.time || ""} `;
+    li.appendChild(createButton("Delete", "delete-btn", () => {
+      const removed = timetable.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.timetable, timetable)) {
+        displayTimetable();
+        updateDashboard();
+        applySearch();
+      } else {
+        timetable.splice(index, 0, ...removed);
+      }
+    }));
     timetableList.appendChild(li);
   });
 }
 
-timetableForm.addEventListener("submit", function (event) {
+timetableForm.addEventListener("submit", event => {
   event.preventDefault();
-
   const subject = document.getElementById("subject").value.trim();
   const day = document.getElementById("day").value.trim();
   const time = document.getElementById("classTime").value.trim();
-
   if (!subject || !day || !time) return;
 
   timetable.push({ subject, day, time });
-  localStorage.setItem("campusTimetable", JSON.stringify(timetable));
-
-  displayTimetable();
-  updateDashboard();
-  timetableForm.reset();
+  if (saveArray(STORAGE_KEYS.timetable, timetable)) {
+    displayTimetable();
+    updateDashboard();
+    applySearch();
+    timetableForm.reset();
+  } else {
+    timetable.pop();
+  }
 });
 
-displayTimetable();
-
-const notesForm = document.getElementById("notesForm");
-const notesList = document.getElementById("notesList");
-
-let savedNotes = JSON.parse(localStorage.getItem("campusNotes")) || [];
-
 function displayNotes() {
-  notesList.innerHTML = "";
-
+  notesList.replaceChildren();
+  if (savedNotes.length === 0) {
+    makeEmptyMessage(notesList, "No notes saved yet.");
+    return;
+  }
   savedNotes.forEach((note, index) => {
     const card = document.createElement("div");
     card.className = "note-item";
-
     const heading = document.createElement("h4");
-    heading.textContent = note.subject;
-
+    heading.textContent = note.subject || "Untitled note";
     const content = document.createElement("p");
-    content.textContent = note.text;
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-
-    deleteButton.onclick = function () {
-      savedNotes.splice(index, 1);
-      localStorage.setItem("campusNotes", JSON.stringify(savedNotes));
-      displayNotes();
-      updateDashboard();
-    };
-
-    card.appendChild(heading);
-    card.appendChild(content);
-    card.appendChild(deleteButton);
+    content.textContent = note.text || "";
+    card.append(heading, content);
+    card.appendChild(createButton("Delete", "delete-btn", () => {
+      const removed = savedNotes.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
+        displayNotes();
+        updateDashboard();
+        applySearch();
+      } else {
+        savedNotes.splice(index, 0, ...removed);
+      }
+    }));
     notesList.appendChild(card);
   });
 }
 
-notesForm.addEventListener("submit", function (event) {
+notesForm.addEventListener("submit", event => {
   event.preventDefault();
-
   const subject = document.getElementById("noteSubject").value.trim();
   const noteText = document.getElementById("noteText").value.trim();
-
   if (!subject || !noteText) return;
 
-  savedNotes.push({ subject: subject, text: noteText });
-
-  localStorage.setItem("campusNotes", JSON.stringify(savedNotes));
-
-  displayNotes();
-  updateDashboard();
-  notesForm.reset();
-});
-
-displayNotes();
-
-function updateDashboard() {
-  const assignments = JSON.parse(
-    localStorage.getItem("campuskitAssignments") || "[]"
-  );
-
-  const classes = JSON.parse(
-    localStorage.getItem("campusTimetable") || "[]"
-  );
-
-  const notes = JSON.parse(
-    localStorage.getItem("campusNotes") || "[]"
-  );
-
-  document.getElementById("assignmentCount").textContent =
-    assignments.length;
-
-  document.getElementById("classCount").textContent =
-    classes.length;
-
-  document.getElementById("notesCount").textContent =
-    notes.length;
-}
-
-updateDashboard();
-
-const campusSearch = document.getElementById("campusSearch");
-const searchMessage = document.getElementById("searchMessage");
-
-campusSearch.addEventListener("input", function () {
-  const query = campusSearch.value.trim().toLowerCase();
-
-  const searchableItems = document.querySelectorAll(
-    "#assignmentList li, #timetableList li, #notesList .note-item"
-  );
-
-  let visibleCount = 0;
-
-  searchableItems.forEach(function (item) {
-    const matches = item.textContent.toLowerCase().includes(query);
-
-    item.style.display = matches ? "" : "none";
-
-    if (matches) {
-      visibleCount++;
-    }
-  });
-
-  if (query === "") {
-    searchMessage.textContent = "Type something to search.";
+  savedNotes.push({ subject, text: noteText });
+  if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
+    displayNotes();
+    updateDashboard();
+    applySearch();
+    notesForm.reset();
   } else {
-    searchMessage.textContent =
-      visibleCount + " matching item(s) found.";
+    savedNotes.pop();
   }
 });
 
-</script>
+function updateDashboard() {
+  const total = savedAssignments.length;
+  const completed = savedAssignments.filter(item => item.completed === true).length;
+  const pending = total - completed;
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const threeDays = new Date(today);
+  threeDays.setDate(today.getDate() + 3);
 
+  const dueSoon = savedAssignments.filter(item => {
+    if (item.completed || !item.date) return false;
+    const deadline = new Date(item.date + "T00:00:00");
+    return !Number.isNaN(deadline.getTime()) && deadline >= today && deadline <= threeDays;
+  }).length;
+
+  document.getElementById("assignmentCount").textContent = total;
+  document.getElementById("pendingCount").textContent = pending;
+  document.getElementById("completedCount").textContent = completed;
+  document.getElementById("classCount").textContent = timetable.length;
+  document.getElementById("notesCount").textContent = savedNotes.length;
+  document.getElementById("dueSoonCount").textContent = dueSoon;
+  document.getElementById("progressText").textContent = percent + "%";
+  document.getElementById("progressFill").style.width = percent + "%";
+  document.getElementById("progressBar").setAttribute("aria-valuenow", String(percent));
+}
+
+function applySearch() {
+  const query = campusSearch.value.trim().toLowerCase();
+  const searchableItems = document.querySelectorAll("#assignmentList li, #timetableList li, #notesList .note-item");
+  let visibleCount = 0;
+
+  searchableItems.forEach(item => {
+    const matches = !query || item.textContent.toLowerCase().includes(query);
+    item.style.display = matches ? "" : "none";
+    if (matches) visibleCount++;
+  });
+
+  if (!query) {
+    searchMessage.textContent = "Type something to search.";
+  } else {
+    searchMessage.textContent = visibleCount + " matching item(s) found.";
+  }
+}
+campusSearch.addEventListener("input", applySearch);
+document.getElementById("clearSearchBtn").addEventListener("click", () => {
+  campusSearch.value = "";
+  applySearch();
+  campusSearch.focus();
+});
+
+function updateWelcome() {
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  document.getElementById("dashboardTitle").textContent = greeting + ", Student! 👋";
+  document.getElementById("todayDate").textContent = now.toLocaleDateString(undefined, {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  });
+}
+const quotes = [
+  "Small progress every day adds up.",
+  "Focus on progress, not perfection.",
+  "A little study today makes tomorrow easier.",
+  "Keep going — your effort matters."
+];
+document.getElementById("dailyQuote").textContent = quotes[new Date().getDate() % quotes.length];
+
+displayAssignments();
+displayTimetable();
+displayNotes();
+updateDashboard();
+updateWelcome();
+
+/* Animated neural background. If the CDN/WebGL is unavailable, the aurora CSS still works. */
+(async function initNeuralBackground() {
+  const canvas = document.getElementById("neural-bg");
+  if (!canvas) return;
+  try {
+    const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 35;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const count = window.innerWidth < 600 ? 55 : 90;
+    const points = [];
+    const positions = [];
+    for (let i = 0; i < count; i++) {
+      const p = new THREE.Vector3((Math.random()-.5)*55, (Math.random()-.5)*35, (Math.random()-.5)*25);
+      points.push(p);
+      positions.push(p.x, p.y, p.z);
+    }
+    const nodeGeometry = new THREE.BufferGeometry();
+    nodeGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    const nodeMaterial = new THREE.PointsMaterial({ color: 0x9b7cff, size: .16, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
+    const nodes = new THREE.Points(nodeGeometry, nodeMaterial);
+    scene.add(nodes);
+
+    const linePositions = [];
+    for (let i = 0; i < count; i++) {
+      for (let j = i + 1; j < count; j++) {
+        if (points[i].distanceTo(points[j]) < 9) {
+          linePositions.push(points[i].x,points[i].y,points[i].z,points[j].x,points[j].y,points[j].z);
+        }
+      }
+    }
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x7455ff, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false });
+    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(lines);
+
+    const palettes = [[0x9b7cff,0x7455ff],[0x42a5ff,0x386bff],[0x42ffe0,0x00a8bb],[0xff6bd6,0xa34dff]];
+    let paletteIndex = 0, lastChange = 0, animationId;
+    let lastFrame = 0;
+    function animate(time) {
+      animationId = requestAnimationFrame(animate);
+      if (time - lastFrame < 32) return;
+      lastFrame = time;
+      if (time - lastChange > 7000) {
+        paletteIndex = (paletteIndex + 1) % palettes.length;
+        nodeMaterial.color.setHex(palettes[paletteIndex][0]);
+        lineMaterial.color.setHex(palettes[paletteIndex][1]);
+        lastChange = time;
+      }
+      nodes.rotation.y += .0007;
+      nodes.rotation.x += .0003;
+      lines.rotation.y = nodes.rotation.y;
+      lines.rotation.x = nodes.rotation.x;
+      renderer.render(scene, camera);
+    }
+    animate(0);
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }, 120);
+    });
+    window.addEventListener("pagehide", () => {
+      cancelAnimationFrame(animationId);
+      renderer.dispose();
+      nodeGeometry.dispose();
+      lineGeometry.dispose();
+      nodeMaterial.dispose();
+      lineMaterial.dispose();
+    }, { once: true });
+  } catch (error) {
+    console.warn("Neural background could not load; keeping the CSS aurora background.", error);
+  }
+})();
+</script>
 </body>
 </html>
