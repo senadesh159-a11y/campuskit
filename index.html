@@ -170,6 +170,10 @@ function loadArray(key) {
 function saveArray(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    // Keep local saving instant; the Firebase module syncs after sign-in.
+    if (window.CampusKitCloud && typeof window.CampusKitCloud.save === "function") {
+      window.CampusKitCloud.save(key, value);
+    }
     return true;
   } catch (error) {
     alert("Your browser could not save the latest changes. Please check available storage.");
@@ -530,6 +534,34 @@ updateWelcome();
     console.warn("Neural background could not load; keeping the CSS aurora background.", error);
   }
 })();
+
+// Bridge used by the Firebase module to refresh existing app state without replacing the UI.
+window.CampusKitCloud = {
+  applyCloudData(data) {
+    if (Array.isArray(data.assignments)) {
+      savedAssignments = data.assignments.map(item => ({ ...item, completed: item.completed === true }));
+      localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(savedAssignments));
+    }
+    if (Array.isArray(data.timetable)) {
+      timetable = data.timetable;
+      localStorage.setItem(STORAGE_KEYS.timetable, JSON.stringify(timetable));
+    }
+    if (Array.isArray(data.notes)) {
+      savedNotes = data.notes;
+      localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(savedNotes));
+    }
+    displayAssignments();
+    displayTimetable();
+    displayNotes();
+    updateDashboard();
+    applySearch();
+  },
+  save(key, value) {
+    if (typeof window.CampusKitCloudSave === "function") {
+      window.CampusKitCloudSave(key, value);
+    }
+  }
+};
 </script>
 
 <!-- CampusKit Google Login -->
@@ -554,6 +586,12 @@ updateWelcome();
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",
@@ -567,19 +605,75 @@ updateWelcome();
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
-
   const loginBtn = document.getElementById("ck-google-login");
   const userBox = document.getElementById("ck-user");
   const status = document.getElementById("ck-status");
+  let currentUser = null;
+  let cloudReady = false;
+  let saveQueue = Promise.resolve();
+  const collections = {
+    campuskitAssignments: "assignments",
+    campusTimetable: "timetable",
+    campusNotes: "notes"
+  };
+
+  function showStatus(message) {
+    status.textContent = message;
+  }
+
+  async function syncOnLogin(user) {
+    cloudReady = false;
+    showStatus("Syncing your study data...");
+    const cloudData = {};
+    try {
+      for (const [storageKey, docId] of Object.entries(collections)) {
+        const ref = doc(db, "users", user.uid, "campusData", docId);
+        const snapshot = await getDoc(ref);
+        if (snapshot.exists() && Array.isArray(snapshot.data().items)) {
+          cloudData[docId] = snapshot.data().items;
+        } else {
+          // First login on this account: migrate existing browser data without overwriting existing cloud docs.
+          let localItems = [];
+          try {
+            const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            if (Array.isArray(parsed)) localItems = parsed;
+          } catch (_) {}
+          await setDoc(ref, { items: localItems, updatedAt: new Date().toISOString() });
+          cloudData[docId] = localItems;
+        }
+      }
+      if (window.CampusKitCloud) window.CampusKitCloud.applyCloudData(cloudData);
+      cloudReady = true;
+      showStatus("Cloud sync on ✓");
+    } catch (error) {
+      console.error("CampusKit cloud sync error:", error);
+      showStatus("Cloud sync failed: " + (error.code || error.message));
+    }
+  }
+
+  window.CampusKitCloudSave = (storageKey, value) => {
+    const docId = collections[storageKey];
+    if (!currentUser || !cloudReady || !docId) return;
+    const userId = currentUser.uid;
+    saveQueue = saveQueue.then(() => setDoc(
+      doc(db, "users", userId, "campusData", docId),
+      { items: value, updatedAt: new Date().toISOString() }
+    )).then(() => {
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync on ✓");
+    }).catch(error => {
+      console.error("CampusKit save error:", error);
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud save failed: " + (error.code || error.message));
+    });
+  };
 
   loginBtn.addEventListener("click", async () => {
-    status.textContent = "Opening Google sign-in...";
+    showStatus("Opening Google sign-in...");
     try {
       await signInWithPopup(auth, provider);
-      status.textContent = "";
     } catch (error) {
-      status.textContent = error.message;
+      showStatus("Sign-in failed: " + (error.code || error.message));
       console.error("Google sign-in error:", error);
     }
   });
@@ -588,21 +682,26 @@ updateWelcome();
     try {
       await signOut(auth);
     } catch (error) {
-      status.textContent = error.message;
+      showStatus("Sign-out failed: " + (error.code || error.message));
     }
   });
 
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    cloudReady = false;
     loginBtn.style.display = user ? "none" : "inline-block";
     userBox.style.display = user ? "flex" : "none";
 
-    if (user) {
-      document.getElementById("ck-name").textContent =
-        user.displayName || user.email || "Student";
-      const avatar = document.getElementById("ck-avatar");
-      avatar.src = user.photoURL || "";
-      avatar.style.display = user.photoURL ? "block" : "none";
+    if (!user) {
+      showStatus("Sign in to sync your study data across devices.");
+      return;
     }
+
+    document.getElementById("ck-name").textContent = user.displayName || user.email || "Student";
+    const avatar = document.getElementById("ck-avatar");
+    avatar.src = user.photoURL || "";
+    avatar.style.display = user.photoURL ? "block" : "none";
+    await syncOnLogin(user);
   });
 </script>
 </body>
