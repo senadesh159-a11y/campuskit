@@ -633,16 +633,17 @@ window.CampusKitCloud = {
         const snapshot = await getDoc(ref);
         if (snapshot.exists() && Array.isArray(snapshot.data().items)) {
           cloudData[docId] = snapshot.data().items;
-        } else {
-          // First login on this account: migrate existing browser data without overwriting existing cloud docs.
-          let localItems = [];
-          try {
-            const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
-            if (Array.isArray(parsed)) localItems = parsed;
-          } catch (_) {}
-          await setDoc(ref, { items: localItems, updatedAt: new Date().toISOString() });
-          cloudData[docId] = localItems;
-        }
+
+} else {
+  // New account: do not copy another account's browser data.
+  const emptyItems = [];
+  await setDoc(ref, {
+    items: emptyItems,
+    updatedAt: new Date().toISOString()
+  });
+  cloudData[docId] = emptyItems;
+}
+
       }
       if (window.CampusKitCloud) window.CampusKitCloud.applyCloudData(cloudData);
       cloudReady = true;
