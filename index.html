@@ -145,6 +145,27 @@ footer{padding:24px 16px;text-align:center;color:#c0b7df}
   </div>
 </main>
 
+<!-- CampusKit AI Study Assistant -->
+<section class="card" id="ai-assistant" aria-labelledby="aiTitle">
+  <h3 id="aiTitle">🤖 CampusKit AI Study Assistant</h3>
+  <p>Ask questions about Physics, Chemistry, practicals and assignments.</p>
+
+  <div id="aiChat" aria-live="polite">
+    <p class="empty-state">Hi! Ask me a study question to get started.</p>
+  </div>
+
+  <form id="aiForm">
+    <textarea
+      id="aiQuestion"
+      placeholder="Ask your study question here..."
+      maxlength="4000"
+      required
+    ></textarea>
+    <button type="submit" id="aiSend">Ask AI</button>
+    <p id="aiStatus" role="status"></p>
+  </form>
+</section>
+
 <footer>Made for Students ❤️ | CampusKit</footer>
 <canvas id="neural-bg" aria-hidden="true"></canvas>
 
@@ -705,5 +726,76 @@ window.CampusKitCloud = {
     await syncOnLogin(user);
   });
 </script>
+
+<script>
+(() => {
+  const form = document.getElementById("aiForm");
+  const questionInput = document.getElementById("aiQuestion");
+  const sendButton = document.getElementById("aiSend");
+  const chat = document.getElementById("aiChat");
+  const status = document.getElementById("aiStatus");
+
+  const WORKER_URL =
+    "https://campuskitt-ai.senadesh159.workers.dev";
+
+  function addMessage(label, message) {
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText =
+      "margin:12px 0;padding:12px;border-radius:10px;" +
+      "background:rgba(105,85,170,.18);overflow-wrap:anywhere;";
+
+    const heading = document.createElement("strong");
+    heading.textContent = label;
+
+    const content = document.createElement("p");
+    content.style.whiteSpace = "pre-wrap";
+    content.textContent = message;
+
+    wrapper.append(heading, content);
+    chat.appendChild(wrapper);
+    return wrapper;
+  }
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    addMessage("You", question);
+    questionInput.value = "";
+    sendButton.disabled = true;
+    status.textContent = "AI is thinking...";
+
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "AI request failed.");
+      }
+
+      addMessage("CampusKit AI", data.answer || "No answer received.");
+      status.textContent = "Answer received.";
+    } catch (error) {
+      addMessage(
+        "CampusKit AI",
+        "Sorry, the AI could not respond. " +
+        "Please check the Worker URL, API access and billing."
+      );
+      status.textContent = "Request failed.";
+      console.error("CampusKit AI error:", error);
+    } finally {
+      sendButton.disabled = false;
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
