@@ -56,6 +56,25 @@ li.done .assignment-title{text-decoration:line-through;color:#b5abc9}
 .note-item{margin-top:14px;padding:14px;border:1px solid rgba(170,150,235,.23);border-radius:12px;background:rgba(105,85,170,.15);overflow-wrap:anywhere}
 .note-item h4{margin:0 0 6px;color:#cdbaff}
 .note-item p{white-space:pre-wrap}
+.notes-toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:8px;margin:12px 0}
+.notes-toolbar input,.notes-toolbar select,.notes-form-grid select{display:block;width:100%;padding:11px;margin:0;border:1px solid rgba(165,145,230,.38);border-radius:10px;background:rgba(9,12,34,.75);color:#fff;font:inherit}
+.notes-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.notes-form-grid .full{grid-column:1/-1}
+.notes-form-grid label{display:block;font-size:13px;color:#d8c8ff;margin-bottom:4px}
+.notes-form-grid input,.notes-form-grid textarea{margin:0}
+.notes-form-grid textarea{min-height:140px}
+.notes-library-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:12px}
+.note-item{min-width:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.note-item .note-body{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.note-tags{display:flex;flex-wrap:wrap;gap:5px}
+.note-tag{font-size:12px;padding:3px 8px;border-radius:99px;background:rgba(139,92,246,.22);border:1px solid rgba(173,150,255,.3);color:#e4d9ff}
+.note-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
+.note-actions button{margin:0}
+.note-attachment{font-size:13px;color:#c6d8ff;overflow-wrap:anywhere}
+.notes-status{font-size:13px;min-height:20px;margin:8px 0;color:#d8c8ff}
+.notes-count{font-size:13px;color:#c8bee9}
+.bookmark-btn{background:linear-gradient(135deg,#b7791f,#8b5cf6)}
+@media(max-width:480px){.notes-form-grid{grid-template-columns:1fr}.notes-form-grid .full{grid-column:auto}}
 .empty-state{color:#bdb4da;font-size:14px;padding:8px 2px}
 #searchMessage{font-size:13px;margin-bottom:0}
 footer{padding:24px 16px;text-align:center;color:#c0b7df}
@@ -132,15 +151,57 @@ footer{padding:24px 16px;text-align:center;color:#c0b7df}
       <ul id="assignmentList"></ul>
     </section>
 
-    <section class="card" aria-labelledby="notesTitle">
-      <h3 id="notesTitle">📚 Study Notes</h3>
-      <p>Save important notes for quick revision.</p>
+    <section class="card" aria-labelledby="notesTitle" id="notes-library">
+      <h3 id="notesTitle">📚 Notes Library</h3>
+      <p>Organize notes by subject, search them, bookmark important topics, and attach PDFs.</p>
       <form id="notesForm">
-        <input type="text" id="noteSubject" placeholder="Subject name" required maxlength="100">
-        <textarea id="noteText" placeholder="Write your notes here..." required maxlength="10000"></textarea>
-        <button type="submit">Save Note</button>
+        <div class="notes-form-grid">
+          <div>
+            <label for="noteSubject">Subject / folder</label>
+            <select id="noteSubject" required>
+              <option value="Physics">Physics</option><option value="Chemistry">Chemistry</option>
+              <option value="English">English</option><option value="Hindi">Hindi</option>
+              <option value="MIL">MIL</option><option value="Mathematics">Mathematics</option>
+              <option value="Computer Science">Computer Science</option><option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="noteTitle">Note title</label>
+            <input type="text" id="noteTitle" placeholder="e.g. Newton's Laws" maxlength="150" required>
+          </div>
+          <div class="full">
+            <label for="noteTags">Tags (comma-separated)</label>
+            <input type="text" id="noteTags" placeholder="e.g. mechanics, exam, important" maxlength="250">
+          </div>
+          <div class="full">
+            <label for="noteText">Notes / summary</label>
+            <textarea id="noteText" placeholder="Write your notes here..." maxlength="20000"></textarea>
+          </div>
+          <div class="full">
+            <label for="noteFile">Attach a PDF or document (optional, max 10 MB)</label>
+            <input type="file" id="noteFile" accept=".pdf,.txt,.doc,.docx,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <p class="item-meta">PDF upload uses Firebase Storage. Storage must be enabled and its security rules must allow signed-in users to access only their own files.</p>
+          </div>
+        </div>
+        <p id="notesFormStatus" class="notes-status" role="status" aria-live="polite"></p>
+        <button type="submit" id="saveNoteBtn">＋ Save Note</button>
+        <button type="button" id="cancelNoteEditBtn" hidden>Cancel edit</button>
       </form>
-      <div id="notesList"></div>
+      <div class="notes-toolbar">
+        <input type="search" id="notesSearch" placeholder="Search titles, notes, tags..." aria-label="Search notes">
+        <select id="notesSubjectFilter" aria-label="Filter notes by subject">
+          <option value="all">All subjects</option><option>Physics</option><option>Chemistry</option>
+          <option>English</option><option>Hindi</option><option>MIL</option><option>Mathematics</option>
+          <option>Computer Science</option><option>Other</option>
+        </select>
+        <select id="notesSort" aria-label="Sort notes">
+          <option value="updated">Recently updated</option><option value="created">Recently created</option><option value="title">Title A–Z</option>
+        </select>
+        <button type="button" id="notesBookmarksOnly" aria-pressed="false">☆ Bookmarks only</button>
+      </div>
+      <p id="notesCountLabel" class="notes-count" aria-live="polite">0 notes</p>
+      <p id="notesLibraryStatus" class="notes-status" role="status" aria-live="polite">Your notes will appear here.</p>
+      <div id="notesList" class="notes-library-grid"></div>
     </section>
   </div>
 </main>
@@ -207,7 +268,24 @@ let savedAssignments = loadArray(STORAGE_KEYS.assignments).map(item => ({
   completed: item.completed === true
 }));
 let timetable = loadArray(STORAGE_KEYS.timetable);
-let savedNotes = loadArray(STORAGE_KEYS.notes);
+function normalizeNote(note) {
+  const now = new Date().toISOString();
+  return {
+    ...note,
+    id: note.id || (crypto.randomUUID ? crypto.randomUUID() : "note-" + Date.now() + "-" + Math.random().toString(16).slice(2)),
+    subject: String(note.subject || "Other"),
+    title: String(note.title || note.subject || "Untitled note"),
+    text: String(note.text || ""),
+    tags: Array.isArray(note.tags) ? note.tags.map(String) : [],
+    bookmarked: note.bookmarked === true,
+    createdAt: note.createdAt || now,
+    updatedAt: note.updatedAt || now,
+    attachment: note.attachment && typeof note.attachment === "object" ? note.attachment : null
+  };
+}
+let savedNotes = loadArray(STORAGE_KEYS.notes).map(normalizeNote);
+let editingNoteId = null;
+let bookmarksOnly = false;
 
 const assignmentForm = document.getElementById("assignmentForm");
 const assignmentName = document.getElementById("assignmentName");
@@ -353,49 +431,203 @@ timetableForm.addEventListener("submit", event => {
   }
 });
 
+const noteSubjectInput = document.getElementById("noteSubject");
+const noteTitleInput = document.getElementById("noteTitle");
+const noteTagsInput = document.getElementById("noteTags");
+const noteTextInput = document.getElementById("noteText");
+const noteFileInput = document.getElementById("noteFile");
+const notesSearchInput = document.getElementById("notesSearch");
+const notesSubjectFilter = document.getElementById("notesSubjectFilter");
+const notesSort = document.getElementById("notesSort");
+const notesFormStatus = document.getElementById("notesFormStatus");
+const notesLibraryStatus = document.getElementById("notesLibraryStatus");
+const notesCountLabel = document.getElementById("notesCountLabel");
+const saveNoteBtn = document.getElementById("saveNoteBtn");
+const cancelNoteEditBtn = document.getElementById("cancelNoteEditBtn");
+const notesBookmarksOnlyBtn = document.getElementById("notesBookmarksOnly");
+
+function setNotesStatus(message, isError = false) {
+  notesFormStatus.textContent = message;
+  notesFormStatus.style.color = isError ? "#ff9cab" : "#d8c8ff";
+}
+
 function displayNotes() {
   notesList.replaceChildren();
-  if (savedNotes.length === 0) {
-    makeEmptyMessage(notesList, "No notes saved yet.");
+  const query = (notesSearchInput?.value || "").trim().toLowerCase();
+  const subjectFilter = notesSubjectFilter?.value || "all";
+  let filtered = savedNotes.filter(note => {
+    const haystack = [note.title, note.subject, note.text, ...(note.tags || [])].join(" ").toLowerCase();
+    return (!query || haystack.includes(query)) &&
+      (subjectFilter === "all" || note.subject === subjectFilter) &&
+      (!bookmarksOnly || note.bookmarked);
+  });
+  const sort = notesSort?.value || "updated";
+  filtered.sort((a, b) => {
+    if (sort === "title") return a.title.localeCompare(b.title);
+    const aDate = Date.parse(sort === "created" ? a.createdAt : a.updatedAt) || 0;
+    const bDate = Date.parse(sort === "created" ? b.createdAt : b.updatedAt) || 0;
+    return bDate - aDate;
+  });
+  notesCountLabel.textContent = `${filtered.length} of ${savedNotes.length} note${savedNotes.length === 1 ? "" : "s"}`;
+  notesLibraryStatus.textContent = savedNotes.length ? "Your notes are saved on this device and sync to Firebase when signed in." : "Your library is empty. Add your first note above.";
+  if (!filtered.length) {
+    makeEmptyMessage(notesList, savedNotes.length ? "No notes match these filters." : "No notes yet. Create a note above to get started.");
     return;
   }
-  savedNotes.forEach((note, index) => {
-    const card = document.createElement("div");
+
+  filtered.forEach(note => {
+    const card = document.createElement("article");
     card.className = "note-item";
     const heading = document.createElement("h4");
-    heading.textContent = note.subject || "Untitled note";
-    const content = document.createElement("p");
-    content.textContent = note.text || "";
-    card.append(heading, content);
-    card.appendChild(createButton("Delete", "delete-btn", () => {
-      const removed = savedNotes.splice(index, 1);
-      if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
-        displayNotes();
-        updateDashboard();
-        applySearch();
-      } else {
-        savedNotes.splice(index, 0, ...removed);
-      }
+    heading.textContent = `${note.bookmarked ? "★ " : ""}${note.title || "Untitled note"}`;
+    const meta = document.createElement("span");
+    meta.className = "item-meta";
+    meta.textContent = `${note.subject} · Updated ${formatDate((note.updatedAt || "").slice(0, 10))}`;
+    card.append(heading, meta);
+
+    if (note.text) {
+      const content = document.createElement("p");
+      content.className = "note-body";
+      content.textContent = note.text.length > 450 ? note.text.slice(0, 450) + "…" : note.text;
+      card.appendChild(content);
+    }
+    if (note.tags?.length) {
+      const tags = document.createElement("div");
+      tags.className = "note-tags";
+      note.tags.forEach(tag => {
+        const chip = document.createElement("span");
+        chip.className = "note-tag";
+        chip.textContent = tag;
+        tags.appendChild(chip);
+      });
+      card.appendChild(tags);
+    }
+    if (note.attachment?.url) {
+      const attachment = document.createElement("a");
+      attachment.className = "note-attachment";
+      attachment.href = note.attachment.url;
+      attachment.target = "_blank";
+      attachment.rel = "noopener noreferrer";
+      attachment.textContent = `📎 ${note.attachment.name || "Open attachment"}`;
+      card.appendChild(attachment);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "note-actions";
+    actions.appendChild(createButton(note.bookmarked ? "★ Bookmarked" : "☆ Bookmark", "bookmark-btn", () => {
+      const index = savedNotes.findIndex(item => item.id === note.id);
+      if (index < 0) return;
+      savedNotes[index] = { ...savedNotes[index], bookmarked: !savedNotes[index].bookmarked, updatedAt: new Date().toISOString() };
+      if (saveArray(STORAGE_KEYS.notes, savedNotes)) displayNotes();
     }));
+    actions.appendChild(createButton("Edit", "", () => beginEditNote(note.id)));
+    actions.appendChild(createButton("Delete", "delete-btn", async () => {
+      if (!confirm(`Delete “${note.title}”? This cannot be undone.`)) return;
+      const index = savedNotes.findIndex(item => item.id === note.id);
+      if (index < 0) return;
+      const [removed] = savedNotes.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
+        displayNotes(); updateDashboard(); applySearch();
+        if (removed.attachment?.path && window.CampusKitNotesStorage?.delete) {
+          try { await window.CampusKitNotesStorage.delete(removed.attachment.path); }
+          catch (error) { console.warn("Attachment cleanup failed:", error); }
+        }
+      } else savedNotes.splice(index, 0, removed);
+    }));
+    card.appendChild(actions);
     notesList.appendChild(card);
   });
 }
 
-notesForm.addEventListener("submit", event => {
-  event.preventDefault();
-  const subject = document.getElementById("noteSubject").value.trim();
-  const noteText = document.getElementById("noteText").value.trim();
-  if (!subject || !noteText) return;
+function resetNoteForm() {
+  editingNoteId = null;
+  notesForm.reset();
+  saveNoteBtn.textContent = "＋ Save Note";
+  cancelNoteEditBtn.hidden = true;
+  setNotesStatus("");
+}
 
-  savedNotes.push({ subject, text: noteText });
-  if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
-    displayNotes();
-    updateDashboard();
-    applySearch();
-    notesForm.reset();
-  } else {
-    savedNotes.pop();
+function beginEditNote(id) {
+  const note = savedNotes.find(item => item.id === id);
+  if (!note) return;
+  editingNoteId = id;
+  const knownSubjects = ["Physics", "Chemistry", "English", "Hindi", "MIL", "Mathematics", "Computer Science", "Other"];
+  if (!knownSubjects.includes(note.subject) && ![...noteSubjectInput.options].some(option => option.value === note.subject)) {
+    const customOption = document.createElement("option");
+    customOption.value = note.subject;
+    customOption.textContent = note.subject;
+    noteSubjectInput.insertBefore(customOption, noteSubjectInput.lastElementChild);
   }
+  noteSubjectInput.value = note.subject;
+  noteTitleInput.value = note.title || "";
+  noteTagsInput.value = (note.tags || []).join(", ");
+  noteTextInput.value = note.text || "";
+  noteFileInput.value = "";
+  saveNoteBtn.textContent = "Save Changes";
+  cancelNoteEditBtn.hidden = false;
+  setNotesStatus(note.attachment ? `Current attachment: ${note.attachment.name}. Choose a new file to replace it.` : "Editing note.");
+  document.getElementById("notes-library").scrollIntoView({ behavior: "smooth", block: "start" });
+  noteTitleInput.focus({ preventScroll: true });
+}
+
+notesForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const subject = noteSubjectInput.value;
+  const title = noteTitleInput.value.trim();
+  const text = noteTextInput.value.trim();
+  const tags = [...new Set(noteTagsInput.value.split(",").map(tag => tag.trim()).filter(Boolean))].slice(0, 20);
+  const file = noteFileInput.files?.[0] || null;
+  if (!title) return setNotesStatus("Enter a note title.", true);
+  if (!text && !file && !editingNoteId) return setNotesStatus("Write some notes or attach a file first.", true);
+  if (file && file.size > 10 * 1024 * 1024) return setNotesStatus("File is larger than 10 MB. Choose a smaller file.", true);
+  if (file && !/\.(pdf|txt|doc|docx)$/i.test(file.name)) return setNotesStatus("Please attach a PDF, TXT, DOC or DOCX file.", true);
+
+  const previous = editingNoteId ? savedNotes.find(item => item.id === editingNoteId) : null;
+  const now = new Date().toISOString();
+  let attachment = previous?.attachment || null;
+  saveNoteBtn.disabled = true;
+  setNotesStatus(file ? "Uploading attachment…" : "Saving note…");
+  try {
+    if (file) {
+      if (!window.CampusKitNotesStorage?.upload) {
+        throw new Error("Firebase Storage is not ready. Check Storage setup and security rules, then reload.");
+      }
+      attachment = await window.CampusKitNotesStorage.upload(file, previous?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())));
+    }
+    const note = normalizeNote({
+      ...(previous || {}), id: previous?.id || (crypto.randomUUID ? crypto.randomUUID() : "note-" + Date.now()),
+      subject, title, text, tags, bookmarked: previous?.bookmarked || false,
+      createdAt: previous?.createdAt || now, updatedAt: now, attachment
+    });
+    const index = savedNotes.findIndex(item => item.id === note.id);
+    if (index >= 0) savedNotes[index] = note; else savedNotes.unshift(note);
+    if (!saveArray(STORAGE_KEYS.notes, savedNotes)) {
+      if (index >= 0 && previous) savedNotes[index] = previous;
+      else savedNotes = savedNotes.filter(item => item.id !== note.id);
+      throw new Error("Could not save to this browser. Check available storage.");
+    }
+    if (file && previous?.attachment?.path && previous.attachment.path !== attachment?.path && window.CampusKitNotesStorage?.delete) {
+      try { await window.CampusKitNotesStorage.delete(previous.attachment.path); } catch (error) { console.warn("Old attachment cleanup failed:", error); }
+    }
+    resetNoteForm(); displayNotes(); updateDashboard(); applySearch();
+    setNotesStatus("Note saved successfully.");
+  } catch (error) {
+    console.error("Notes Library save error:", error);
+    setNotesStatus(error.message || "Could not save note. Please try again.", true);
+  } finally {
+    saveNoteBtn.disabled = false;
+  }
+});
+
+cancelNoteEditBtn.addEventListener("click", resetNoteForm);
+notesSearchInput.addEventListener("input", displayNotes);
+notesSubjectFilter.addEventListener("change", displayNotes);
+notesSort.addEventListener("change", displayNotes);
+notesBookmarksOnlyBtn.addEventListener("click", () => {
+  bookmarksOnly = !bookmarksOnly;
+  notesBookmarksOnlyBtn.setAttribute("aria-pressed", String(bookmarksOnly));
+  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "★ Show all notes" : "☆ Bookmarks only";
+  displayNotes();
 });
 
 function updateDashboard() {
@@ -568,7 +800,7 @@ window.CampusKitCloud = {
       localStorage.setItem(STORAGE_KEYS.timetable, JSON.stringify(timetable));
     }
     if (Array.isArray(data.notes)) {
-      savedNotes = data.notes;
+      savedNotes = data.notes.map(normalizeNote);
       localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(savedNotes));
     }
     displayAssignments();
@@ -613,6 +845,13 @@ window.CampusKitCloud = {
     getDoc,
     setDoc
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+  import {
+    getStorage,
+    ref as storageRef,
+    uploadBytes,
+    getDownloadURL,
+    deleteObject
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",
@@ -627,7 +866,13 @@ window.CampusKitCloud = {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
   const provider = new GoogleAuthProvider();
+  window.CampusKitAuth = {
+    async getIdToken() {
+      return auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    }
+  };
   const loginBtn = document.getElementById("ck-google-login");
   const userBox = document.getElementById("ck-user");
   const status = document.getElementById("ck-status");
@@ -688,6 +933,24 @@ window.CampusKitCloud = {
       console.error("CampusKit save error:", error);
       if (currentUser && currentUser.uid === userId) showStatus("Cloud save failed: " + (error.code || error.message));
     });
+  };
+
+  window.CampusKitNotesStorage = {
+    async upload(file, noteId) {
+      if (!auth.currentUser) throw new Error("Sign in with Google before uploading files.");
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-120);
+      const path = `users/${auth.currentUser.uid}/notes/${noteId}/${Date.now()}-${safeName}`;
+      const fileRef = storageRef(storage, path);
+      await uploadBytes(fileRef, file, { contentType: file.type || "application/octet-stream" });
+      const url = await getDownloadURL(fileRef);
+      return { name: file.name, path, url, size: file.size, contentType: file.type || "application/octet-stream" };
+    },
+    async delete(path) {
+      if (!auth.currentUser || !path.startsWith(`users/${auth.currentUser.uid}/notes/`)) {
+        throw new Error("Not allowed to delete this attachment.");
+      }
+      await deleteObject(storageRef(storage, path));
+    }
   };
 
   loginBtn.addEventListener("click", async () => {
@@ -768,22 +1031,19 @@ const WORKER_URL =
     status.textContent = "AI is thinking...";
 
     try {
-     if (!currentUser) {
-  throw new Error("Please sign in first.");
-}
+      const idToken = await window.CampusKitAuth?.getIdToken();
+      if (!idToken) throw new Error("Please sign in with Google before using CampusKit AI.");
 
-const idToken = await currentUser.getIdToken();
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ question })
+      });
 
-const response = await fetch(WORKER_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${idToken}`
-  },
-  body: JSON.stringify({ question })
-});
-
-const data = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || "AI request failed.");
@@ -792,11 +1052,7 @@ const data = await response.json();
       addMessage("CampusKit AI", data.answer || "No answer received.");
       status.textContent = "Answer received.";
     } catch (error) {
-      addMessage(
-        "CampusKit AI",
-        "Sorry, the AI could not respond. " +
-        "Please check the Worker URL, API access and billing."
-      );
+      addMessage("CampusKit AI", error.message || "Sorry, the AI could not respond. Please try again.");
       status.textContent = "Request failed.";
       console.error("CampusKit AI error:", error);
     } finally {
