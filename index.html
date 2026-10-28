@@ -92,7 +92,15 @@ body{padding-left:220px}
 .side-nav .side-hint{margin-top:auto;font-size:12px;color:#9e94c2;line-height:1.5;padding:10px}
 header{margin-left:0}
 main{max-width:1200px}
-#study-tools,#notes-library,#ai-assistant,#dashboard,#search-section{scroll-margin-top:22px}
+#study-tools,#notes-library,#ai-assistant,#dashboard,#search-section,#relaxation-section{scroll-margin-top:22px}
+.app-view{display:none!important}.app-view.active-view{display:block!important}
+#study-tools.active-view{display:grid!important}
+#study-tools .notes-card-hidden{display:none!important}
+#relaxation-section .music-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+#musicList{list-style:none;padding:0;display:grid;gap:10px}
+.music-item{padding:12px;border:1px solid rgba(160,140,220,.25);border-radius:12px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.music-item a{overflow-wrap:anywhere}.music-embed{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#111}
+@media(max-width:650px){#relaxation-section .music-grid{grid-template-columns:1fr}}
 #ai-assistant{max-width:1200px;margin:20px auto 0;padding:22px}
 footer{margin-left:0}
 @media(max-width:760px){body{padding-left:0;padding-top:74px}.side-nav{right:0;bottom:auto;width:auto;height:62px;padding:7px 10px;flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(190,170,255,.22)}.side-brand{font-size:15px;padding:0 8px;white-space:nowrap}.side-nav a{padding:10px 11px;white-space:nowrap;font-size:12px}.side-nav .side-hint{display:none}header{padding-top:18px}main{margin-top:18px}#ai-assistant{margin:18px 12px 0}}
@@ -106,6 +114,7 @@ footer{margin-left:0}
   <a href="#study-tools">📚 Study Tools</a>
   <a href="#notes-library">🗂️ Notes Library</a>
   <a href="#ai-assistant">🤖 AI Assistant</a>
+  <a href="#relaxation-section">🎵 Relaxation</a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
 </nav>
 <header>
@@ -114,7 +123,7 @@ footer{margin-left:0}
 </header>
 
 <main>
-  <section class="card hero" id="dashboard" aria-labelledby="dashboardTitle">
+  <section class="card hero app-view active-view" id="dashboard" aria-labelledby="dashboardTitle">
     <div class="hero-top">
       <div>
         <div class="eyebrow">Your student workspace</div>
@@ -139,13 +148,14 @@ footer{margin-left:0}
     </div>
   </section>
 
-  <section class="card" id="search-section" aria-labelledby="searchTitle">
+  <section class="card app-view active-view" id="search-section" aria-labelledby="searchTitle">
     <h3 id="searchTitle">🔎 Quick Search</h3>
     <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
     <p id="searchMessage" aria-live="polite">Type something to search.</p>
     <button type="button" id="clearSearchBtn">Clear Search</button>
   </section>
 
+  <div class="app-view" id="study-tools-view">
   <h2>My Study Tools</h2>
   <p>Everything you need for college, in one place.</p>
 
@@ -227,10 +237,34 @@ footer{margin-left:0}
       <div id="notesList" class="notes-library-grid"></div>
     </section>
   </div>
+  </div>
 </main>
 
+<section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
+  <h2 id="relaxTitle">🎵 Student Relaxation Corner</h2>
+  <p>Take a short break with calm music. Add a YouTube or Spotify track link to the shared campus playlist.</p>
+  <div class="music-grid">
+    <div class="card">
+      <h3>▶️ Now playing</h3>
+      <p id="musicPlayerHint">Choose a track from the playlist to play it here.</p>
+      <iframe id="musicPlayer" class="music-embed" title="Relaxation music player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="about:blank"></iframe>
+      <p class="item-meta">Use relaxing music at a comfortable volume. Music is not a treatment for persistent headaches.</p>
+    </div>
+    <div class="card">
+      <h3>＋ Add a track</h3>
+      <form id="musicForm">
+        <label for="musicTitle">Song / playlist title</label><input id="musicTitle" required maxlength="120" placeholder="e.g. Calm study music">
+        <label for="musicUrl">YouTube or Spotify link</label><input id="musicUrl" type="url" required placeholder="https://youtu.be/...">
+        <button type="submit">Add to shared playlist</button>
+        <p id="musicStatus" role="status" aria-live="polite"></p>
+      </form>
+      <h3>🌿 Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
+    </div>
+  </div>
+</section>
+
 <!-- CampusKit AI Study Assistant -->
-<section class="card" id="ai-assistant" aria-labelledby="aiTitle">
+<section class="card app-view" id="ai-assistant" aria-labelledby="aiTitle">
   <h3 id="aiTitle">🤖 CampusKit AI Study Assistant</h3>
   <p>Ask questions about Physics, Chemistry, practicals and assignments.</p>
 
@@ -866,7 +900,13 @@ window.CampusKitCloud = {
     getFirestore,
     doc,
     getDoc,
-    setDoc
+    setDoc,
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    limit
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
   import {
     getStorage,
@@ -975,6 +1015,66 @@ window.CampusKitCloud = {
       await deleteObject(storageRef(storage, path));
     }
   };
+
+  // Shared relaxation playlist: all students read the same Firestore collection.
+  const musicForm = document.getElementById("musicForm");
+  const musicList = document.getElementById("musicList");
+  const musicStatus = document.getElementById("musicStatus");
+  const musicPlayer = document.getElementById("musicPlayer");
+  const musicPlayerHint = document.getElementById("musicPlayerHint");
+  function safeMusicUrl(raw) {
+    try {
+      const u = new URL(raw);
+      if (u.hostname === "youtu.be") return { type: "youtube", id: u.pathname.slice(1).split("/")[0], url: u.href };
+      if (["youtube.com", "www.youtube.com", "m.youtube.com"].includes(u.hostname)) {
+        const id = u.searchParams.get("v") || (u.pathname.startsWith("/embed/") ? u.pathname.split("/")[2] : "");
+        if (id && /^[A-Za-z0-9_-]{6,20}$/.test(id)) return { type: "youtube", id, url: u.href };
+      }
+      if (["open.spotify.com", "www.open.spotify.com"].includes(u.hostname) && /^\/(track|album|playlist|episode)\/[A-Za-z0-9]+/.test(u.pathname)) return { type: "spotify", id: "", url: u.href };
+    } catch (_) {}
+    return null;
+  }
+  function playMusic(item) {
+    const parsed = safeMusicUrl(item.url || "");
+    if (!parsed) return;
+    musicPlayerHint.textContent = item.title || "Relaxation track";
+    musicPlayer.src = parsed.type === "youtube" ? `https://www.youtube-nocookie.com/embed/${parsed.id}?autoplay=1&rel=0` : `https://open.spotify.com/embed${new URL(parsed.url).pathname}`;
+  }
+  function renderMusic(items) {
+    musicList.replaceChildren();
+    if (!items.length) { const li = document.createElement("li"); li.textContent = "No tracks yet. Sign in and add the first one."; musicList.append(li); return; }
+    items.forEach(item => {
+      const li = document.createElement("li"); li.className = "music-item";
+      const info = document.createElement("div");
+      const title = document.createElement("strong"); title.textContent = item.title || "Untitled track";
+      const link = document.createElement("a"); link.href = item.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "Open track";
+      info.append(title, document.createElement("br"), link);
+      const play = document.createElement("button"); play.type = "button"; play.textContent = "Play"; play.addEventListener("click", () => playMusic(item));
+      li.append(info, play); musicList.append(li);
+    });
+  }
+  onSnapshot(query(collection(db, "publicMusic"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
+    renderMusic(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, error => {
+    console.error("Shared music playlist error:", error);
+    musicList.textContent = "Playlist needs Firestore rules setup. See the instructions provided with this code.";
+  });
+  musicForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const title = document.getElementById("musicTitle").value.trim();
+    const rawUrl = document.getElementById("musicUrl").value.trim();
+    const parsed = safeMusicUrl(rawUrl);
+    if (!parsed) { musicStatus.textContent = "Please use a valid YouTube or Spotify track/playlist link."; return; }
+    if (!auth.currentUser) { musicStatus.textContent = "Sign in with Google before adding a shared track."; return; }
+    musicStatus.textContent = "Adding track…";
+    try {
+      await addDoc(collection(db, "publicMusic"), { title, url: parsed.url, type: parsed.type, addedBy: auth.currentUser.displayName || "CampusKit student", createdAt: new Date().toISOString() });
+      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students ✓";
+    } catch (error) {
+      console.error("Could not add shared music:", error);
+      musicStatus.textContent = "Could not add. Check Firestore rules for publicMusic (read all, create signed-in; no update/delete).";
+    }
+  });
 
   loginBtn.addEventListener("click", async () => {
     showStatus("Opening Google sign-in...");
@@ -1100,6 +1200,34 @@ const WORKER_URL =
     }, {rootMargin:'-15% 0px -65% 0px', threshold:[0,.1,.3]});
     targets.forEach(target => observer.observe(target));
   }
+})();
+</script>
+
+
+<script>
+(() => {
+  const nav = document.querySelector('.side-nav');
+  const links = [...nav.querySelectorAll('a[href^="#"]')];
+  const views = ['dashboard','search-section','study-tools-view','notes-library','ai-assistant','relaxation-section'];
+  function setView(name) {
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'] };
+    const selected = map[name] || map.dashboard;
+    views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
+    const tools = document.getElementById('study-tools');
+    if (tools) {
+      tools.querySelectorAll(':scope > section').forEach(card => card.style.display = (name === 'study-tools' && card.id !== 'notes-library') || (name === 'notes-library' && card.id === 'notes-library') ? '' : 'none');
+      const notes = document.getElementById('notes-library');
+      if (notes) notes.style.display = name === 'notes-library' ? '' : 'none';
+    }
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name)));
+    if (name === 'notes-library') { document.getElementById('notes-library').style.display = ''; }
+    if (name === 'study-tools') document.getElementById('study-tools').querySelectorAll(':scope > section').forEach(card => card.style.display = card.id === 'notes-library' ? 'none' : '');
+    if (name === 'dashboard') { document.getElementById('search-section').classList.add('active-view'); }
+    history.replaceState(null, '', '#' + name);
+  }
+  links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
+  const initial = location.hash.slice(1);
+  setView(['study-tools','notes-library','ai-assistant','relaxation-section'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
 
