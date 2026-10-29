@@ -90,6 +90,8 @@ body{padding-left:220px}
 .side-nav a{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;color:#d8d0f3;text-decoration:none;font-weight:600;font-size:14px;transition:background .2s,color .2s}
 .side-nav a:hover,.side-nav a.active{background:linear-gradient(120deg,rgba(139,92,246,.32),rgba(34,211,238,.12));color:#fff}
 .side-nav .side-hint{margin-top:auto;font-size:12px;color:#9e94c2;line-height:1.5;padding:10px}
+#ck-sidebar-logout{width:100%;margin:0;text-align:left;background:rgba(255,255,255,.06);border-color:rgba(190,170,255,.18);box-shadow:none;color:#d8d0f3}
+#ck-sidebar-logout:hover{background:rgba(139,92,246,.2)}
 header{margin-left:0}
 main{max-width:1200px}
 #study-tools,#notes-library,#ai-assistant,#dashboard,#search-section,#relaxation-section{scroll-margin-top:22px}
@@ -105,9 +107,45 @@ main{max-width:1200px}
 footer{margin-left:0}
 @media(max-width:760px){body{padding-left:0;padding-top:74px}.side-nav{right:0;bottom:auto;width:auto;height:62px;padding:7px 10px;flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(190,170,255,.22)}.side-brand{font-size:15px;padding:0 8px;white-space:nowrap}.side-nav a{padding:10px 11px;white-space:nowrap;font-size:12px}.side-nav .side-hint{display:none}header{padding-top:18px}main{margin-top:18px}#ai-assistant{margin:18px 12px 0}}
 
+/* First-screen Google login gate */
+body:not(.authenticated) .side-nav,
+body:not(.authenticated) header,
+body:not(.authenticated) main,
+body:not(.authenticated) footer{display:none!important}
+#campuskit-login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden;background:rgba(5,7,24,.42);backdrop-filter:blur(3px)}
+body.authenticated #campuskit-login-screen{display:none!important}
+.login-orb{position:absolute;width:min(68vw,520px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(167,139,250,.22);box-shadow:0 0 70px rgba(139,92,246,.12),inset 0 0 70px rgba(59,130,246,.08);animation:loginOrbit 22s linear infinite;pointer-events:none}
+.login-orb:before,.login-orb:after{content:"";position:absolute;border:1px solid rgba(96,165,250,.25);border-radius:50%;inset:12%;transform:rotate(35deg) scaleX(.58)}
+.login-orb:after{inset:25%;transform:rotate(-35deg) scaleX(.68);border-color:rgba(196,181,253,.28)}
+@keyframes loginOrbit{to{transform:rotate(360deg)}}
+.login-card{position:relative;z-index:1;width:min(100%,430px);padding:34px 28px;text-align:center;border:1px solid rgba(196,181,253,.28);border-radius:26px;background:linear-gradient(145deg,rgba(23,21,54,.9),rgba(11,19,48,.84));box-shadow:0 25px 90px rgba(0,0,0,.42);backdrop-filter:blur(22px)}
+.login-logo{width:68px;height:68px;margin:0 auto 14px;display:grid;place-items:center;border-radius:22px;font-size:32px;background:linear-gradient(135deg,#8b5cf6,#2563eb);box-shadow:0 10px 35px rgba(99,102,241,.35)}
+.login-card h1{font-size:clamp(28px,7vw,36px);margin:0;color:#fff;letter-spacing:-.7px}
+.login-card .login-subtitle{margin:8px 0 24px;color:#c8c5e5;font-size:14px}
+#ck-google-login{width:100%;margin:0;padding:13px 16px;border:1px solid rgba(255,255,255,.8);border-radius:12px;background:#fff;color:#222;font-size:15px;font-weight:700;box-shadow:none}
+#ck-google-login:before{content:"G";display:inline-grid;place-items:center;width:22px;height:22px;margin-right:10px;border-radius:50%;background:conic-gradient(#4285f4 0 25%,#34a853 25% 50%,#fbbc05 50% 75%,#ea4335 75%);color:#fff;font-weight:900}
+#ck-status{min-height:20px;color:#d7d2f0}
+.login-privacy{margin:18px 0 0!important;font-size:11px!important;color:#a7a3c6!important}
+@media(max-width:480px){.login-card{padding:28px 20px}.login-orb{width:95vw}}
 </style>
 </head>
 <body>
+<div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-orb" aria-hidden="true"></div>
+  <div class="login-card">
+    <div class="login-logo" aria-hidden="true">🎓</div>
+    <h1 id="loginTitle">CampusKit</h1>
+    <p class="login-subtitle">Your college life, organized in one place.</p>
+    <button id="ck-google-login" type="button">Continue with Google</button>
+    <p id="ck-status" aria-live="polite">Sign in to open your student workspace.</p>
+    <p class="login-privacy">Secure sign-in · Your study space starts here</p>
+    <span id="ck-user" style="display:none;align-items:center;gap:8px">
+      <img id="ck-avatar" alt="Profile" style="width:32px;height:32px;border-radius:50%">
+      <span id="ck-name"></span>
+      <button id="ck-logout" type="button" style="padding:7px;border-radius:7px">Sign out</button>
+    </span>
+  </div>
+</div>
 <nav class="side-nav" aria-label="Main navigation">
   <div class="side-brand">🎓 CampusKit</div>
   <a href="#dashboard" class="active">🏠 Dashboard</a>
@@ -116,6 +154,7 @@ footer{margin-left:0}
   <a href="#ai-assistant">🤖 AI Assistant</a>
   <a href="#relaxation-section">🎵 Relaxation</a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
+  <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
 </nav>
 <header>
   <h1>🎓 CampusKit</h1>
@@ -874,18 +913,7 @@ window.CampusKitCloud = {
 };
 </script>
 
-<!-- CampusKit Google Login -->
-<div id="campuskit-auth" style="position:fixed;top:16px;right:16px;z-index:9999;background:#17152b;color:white;padding:12px 16px;border-radius:14px;font-family:Arial,sans-serif;box-shadow:0 4px 20px #0003">
-  <button id="ck-google-login" style="padding:10px 14px;border:0;border-radius:9px;background:#fff;color:#222;font-weight:bold;cursor:pointer">
-    Continue with Google
-  </button>
-  <span id="ck-user" style="display:none;align-items:center;gap:8px">
-    <img id="ck-avatar" alt="Profile" style="width:32px;height:32px;border-radius:50%">
-    <span id="ck-name"></span>
-    <button id="ck-logout" style="padding:7px;border:0;border-radius:7px;cursor:pointer">Sign out</button>
-  </span>
-  <p id="ck-status" style="font-size:12px;margin:8px 0 0"></p>
-</div>
+<!-- Google login is displayed only as the first screen; no floating login widget remains. -->
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
@@ -1086,22 +1114,26 @@ window.CampusKitCloud = {
     }
   });
 
-  document.getElementById("ck-logout").addEventListener("click", async () => {
+  async function campusKitSignOut() {
     try {
       await signOut(auth);
     } catch (error) {
       showStatus("Sign-out failed: " + (error.code || error.message));
     }
-  });
+  }
+  document.getElementById("ck-logout").addEventListener("click", campusKitSignOut);
+  document.getElementById("ck-sidebar-logout").addEventListener("click", campusKitSignOut);
 
   onAuthStateChanged(auth, async user => {
     currentUser = user;
     cloudReady = false;
+    document.body.classList.toggle("authenticated", Boolean(user));
+    document.getElementById("campuskit-login-screen").setAttribute("aria-hidden", user ? "true" : "false");
     loginBtn.style.display = user ? "none" : "inline-block";
-    userBox.style.display = user ? "flex" : "none";
+    userBox.style.display = "none";
 
     if (!user) {
-      showStatus("Sign in to sync your study data across devices.");
+      showStatus("Sign in to open CampusKit and sync your study data.");
       return;
     }
 
