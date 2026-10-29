@@ -1052,21 +1052,53 @@ window.CampusKitCloud = {
   const musicPlayerHint = document.getElementById("musicPlayerHint");
   function safeMusicUrl(raw) {
     try {
-      const u = new URL(raw);
-      if (u.hostname === "youtu.be") return { type: "youtube", id: u.pathname.slice(1).split("/")[0], url: u.href };
-      if (["youtube.com", "www.youtube.com", "m.youtube.com"].includes(u.hostname)) {
-        const id = u.searchParams.get("v") || (u.pathname.startsWith("/embed/") ? u.pathname.split("/")[2] : "");
-        if (id && /^[A-Za-z0-9_-]{6,20}$/.test(id)) return { type: "youtube", id, url: u.href };
+      const u = new URL(raw.trim());
+      if (u.protocol !== "https:") return null;
+      const host = u.hostname.toLowerCase();
+      const validId = id => /^[A-Za-z0-9_-]{6,40}$/.test(id || "");
+
+      // YouTube video, Shorts, embed, youtu.be, and playlist links.
+      if (host === "youtu.be") {
+        const id = u.pathname.split("/").filter(Boolean)[0] || "";
+        if (!validId(id)) return null;
+        return { type: "youtube-video", id, list: u.searchParams.get("list") || "", url: u.href };
       }
-      if (["open.spotify.com", "www.open.spotify.com"].includes(u.hostname) && /^\/(track|album|playlist|episode)\/[A-Za-z0-9]+/.test(u.pathname)) return { type: "spotify", id: "", url: u.href };
+      if (["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
+        const list = u.searchParams.get("list") || "";
+        if (u.pathname === "/playlist" && validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
+        const parts = u.pathname.split("/").filter(Boolean);
+        let id = "";
+        if (u.pathname === "/watch") id = u.searchParams.get("v") || "";
+        else if (["embed", "shorts", "live"].includes(parts[0])) id = parts[1] || "";
+        if (validId(id)) return { type: "youtube-video", id, list, url: u.href };
+        if (validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
+      }
+
+      // Spotify track, album, playlist, episode, or show URLs.
+      if (["open.spotify.com", "www.open.spotify.com"].includes(host)) {
+        const match = u.pathname.match(/^\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)\/?$/);
+        if (match) return { type: "spotify", kind: match[1], id: match[2], url: u.href };
+      }
     } catch (_) {}
     return null;
   }
   function playMusic(item) {
     const parsed = safeMusicUrl(item.url || "");
-    if (!parsed) return;
+    if (!parsed) {
+      musicStatus.textContent = "This link is not supported. Use a YouTube video/playlist or Spotify track/playlist link.";
+      return;
+    }
     musicPlayerHint.textContent = item.title || "Relaxation track";
-    musicPlayer.src = parsed.type === "youtube" ? `https://www.youtube-nocookie.com/embed/${parsed.id}?autoplay=1&rel=0` : `https://open.spotify.com/embed${new URL(parsed.url).pathname}`;
+    if (parsed.type === "youtube-playlist") {
+      musicPlayer.src = `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(parsed.list)}&autoplay=1`;
+    } else if (parsed.type === "youtube-video") {
+      const listPart = parsed.list ? `&list=${encodeURIComponent(parsed.list)}` : "";
+      musicPlayer.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(parsed.id)}?autoplay=1&rel=0${listPart}`;
+    } else {
+      musicPlayer.src = `https://open.spotify.com/embed/${parsed.kind}/${encodeURIComponent(parsed.id)}?utm_source=generator`;
+    }
+    musicPlayer.title = `Player: ${item.title || "Relaxation track"}`;
+    musicStatus.textContent = "Player loaded. If playback does not start automatically, press Play inside the player.";
   }
   function renderMusic(items) {
     musicList.replaceChildren();
@@ -1092,7 +1124,7 @@ window.CampusKitCloud = {
     const title = document.getElementById("musicTitle").value.trim();
     const rawUrl = document.getElementById("musicUrl").value.trim();
     const parsed = safeMusicUrl(rawUrl);
-    if (!parsed) { musicStatus.textContent = "Please use a valid YouTube or Spotify track/playlist link."; return; }
+    if (!parsed) { musicStatus.textContent = "Unsupported link. Use an HTTPS YouTube video/playlist or Spotify track/album/playlist/episode link."; return; }
     if (!auth.currentUser) { musicStatus.textContent = "Sign in with Google before adding a shared track."; return; }
     musicStatus.textContent = "Adding track…";
     try {
@@ -1100,7 +1132,7 @@ window.CampusKitCloud = {
       musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students ✓";
     } catch (error) {
       console.error("Could not add shared music:", error);
-      musicStatus.textContent = "Could not add. Check Firestore rules for publicMusic (read all, create signed-in; no update/delete).";
+      musicStatus.textContent = "Could not add: " + (error.code || error.message || "unknown error") + ". Check Firestore rules for publicMusic and confirm you are signed in.";
     }
   });
 
