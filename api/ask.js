@@ -1,5 +1,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const admin = require("firebase-admin");
+
+const { initializeApp, cert, getApps } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -17,13 +19,13 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    if (!admin.apps.length) {
+    if (getApps().length === 0) {
       const serviceAccount = JSON.parse(
         process.env.FIREBASE_SERVICE_ACCOUNT
       );
 
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+      initializeApp({
+        credential: cert(serviceAccount)
       });
     }
 
@@ -33,15 +35,19 @@ module.exports = async function handler(req, res) {
       : "";
 
     if (!token) {
-      return res.status(401).json({ error: "Please sign in first." });
+      return res.status(401).json({
+        error: "Please sign in first."
+      });
     }
 
-    await admin.auth().verifyIdToken(token);
+    await getAuth().verifyIdToken(token);
 
     const question = req.body?.question;
 
     if (typeof question !== "string" || !question.trim()) {
-      return res.status(400).json({ error: "Please enter a question." });
+      return res.status(400).json({
+        error: "Please enter a question."
+      });
     }
 
     if (!process.env.GEMINI_API_KEY) {
@@ -50,13 +56,18 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const genAI = new GoogleGenerativeAI(
+      process.env.GEMINI_API_KEY
+    );
+
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash"
     });
 
     const result = await model.generateContent(
-      `You are CampusKit AI, a helpful student assistant. Answer clearly and simply.\n\nStudent question: ${question.trim()}`
+      `You are CampusKit AI, a helpful student assistant. Answer clearly and simply.
+
+Student question: ${question.trim()}`
     );
 
     return res.status(200).json({
