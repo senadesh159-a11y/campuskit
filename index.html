@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#08091f">
+<title>CampusKit | Student Dashboard</title>
+<style>
+*{box-sizing:border-box}
+:root{--purple:#8b5cf6;--lavender:#d8c8ff;--muted:#d0cbea;--panel:rgba(20,19,49,.72);--border:rgba(173,150,255,.3)}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0;font-family:Arial,sans-serif;background:#08091f;color:#f2efff;line-height:1.6;background-image:radial-gradient(ellipse at 15% 20%,rgba(139,92,246,.25),transparent 45%),radial-gradient(ellipse at 85% 30%,rgba(59,130,246,.22),transparent 45%),radial-gradient(ellipse at 50% 90%,rgba(168,85,247,.18),transparent 50%);background-size:200% 200%;animation:auroraMove 16s ease-in-out infinite alternate}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(2px 2px at 20% 30%,rgba(255,255,255,.7) 50%,transparent 100%),radial-gradient(2px 2px at 70% 60%,rgba(167,139,250,.8) 50%,transparent 100%),radial-gradient(3px 3px at 40% 80%,rgba(96,165,250,.7) 50%,transparent 100%),radial-gradient(2px 2px at 85% 15%,rgba(255,255,255,.6) 50%,transparent 100%);background-size:250px 250px;animation:particleFloat 20s linear infinite}
+@keyframes auroraMove{from{background-position:0 0}to{background-position:100% 100%}}
+@keyframes particleFloat{from{background-position:0 0}to{background-position:250px -250px}}
+header,main,footer{position:relative;z-index:1}
+header{text-align:center;padding:27px 16px;background:linear-gradient(135deg,rgba(104,70,217,.82),rgba(35,43,115,.78));border-bottom:1px solid rgba(190,170,255,.3);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+header h1{color:#fff;margin:0;font-size:clamp(26px,4vw,36px);letter-spacing:.3px}
+header p{margin:4px 0 0;color:#f1edff}
+main{max-width:1000px;width:100%;margin:26px auto;padding:0 18px}
+h2{color:var(--lavender);margin:0 0 4px}
+p{color:var(--muted)}
+.card{min-width:0;padding:22px;border-radius:18px;background:var(--panel);color:#f4f0ff;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:border-color .25s ease,transform .25s ease;margin-bottom:20px}
+.card:hover{border-color:rgba(180,155,255,.6)}
+.card h3{color:#cdbaff;margin:0 0 8px}
+.card>p{margin-top:4px}
+.hero{padding:25px;background:linear-gradient(120deg,rgba(101,69,201,.25),rgba(36,104,190,.15)),var(--panel)}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#bca8ff;font-weight:bold}
+#todayDate{font-size:13px;color:#d0cbea;margin-top:5px}
+.quote{margin:12px 0 0;color:#e3dcff}
+.dashboard-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.stat-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px;background:rgba(126,92,220,.16);border:1px solid rgba(180,155,255,.22);border-radius:12px;text-align:center}
+.stat-box strong{font-size:clamp(23px,4vw,30px);line-height:1.25;color:#c3adff;text-shadow:0 0 14px rgba(157,117,255,.3)}
+.stat-box span{font-size:13px;color:#e0d8ff}
+.progress-section{margin-top:20px}
+.progress-label{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#e7e0ff;margin-bottom:8px}
+.progress-track{height:11px;background:rgba(255,255,255,.1);border:1px solid rgba(190,170,255,.2);border-radius:99px;overflow:hidden}
+#progressFill{height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#8b5cf6,#42a5ff);transition:width .45s ease}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:18px;align-items:start}
+.tools .card{margin:0}
+input,textarea{display:block;width:100%;padding:12px;margin:10px 0;border:1px solid rgba(165,145,230,.38);border-radius:10px;background:rgba(9,12,34,.75);color:#fff;font:inherit}
+input::placeholder,textarea::placeholder{color:#b8b2d0}
+input:focus,textarea:focus{outline:2px solid #a78bfa;border-color:#c4b5fd}
+textarea{min-height:100px;resize:vertical}
+button{padding:10px 14px;margin:5px 5px 5px 0;border:1px solid transparent;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#5b50d9);color:#fff;font-weight:bold;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(104,70,217,.2);transition:transform .15s ease,filter .15s ease}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.delete-btn{background:#be3455}
+.delete-btn:hover{background:#e04769}
+.complete-btn{background:linear-gradient(135deg,#0f9f79,#087f8c)}
+.complete-btn.is-complete{background:rgba(126,145,167,.3);border-color:rgba(200,210,230,.3)}
+li{margin:10px 0;padding:12px;background:rgba(105,85,170,.15);border:1px solid rgba(170,150,235,.23);border-radius:10px;color:#eeeaff;overflow-wrap:anywhere}
+li.done .assignment-title{text-decoration:line-through;color:#b5abc9}
+.item-meta{display:block;font-size:13px;color:#c8bee9;margin-top:3px}
+.note-item{margin-top:14px;padding:14px;border:1px solid rgba(170,150,235,.23);border-radius:12px;background:rgba(105,85,170,.15);overflow-wrap:anywhere}
+.note-item h4{margin:0 0 6px;color:#cdbaff}
+.note-item p{white-space:pre-wrap}
+.notes-toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:8px;margin:12px 0}
+.notes-toolbar input,.notes-toolbar select,.notes-form-grid select{display:block;width:100%;padding:11px;margin:0;border:1px solid rgba(165,145,230,.38);border-radius:10px;background:rgba(9,12,34,.75);color:#fff;font:inherit}
+.notes-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.notes-form-grid .full{grid-column:1/-1}
+.notes-form-grid label{display:block;font-size:13px;color:#d8c8ff;margin-bottom:4px}
+.notes-form-grid input,.notes-form-grid textarea{margin:0}
+.notes-form-grid textarea{min-height:140px}
+.notes-library-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin-top:12px}
+.note-item{min-width:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.note-item .note-body{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.note-tags{display:flex;flex-wrap:wrap;gap:5px}
+.note-tag{font-size:12px;padding:3px 8px;border-radius:99px;background:rgba(139,92,246,.22);border:1px solid rgba(173,150,255,.3);color:#e4d9ff}
+.note-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
+.note-actions button{margin:0}
+.note-attachment{font-size:13px;color:#c6d8ff;overflow-wrap:anywhere}
+.notes-status{font-size:13px;min-height:20px;margin:8px 0;color:#d8c8ff}
+.notes-count{font-size:13px;color:#c8bee9}
+.bookmark-btn{background:linear-gradient(135deg,#b7791f,#8b5cf6)}
+@media(max-width:480px){.notes-form-grid{grid-template-columns:1fr}.notes-form-grid .full{grid-column:auto}}
+.empty-state{color:#bdb4da;font-size:14px;padding:8px 2px}
+#searchMessage{font-size:13px;margin-bottom:0}
+footer{padding:24px 16px;text-align:center;color:#c0b7df}
+#neural-bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.65}
+@media(max-width:480px){header{padding:22px 12px}main{margin:20px auto;padding:0 12px}.card{padding:17px}.dashboard-stats{gap:8px}.stat-box{padding:13px 5px}.stat-box span{font-size:12px}}
+@media(max-width:360px){.dashboard-stats{grid-template-columns:1fr}.hero-top{display:block}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* CampusKit multi-section side navigation */
+body{padding-left:220px}
+.side-nav{position:fixed;left:0;top:0;bottom:0;width:200px;padding:22px 14px;z-index:20;background:rgba(15,12,35,.96);border-right:1px solid rgba(190,170,255,.22);backdrop-filter:blur(16px);display:flex;flex-direction:column;gap:9px}
+.side-brand{font-size:20px;font-weight:800;color:#fff;padding:8px 10px 22px}
+.side-nav a{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:12px;color:#d8d0f3;text-decoration:none;font-weight:600;font-size:14px;transition:background .2s,color .2s}
+.side-nav a:hover,.side-nav a.active{background:linear-gradient(120deg,rgba(139,92,246,.32),rgba(34,211,238,.12));color:#fff}
+.side-nav .side-hint{margin-top:auto;font-size:12px;color:#9e94c2;line-height:1.5;padding:10px}
+#ck-sidebar-logout{width:100%;margin:0;text-align:left;background:rgba(255,255,255,.06);border-color:rgba(190,170,255,.18);box-shadow:none;color:#d8d0f3}
+#ck-sidebar-logout:hover{background:rgba(139,92,246,.2)}
+header{margin-left:0}
+main{max-width:1200px}
+#study-tools,#notes-library,#ai-assistant,#dashboard,#search-section,#relaxation-section{scroll-margin-top:22px}
+.app-view{display:none!important}.app-view.active-view{display:block!important}
+#study-tools.active-view{display:grid!important}
+#study-tools .notes-card-hidden{display:none!important}
+#relaxation-section .music-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+#musicList{list-style:none;padding:0;display:grid;gap:10px}
+.music-item{padding:12px;border:1px solid rgba(160,140,220,.25);border-radius:12px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.music-item a{overflow-wrap:anywhere}.music-embed{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#111}
+@media(max-width:650px){#relaxation-section .music-grid{grid-template-columns:1fr}}
+#ai-assistant{max-width:1200px;margin:20px auto 0;padding:22px}
+footer{margin-left:0}
+@media(max-width:760px){body{padding-left:0;padding-top:74px}.side-nav{right:0;bottom:auto;width:auto;height:62px;padding:7px 10px;flex-direction:row;align-items:center;overflow-x:auto;border-right:0;border-bottom:1px solid rgba(190,170,255,.22)}.side-brand{font-size:15px;padding:0 8px;white-space:nowrap}.side-nav a{padding:10px 11px;white-space:nowrap;font-size:12px}.side-nav .side-hint{display:none}header{padding-top:18px}main{margin-top:18px}#ai-assistant{margin:18px 12px 0}}
+
+/* First-screen Google login gate */
+body:not(.authenticated) .side-nav,
+body:not(.authenticated) header,
+body:not(.authenticated) main,
+body:not(.authenticated) footer{display:none!important}
+#campuskit-login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden;background:rgba(5,7,24,.42);backdrop-filter:blur(3px)}
+body.authenticated #campuskit-login-screen{display:none!important}
+.login-orb{position:absolute;width:min(68vw,520px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(167,139,250,.22);box-shadow:0 0 70px rgba(139,92,246,.12),inset 0 0 70px rgba(59,130,246,.08);animation:loginOrbit 22s linear infinite;pointer-events:none}
+.login-orb:before,.login-orb:after{content:"";position:absolute;border:1px solid rgba(96,165,250,.25);border-radius:50%;inset:12%;transform:rotate(35deg) scaleX(.58)}
+.login-orb:after{inset:25%;transform:rotate(-35deg) scaleX(.68);border-color:rgba(196,181,253,.28)}
+@keyframes loginOrbit{to{transform:rotate(360deg)}}
+.login-card{position:relative;z-index:1;width:min(100%,430px);padding:34px 28px;text-align:center;border:1px solid rgba(196,181,253,.28);border-radius:26px;background:linear-gradient(145deg,rgba(23,21,54,.9),rgba(11,19,48,.84));box-shadow:0 25px 90px rgba(0,0,0,.42);backdrop-filter:blur(22px)}
+.login-logo{width:68px;height:68px;margin:0 auto 14px;display:grid;place-items:center;border-radius:22px;font-size:32px;background:linear-gradient(135deg,#8b5cf6,#2563eb);box-shadow:0 10px 35px rgba(99,102,241,.35)}
+.login-card h1{font-size:clamp(28px,7vw,36px);margin:0;color:#fff;letter-spacing:-.7px}
+.login-card .login-subtitle{margin:8px 0 24px;color:#c8c5e5;font-size:14px}
+#ck-google-login{width:100%;margin:0;padding:13px 16px;border:1px solid rgba(255,255,255,.8);border-radius:12px;background:#fff;color:#222;font-size:15px;font-weight:700;box-shadow:none}
+#ck-google-login:before{content:"G";display:inline-grid;place-items:center;width:22px;height:22px;margin-right:10px;border-radius:50%;background:conic-gradient(#4285f4 0 25%,#34a853 25% 50%,#fbbc05 50% 75%,#ea4335 75%);color:#fff;font-weight:900}
+#ck-status{min-height:20px;color:#d7d2f0}
+.login-privacy{margin:18px 0 0!important;font-size:11px!important;color:#a7a3c6!important}
+@media(max-width:480px){.login-card{padding:28px 20px}.login-orb{width:95vw}}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-orb" aria-hidden="true"></div>
+  <div class="login-card">
+    <div class="login-logo" aria-hidden="true">🎓</div>
+    <h1 id="loginTitle">CampusKit</h1>
+    <p class="login-subtitle">Your college life, organized in one place.</p>
+    <button id="ck-google-login" type="button">Continue with Google</button>
+    <p id="ck-status" aria-live="polite">Sign in to open your student workspace.</p>
+    <p class="login-privacy">Secure sign-in · Your study space starts here</p>
+    <span id="ck-user" style="display:none;align-items:center;gap:8px">
+      <img id="ck-avatar" alt="Profile" style="width:32px;height:32px;border-radius:50%">
+      <span id="ck-name"></span>
+      <button id="ck-logout" type="button" style="padding:7px;border-radius:7px">Sign out</button>
+    </span>
+  </div>
+</div>
+<nav class="side-nav" aria-label="Main navigation">
+  <div class="side-brand">🎓 CampusKit</div>
+  <a href="#dashboard" class="active">🏠 Dashboard</a>
+  <a href="#study-tools">📚 Study Tools</a>
+  <a href="#notes-library">🗂️ Notes Library</a>
+  <a href="#ai-assistant">🤖 AI Assistant</a>
+  <a href="#relaxation-section">🎵 Relaxation</a>
+  <div class="side-hint">Your college life,<br>organized in one place.</div>
+  <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
+</nav>
+<header>
+  <h1>🎓 CampusKit</h1>
+  <p>Your College Life, Organized!</p>
+</header>
+
+<main>
+  <section class="card hero app-view active-view" id="dashboard" aria-labelledby="dashboardTitle">
+    <div class="hero-top">
+      <div>
+        <div class="eyebrow">Your student workspace</div>
+        <h2 id="dashboardTitle">Welcome back, Student! 👋</h2>
+        <p class="quote" id="dailyQuote">Small progress every day adds up.</p>
+      </div>
+      <div id="todayDate" aria-live="polite"></div>
+    </div>
+    <div class="dashboard-stats">
+      <div class="stat-box"><strong id="assignmentCount">0</strong><span>Total Assignments</span></div>
+      <div class="stat-box"><strong id="pendingCount">0</strong><span>Pending</span></div>
+      <div class="stat-box"><strong id="completedCount">0</strong><span>Completed</span></div>
+    </div>
+    <div class="progress-section">
+      <div class="progress-label"><span>Assignment progress</span><strong id="progressText">0%</strong></div>
+      <div class="progress-track" role="progressbar" aria-label="Assignment completion progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div id="progressFill"></div></div>
+    </div>
+    <div class="dashboard-stats">
+      <div class="stat-box"><strong id="classCount">0</strong><span>Classes Saved</span></div>
+      <div class="stat-box"><strong id="notesCount">0</strong><span>Study Notes</span></div>
+      <div class="stat-box"><strong id="dueSoonCount">0</strong><span>Due in 3 Days</span></div>
+    </div>
+  </section>
+
+  <section class="card app-view active-view" id="search-section" aria-labelledby="searchTitle">
+    <h3 id="searchTitle">🔎 Quick Search</h3>
+    <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
+    <p id="searchMessage" aria-live="polite">Type something to search.</p>
+    <button type="button" id="clearSearchBtn">Clear Search</button>
+  </section>
+
+  <div class="app-view" id="study-tools-view">
+  <h2>My Study Tools</h2>
+  <p>Everything you need for college, in one place.</p>
+
+  <div class="tools" id="study-tools">
+    <section class="card" aria-labelledby="timetableTitle">
+      <h3 id="timetableTitle">📅 Class Timetable</h3>
+      <p>Organize your classes and practicals.</p>
+      <form id="timetableForm">
+        <input type="text" id="subject" placeholder="Subject name" required maxlength="100">
+        <input type="text" id="day" placeholder="Day (e.g. Monday)" required maxlength="30">
+        <input type="text" id="classTime" placeholder="Time (e.g. 10 AM)" required maxlength="50">
+        <button type="submit">+ Add Class</button>
+      </form>
+      <ul id="timetableList"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="assignmentTitle">
+      <h3 id="assignmentTitle">📝 Assignment Tracker</h3>
+      <p>Add deadlines and mark work as complete.</p>
+      <form id="assignmentForm">
+        <input id="assignmentName" type="text" placeholder="Assignment name" required maxlength="150">
+        <label for="deadline">Deadline</label>
+        <input id="deadline" type="date" required>
+        <button type="submit">+ Add Assignment</button>
+      </form>
+      <ul id="assignmentList"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="notesTitle" id="notes-library">
+      <h3 id="notesTitle">📚 Notes Library</h3>
+      <p>Organize notes by subject, search them, bookmark important topics, and attach PDFs.</p>
+      <form id="notesForm">
+        <div class="notes-form-grid">
+          <div>
+            <label for="noteSubject">Subject / folder</label>
+            <select id="noteSubject" required>
+              <option value="Physics">Physics</option><option value="Chemistry">Chemistry</option>
+              <option value="English">English</option><option value="Hindi">Hindi</option>
+              <option value="MIL">MIL</option><option value="Mathematics">Mathematics</option>
+              <option value="Computer Science">Computer Science</option><option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="noteTitle">Note title</label>
+            <input type="text" id="noteTitle" placeholder="e.g. Newton's Laws" maxlength="150" required>
+          </div>
+          <div class="full">
+            <label for="noteTags">Tags (comma-separated)</label>
+            <input type="text" id="noteTags" placeholder="e.g. mechanics, exam, important" maxlength="250">
+          </div>
+          <div class="full">
+            <label for="noteText">Notes / summary</label>
+            <textarea id="noteText" placeholder="Write your notes here..." maxlength="20000"></textarea>
+          </div>
+          <div class="full">
+            <label for="noteFile">Attach a PDF or document (optional, max 100 MB)</label>
+            <input type="file" id="noteFile" accept=".pdf,.txt,.doc,.docx,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            <button type="button" id="connectDriveBtn">Connect Google Drive</button>
+            <p id="driveStatus" class="notes-status" role="status" aria-live="polite">Connect your own Google Drive to attach files. Files stay private in your Drive.</p>
+            <p class="item-meta">Attachments are saved to the Google account you authorize. Reconnect after refreshing the page.</p>
+          </div>
+        </div>
+        <p id="notesFormStatus" class="notes-status" role="status" aria-live="polite"></p>
+        <button type="submit" id="saveNoteBtn">＋ Save Note</button>
+        <button type="button" id="cancelNoteEditBtn" hidden>Cancel edit</button>
+      </form>
+      <div class="notes-toolbar">
+        <input type="search" id="notesSearch" placeholder="Search titles, notes, tags..." aria-label="Search notes">
+        <select id="notesSubjectFilter" aria-label="Filter notes by subject">
+          <option value="all">All subjects</option><option>Physics</option><option>Chemistry</option>
+          <option>English</option><option>Hindi</option><option>MIL</option><option>Mathematics</option>
+          <option>Computer Science</option><option>Other</option>
+        </select>
+        <select id="notesSort" aria-label="Sort notes">
+          <option value="updated">Recently updated</option><option value="created">Recently created</option><option value="title">Title A–Z</option>
+        </select>
+        <button type="button" id="notesBookmarksOnly" aria-pressed="false">☆ Bookmarks only</button>
+      </div>
+      <p id="notesCountLabel" class="notes-count" aria-live="polite">0 notes</p>
+      <p id="notesLibraryStatus" class="notes-status" role="status" aria-live="polite">Your notes will appear here.</p>
+      <div id="notesList" class="notes-library-grid"></div>
+    </section>
+  </div>
+  </div>
+</main>
+
+<section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
+  <h2 id="relaxTitle">🎵 Student Relaxation Corner</h2>
+  <p>Take a short break with calm music. Add a YouTube or Spotify track link to the shared campus playlist.</p>
+  <div class="music-grid">
+    <div class="card">
+      <h3>▶️ Now playing</h3>
+      <p id="musicPlayerHint">Choose a track from the playlist to play it here.</p>
+      <iframe id="musicPlayer" class="music-embed" title="Relaxation music player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="about:blank"></iframe>
+      <p class="item-meta">Use relaxing music at a comfortable volume. Music is not a treatment for persistent headaches.</p>
+    </div>
+    <div class="card">
+      <h3>＋ Add a track</h3>
+      <form id="musicForm">
+        <label for="musicTitle">Song / playlist title</label><input id="musicTitle" required maxlength="120" placeholder="e.g. Calm study music">
+        <label for="musicUrl">YouTube or Spotify link</label><input id="musicUrl" type="url" required placeholder="https://youtu.be/...">
+        <button type="submit">Add to shared playlist</button>
+        <p id="musicStatus" role="status" aria-live="polite"></p>
+      </form>
+      <h3>🌿 Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- CampusKit AI Study Assistant -->
+<section class="card app-view" id="ai-assistant" aria-labelledby="aiTitle">
+  <h3 id="aiTitle">🤖 CampusKit AI Study Assistant</h3>
+  <p>Ask questions about Physics, Chemistry, practicals and assignments.</p>
+
+  <div id="aiChat" aria-live="polite">
+    <p class="empty-state">Hi! Ask me a study question to get started.</p>
+  </div>
+
+  <form id="aiForm">
+    <textarea
+      id="aiQuestion"
+      placeholder="Ask your study question here..."
+      maxlength="4000"
+      required
+    ></textarea>
+    <button type="submit" id="aiSend">Ask AI</button>
+    <p id="aiStatus" role="status"></p>
+  </form>
+</section>
+
+<footer>Made for Students ❤️ | CampusKit</footer>
+<canvas id="neural-bg" aria-hidden="true"></canvas>
+
+<script>
+"use strict";
+
+const STORAGE_KEYS = {
+  assignments: "campuskitAssignments",
+  timetable: "campusTimetable",
+  notes: "campusNotes"
+};
+
+function loadArray(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn("Could not read saved data for", key, error);
+    return [];
+  }
+}
+
+function saveArray(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    // Keep local saving instant; the Firebase module syncs after sign-in.
+    if (window.CampusKitCloud && typeof window.CampusKitCloud.save === "function") {
+      window.CampusKitCloud.save(key, value);
+    }
+    return true;
+  } catch (error) {
+    alert("Your browser could not save the latest changes. Please check available storage.");
+    return false;
+  }
+}
+
+let savedAssignments = loadArray(STORAGE_KEYS.assignments).map(item => ({
+  ...item,
+  completed: item.completed === true
+}));
+let timetable = loadArray(STORAGE_KEYS.timetable);
+function normalizeNote(note) {
+  const now = new Date().toISOString();
+  return {
+    ...note,
+    id: note.id || (crypto.randomUUID ? crypto.randomUUID() : "note-" + Date.now() + "-" + Math.random().toString(16).slice(2)),
+    subject: String(note.subject || "Other"),
+    title: String(note.title || note.subject || "Untitled note"),
+    text: String(note.text || ""),
+    tags: Array.isArray(note.tags) ? note.tags.map(String) : [],
+    bookmarked: note.bookmarked === true,
+    createdAt: note.createdAt || now,
+    updatedAt: note.updatedAt || now,
+    attachment: note.attachment && typeof note.attachment === "object" ? note.attachment : null
+  };
+}
+let savedNotes = loadArray(STORAGE_KEYS.notes).map(normalizeNote);
+let editingNoteId = null;
+let bookmarksOnly = false;
+
+const assignmentForm = document.getElementById("assignmentForm");
+const assignmentName = document.getElementById("assignmentName");
+const dateInput = document.getElementById("deadline");
+const assignmentList = document.getElementById("assignmentList");
+const timetableForm = document.getElementById("timetableForm");
+const timetableList = document.getElementById("timetableList");
+const notesForm = document.getElementById("notesForm");
+const notesList = document.getElementById("notesList");
+const campusSearch = document.getElementById("campusSearch");
+const searchMessage = document.getElementById("searchMessage");
+
+function makeEmptyMessage(container, message) {
+  const p = document.createElement("p");
+  p.className = "empty-state";
+  p.textContent = message;
+  container.appendChild(p);
+}
+
+function createButton(label, className, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  if (className) button.className = className;
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "No deadline";
+  const date = new Date(dateString + "T00:00:00");
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+}
+
+function displayAssignments() {
+  assignmentList.replaceChildren();
+  if (savedAssignments.length === 0) {
+    makeEmptyMessage(assignmentList, "No assignments yet. Add your first assignment above.");
+    return;
+  }
+
+  savedAssignments.forEach((assignment, index) => {
+    const item = document.createElement("li");
+    if (assignment.completed) item.classList.add("done");
+
+    const title = document.createElement("strong");
+    title.className = "assignment-title";
+    title.textContent = assignment.name || "Untitled assignment";
+    item.appendChild(title);
+
+    const meta = document.createElement("span");
+    meta.className = "item-meta";
+    meta.textContent = "Due: " + formatDate(assignment.date);
+    item.appendChild(meta);
+
+    const toggleButton = createButton(
+      assignment.completed ? "✓ Completed" : "Mark Complete",
+      "complete-btn" + (assignment.completed ? " is-complete" : ""),
+      () => {
+        savedAssignments[index].completed = !savedAssignments[index].completed;
+        if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+          displayAssignments();
+          updateDashboard();
+          applySearch();
+        } else {
+          savedAssignments[index].completed = !savedAssignments[index].completed;
+        }
+      }
+    );
+    toggleButton.setAttribute("aria-pressed", String(assignment.completed));
+    item.appendChild(toggleButton);
+
+    item.appendChild(createButton("Delete", "delete-btn", () => {
+      const removed = savedAssignments.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+        displayAssignments();
+        updateDashboard();
+        applySearch();
+      } else {
+        savedAssignments.splice(index, 0, ...removed);
+      }
+    }));
+    assignmentList.appendChild(item);
+  });
+}
+
+assignmentForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const name = assignmentName.value.trim();
+  const date = dateInput.value;
+  if (!name || !date) return;
+
+  savedAssignments.push({ name, date, completed: false });
+  if (saveArray(STORAGE_KEYS.assignments, savedAssignments)) {
+    displayAssignments();
+    updateDashboard();
+    applySearch();
+    assignmentForm.reset();
+  } else {
+    savedAssignments.pop();
+  }
+});
+
+function displayTimetable() {
+  timetableList.replaceChildren();
+  if (timetable.length === 0) {
+    makeEmptyMessage(timetableList, "No classes added yet.");
+    return;
+  }
+  timetable.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.day || ""} — ${item.subject || ""} — ${item.time || ""} `;
+    li.appendChild(createButton("Delete", "delete-btn", () => {
+      const removed = timetable.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.timetable, timetable)) {
+        displayTimetable();
+        updateDashboard();
+        applySearch();
+      } else {
+        timetable.splice(index, 0, ...removed);
+      }
+    }));
+    timetableList.appendChild(li);
+  });
+}
+
+timetableForm.addEventListener("submit", event => {
+  event.preventDefault();
+  const subject = document.getElementById("subject").value.trim();
+  const day = document.getElementById("day").value.trim();
+  const time = document.getElementById("classTime").value.trim();
+  if (!subject || !day || !time) return;
+
+  timetable.push({ subject, day, time });
+  if (saveArray(STORAGE_KEYS.timetable, timetable)) {
+    displayTimetable();
+    updateDashboard();
+    applySearch();
+    timetableForm.reset();
+  } else {
+    timetable.pop();
+  }
+});
+
+const noteSubjectInput = document.getElementById("noteSubject");
+const noteTitleInput = document.getElementById("noteTitle");
+const noteTagsInput = document.getElementById("noteTags");
+const noteTextInput = document.getElementById("noteText");
+const noteFileInput = document.getElementById("noteFile");
+const notesSearchInput = document.getElementById("notesSearch");
+const notesSubjectFilter = document.getElementById("notesSubjectFilter");
+const notesSort = document.getElementById("notesSort");
+const notesFormStatus = document.getElementById("notesFormStatus");
+const notesLibraryStatus = document.getElementById("notesLibraryStatus");
+const notesCountLabel = document.getElementById("notesCountLabel");
+const saveNoteBtn = document.getElementById("saveNoteBtn");
+const cancelNoteEditBtn = document.getElementById("cancelNoteEditBtn");
+const notesBookmarksOnlyBtn = document.getElementById("notesBookmarksOnly");
+
+function setNotesStatus(message, isError = false) {
+  notesFormStatus.textContent = message;
+  notesFormStatus.style.color = isError ? "#ff9cab" : "#d8c8ff";
+}
+
+function displayNotes() {
+  notesList.replaceChildren();
+  const query = (notesSearchInput?.value || "").trim().toLowerCase();
+  const subjectFilter = notesSubjectFilter?.value || "all";
+  let filtered = savedNotes.filter(note => {
+    const haystack = [note.title, note.subject, note.text, ...(note.tags || [])].join(" ").toLowerCase();
+    return (!query || haystack.includes(query)) &&
+      (subjectFilter === "all" || note.subject === subjectFilter) &&
+      (!bookmarksOnly || note.bookmarked);
+  });
+  const sort = notesSort?.value || "updated";
+  filtered.sort((a, b) => {
+    if (sort === "title") return a.title.localeCompare(b.title);
+    const aDate = Date.parse(sort === "created" ? a.createdAt : a.updatedAt) || 0;
+    const bDate = Date.parse(sort === "created" ? b.createdAt : b.updatedAt) || 0;
+    return bDate - aDate;
+  });
+  notesCountLabel.textContent = `${filtered.length} of ${savedNotes.length} note${savedNotes.length === 1 ? "" : "s"}`;
+  notesLibraryStatus.textContent = savedNotes.length ? "Your notes are saved on this device and sync to Firebase when signed in." : "Your library is empty. Add your first note above.";
+  if (!filtered.length) {
+    makeEmptyMessage(notesList, savedNotes.length ? "No notes match these filters." : "No notes yet. Create a note above to get started.");
+    return;
+  }
+
+  filtered.forEach(note => {
+    const card = document.createElement("article");
+    card.className = "note-item";
+    const heading = document.createElement("h4");
+    heading.textContent = `${note.bookmarked ? "★ " : ""}${note.title || "Untitled note"}`;
+    const meta = document.createElement("span");
+    meta.className = "item-meta";
+    meta.textContent = `${note.subject} · Updated ${formatDate((note.updatedAt || "").slice(0, 10))}`;
+    card.append(heading, meta);
+
+    if (note.text) {
+      const content = document.createElement("p");
+      content.className = "note-body";
+      content.textContent = note.text.length > 450 ? note.text.slice(0, 450) + "…" : note.text;
+      card.appendChild(content);
+    }
+    if (note.tags?.length) {
+      const tags = document.createElement("div");
+      tags.className = "note-tags";
+      note.tags.forEach(tag => {
+        const chip = document.createElement("span");
+        chip.className = "note-tag";
+        chip.textContent = tag;
+        tags.appendChild(chip);
+      });
+      card.appendChild(tags);
+    }
+    if (note.attachment?.url) {
+      const attachment = document.createElement("a");
+      attachment.className = "note-attachment";
+      attachment.href = note.attachment.url;
+      attachment.target = "_blank";
+      attachment.rel = "noopener noreferrer";
+      attachment.textContent = `📎 ${note.attachment.name || "Open attachment"}${note.attachment.provider === "google-drive" ? " (Google Drive)" : ""}`;
+      card.appendChild(attachment);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "note-actions";
+    actions.appendChild(createButton(note.bookmarked ? "★ Bookmarked" : "☆ Bookmark", "bookmark-btn", () => {
+      const index = savedNotes.findIndex(item => item.id === note.id);
+      if (index < 0) return;
+      savedNotes[index] = { ...savedNotes[index], bookmarked: !savedNotes[index].bookmarked, updatedAt: new Date().toISOString() };
+      if (saveArray(STORAGE_KEYS.notes, savedNotes)) displayNotes();
+    }));
+    actions.appendChild(createButton("Edit", "", () => beginEditNote(note.id)));
+    actions.appendChild(createButton("Delete", "delete-btn", async () => {
+      if (!confirm(`Delete “${note.title}”? This cannot be undone.`)) return;
+      const index = savedNotes.findIndex(item => item.id === note.id);
+      if (index < 0) return;
+      const [removed] = savedNotes.splice(index, 1);
+      if (saveArray(STORAGE_KEYS.notes, savedNotes)) {
+        displayNotes(); updateDashboard(); applySearch();
+        if (removed.attachment?.driveFileId && window.CampusKitNotesStorage?.delete) {
+          try { await window.CampusKitNotesStorage.delete(removed.attachment.driveFileId); }
+          catch (error) { console.warn("Attachment cleanup failed:", error); }
+        }
+      } else savedNotes.splice(index, 0, removed);
+    }));
+    card.appendChild(actions);
+    notesList.appendChild(card);
+  });
+}
+
+function resetNoteForm() {
+  editingNoteId = null;
+  notesForm.reset();
+  saveNoteBtn.textContent = "＋ Save Note";
+  cancelNoteEditBtn.hidden = true;
+  setNotesStatus("");
+}
+
+function beginEditNote(id) {
+  const note = savedNotes.find(item => item.id === id);
+  if (!note) return;
+  editingNoteId = id;
+  const knownSubjects = ["Physics", "Chemistry", "English", "Hindi", "MIL", "Mathematics", "Computer Science", "Other"];
+  if (!knownSubjects.includes(note.subject) && ![...noteSubjectInput.options].some(option => option.value === note.subject)) {
+    const customOption = document.createElement("option");
+    customOption.value = note.subject;
+    customOption.textContent = note.subject;
+    noteSubjectInput.insertBefore(customOption, noteSubjectInput.lastElementChild);
+  }
+  noteSubjectInput.value = note.subject;
+  noteTitleInput.value = note.title || "";
+  noteTagsInput.value = (note.tags || []).join(", ");
+  noteTextInput.value = note.text || "";
+  noteFileInput.value = "";
+  saveNoteBtn.textContent = "Save Changes";
+  cancelNoteEditBtn.hidden = false;
+  setNotesStatus(note.attachment ? `Current attachment: ${note.attachment.name}. Choose a new file to replace it.` : "Editing note.");
+  document.getElementById("notes-library").scrollIntoView({ behavior: "smooth", block: "start" });
+  noteTitleInput.focus({ preventScroll: true });
+}
+
+notesForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const subject = noteSubjectInput.value;
+  const title = noteTitleInput.value.trim();
+  const text = noteTextInput.value.trim();
+  const tags = [...new Set(noteTagsInput.value.split(",").map(tag => tag.trim()).filter(Boolean))].slice(0, 20);
+  const file = noteFileInput.files?.[0] || null;
+  if (!title) return setNotesStatus("Enter a note title.", true);
+  if (!text && !file && !editingNoteId) return setNotesStatus("Write some notes or attach a file first.", true);
+  if (file && file.size > 100 * 1024 * 1024)
+  return setNotesStatus("File is larger than 100 MB. Choose a smaller file.", true);
+  if (file && !/\.(pdf|txt|doc|docx)$/i.test(file.name)) return setNotesStatus("Please attach a PDF, TXT, DOC or DOCX file.", true);
+
+  const previous = editingNoteId ? savedNotes.find(item => item.id === editingNoteId) : null;
+  const now = new Date().toISOString();
+  let attachment = previous?.attachment || null;
+  saveNoteBtn.disabled = true;
+  setNotesStatus(file ? "Uploading attachment…" : "Saving note…");
+  try {
+    if (file) {
+      if (!window.CampusKitNotesStorage?.upload) {
+        throw new Error("Google Drive upload is not ready. Click Connect Google Drive and try again.");
+      }
+      attachment = await window.CampusKitNotesStorage.upload(file, previous?.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())));
+    }
+    const note = normalizeNote({
+      ...(previous || {}), id: previous?.id || (crypto.randomUUID ? crypto.randomUUID() : "note-" + Date.now()),
+      subject, title, text, tags, bookmarked: previous?.bookmarked || false,
+      createdAt: previous?.createdAt || now, updatedAt: now, attachment
+    });
+    const index = savedNotes.findIndex(item => item.id === note.id);
+    if (index >= 0) savedNotes[index] = note; else savedNotes.unshift(note);
+    if (!saveArray(STORAGE_KEYS.notes, savedNotes)) {
+      if (index >= 0 && previous) savedNotes[index] = previous;
+      else savedNotes = savedNotes.filter(item => item.id !== note.id);
+      throw new Error("Could not save to this browser. Check available storage.");
+    }
+    if (file && previous?.attachment?.driveFileId && previous.attachment.driveFileId !== attachment?.driveFileId && window.CampusKitNotesStorage?.delete) {
+      try { await window.CampusKitNotesStorage.delete(previous.attachment.driveFileId); } catch (error) { console.warn("Old attachment cleanup failed:", error); }
+    }
+    resetNoteForm(); displayNotes(); updateDashboard(); applySearch();
+    setNotesStatus("Note saved successfully.");
+  } catch (error) {
+    console.error("Notes Library save error:", error);
+    setNotesStatus(error.message || "Could not save note. Please try again.", true);
+  } finally {
+    saveNoteBtn.disabled = false;
+  }
+});
+
+cancelNoteEditBtn.addEventListener("click", resetNoteForm);
+notesSearchInput.addEventListener("input", displayNotes);
+notesSubjectFilter.addEventListener("change", displayNotes);
+notesSort.addEventListener("change", displayNotes);
+notesBookmarksOnlyBtn.addEventListener("click", () => {
+  bookmarksOnly = !bookmarksOnly;
+  notesBookmarksOnlyBtn.setAttribute("aria-pressed", String(bookmarksOnly));
+  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "★ Show all notes" : "☆ Bookmarks only";
+  displayNotes();
+});
+
+function updateDashboard() {
+  const total = savedAssignments.length;
+  const completed = savedAssignments.filter(item => item.completed === true).length;
+  const pending = total - completed;
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const threeDays = new Date(today);
+  threeDays.setDate(today.getDate() + 3);
+
+  const dueSoon = savedAssignments.filter(item => {
+    if (item.completed || !item.date) return false;
+    const deadline = new Date(item.date + "T00:00:00");
+    return !Number.isNaN(deadline.getTime()) && deadline >= today && deadline <= threeDays;
+  }).length;
+
+  document.getElementById("assignmentCount").textContent = total;
+  document.getElementById("pendingCount").textContent = pending;
+  document.getElementById("completedCount").textContent = completed;
+  document.getElementById("classCount").textContent = timetable.length;
+  document.getElementById("notesCount").textContent = savedNotes.length;
+  document.getElementById("dueSoonCount").textContent = dueSoon;
+  document.getElementById("progressText").textContent = percent + "%";
+  document.getElementById("progressFill").style.width = percent + "%";
+  document.getElementById("progressBar").setAttribute("aria-valuenow", String(percent));
+}
+
+function applySearch() {
+  const query = campusSearch.value.trim().toLowerCase();
+  const searchableItems = document.querySelectorAll("#assignmentList li, #timetableList li, #notesList .note-item");
+  let visibleCount = 0;
+
+  searchableItems.forEach(item => {
+    const matches = !query || item.textContent.toLowerCase().includes(query);
+    item.style.display = matches ? "" : "none";
+    if (matches) visibleCount++;
+  });
+
+  if (!query) {
+    searchMessage.textContent = "Type something to search.";
+  } else {
+    searchMessage.textContent = visibleCount + " matching item(s) found.";
+  }
+}
+campusSearch.addEventListener("input", applySearch);
+document.getElementById("clearSearchBtn").addEventListener("click", () => {
+  campusSearch.value = "";
+  applySearch();
+  campusSearch.focus();
+});
+
+function updateWelcome() {
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  document.getElementById("dashboardTitle").textContent = greeting + ", Student! 👋";
+  document.getElementById("todayDate").textContent = now.toLocaleDateString(undefined, {
+    weekday: "long", day: "numeric", month: "long", year: "numeric"
+  });
+}
+const quotes = [
+  "Small progress every day adds up.",
+  "Focus on progress, not perfection.",
+  "A little study today makes tomorrow easier.",
+  "Keep going — your effort matters."
+];
+document.getElementById("dailyQuote").textContent = quotes[new Date().getDate() % quotes.length];
+
+displayAssignments();
+displayTimetable();
+displayNotes();
+updateDashboard();
+updateWelcome();
+
+/* Animated neural background. If the CDN/WebGL is unavailable, the aurora CSS still works. */
+(async function initNeuralBackground() {
+  const canvas = document.getElementById("neural-bg");
+  if (!canvas) return;
+  try {
+    const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js");
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 35;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const count = window.innerWidth < 600 ? 55 : 90;
+    const points = [];
+    const positions = [];
+    for (let i = 0; i < count; i++) {
+      const p = new THREE.Vector3((Math.random()-.5)*55, (Math.random()-.5)*35, (Math.random()-.5)*25);
+      points.push(p);
+      positions.push(p.x, p.y, p.z);
+    }
+    const nodeGeometry = new THREE.BufferGeometry();
+    nodeGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    const nodeMaterial = new THREE.PointsMaterial({ color: 0x9b7cff, size: .16, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false });
+    const nodes = new THREE.Points(nodeGeometry, nodeMaterial);
+    scene.add(nodes);
+
+    const linePositions = [];
+    for (let i = 0; i < count; i++) {
+      for (let j = i + 1; j < count; j++) {
+        if (points[i].distanceTo(points[j]) < 9) {
+          linePositions.push(points[i].x,points[i].y,points[i].z,points[j].x,points[j].y,points[j].z);
+        }
+      }
+    }
+    const lineGeometry = new THREE.BufferGeometry();
+    lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x7455ff, transparent: true, opacity: .22, blending: THREE.AdditiveBlending, depthWrite: false });
+    const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+    scene.add(lines);
+
+    const palettes = [[0x9b7cff,0x7455ff],[0x42a5ff,0x386bff],[0x42ffe0,0x00a8bb],[0xff6bd6,0xa34dff]];
+    let paletteIndex = 0, lastChange = 0, animationId;
+    let lastFrame = 0;
+    function animate(time) {
+      animationId = requestAnimationFrame(animate);
+      if (time - lastFrame < 32) return;
+      lastFrame = time;
+      if (time - lastChange > 7000) {
+        paletteIndex = (paletteIndex + 1) % palettes.length;
+        nodeMaterial.color.setHex(palettes[paletteIndex][0]);
+        lineMaterial.color.setHex(palettes[paletteIndex][1]);
+        lastChange = time;
+      }
+      nodes.rotation.y += .0007;
+      nodes.rotation.x += .0003;
+      lines.rotation.y = nodes.rotation.y;
+      lines.rotation.x = nodes.rotation.x;
+      renderer.render(scene, camera);
+    }
+    animate(0);
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }, 120);
+    });
+    window.addEventListener("pagehide", () => {
+      cancelAnimationFrame(animationId);
+      renderer.dispose();
+      nodeGeometry.dispose();
+      lineGeometry.dispose();
+      nodeMaterial.dispose();
+      lineMaterial.dispose();
+    }, { once: true });
+  } catch (error) {
+    console.warn("Neural background could not load; keeping the CSS aurora background.", error);
+  }
+})();
+
+// Bridge used by the Firebase module to refresh existing app state without replacing the UI.
+window.CampusKitCloud = {
+  applyCloudData(data) {
+    if (Array.isArray(data.assignments)) {
+      savedAssignments = data.assignments.map(item => ({ ...item, completed: item.completed === true }));
+      localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(savedAssignments));
+    }
+    if (Array.isArray(data.timetable)) {
+      timetable = data.timetable;
+      localStorage.setItem(STORAGE_KEYS.timetable, JSON.stringify(timetable));
+    }
+    if (Array.isArray(data.notes)) {
+      savedNotes = data.notes.map(normalizeNote);
+      localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(savedNotes));
+    }
+    displayAssignments();
+    displayTimetable();
+    displayNotes();
+    updateDashboard();
+    applySearch();
+  },
+  save(key, value) {
+    if (typeof window.CampusKitCloudSave === "function") {
+      window.CampusKitCloudSave(key, value);
+    }
+  }
+};
+</script>
+
+<!-- Google login is displayed only as the first screen; no floating login widget remains. -->
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",
+    authDomain: "campuskit-11f47.firebaseapp.com",
+    projectId: "campuskit-11f47",
+    storageBucket: "campuskit-11f47.firebasestorage.app",
+    messagingSenderId: "900160377191",
+    appId: "1:900160377191:web:44a0220ce9fb85f4391fc2",
+    measurementId: "G-CM5NHSY03B"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+  window.CampusKitAuth = {
+    async getIdToken() {
+      return auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    }
+  };
+  const loginBtn = document.getElementById("ck-google-login");
+  const userBox = document.getElementById("ck-user");
+  const status = document.getElementById("ck-status");
+  let currentUser = null;
+  let cloudReady = false;
+  let saveQueue = Promise.resolve();
+  const collections = {
+    campuskitAssignments: "assignments",
+    campusTimetable: "timetable",
+    campusNotes: "notes"
+  };
+
+  function showStatus(message) {
+    status.textContent = message;
+  }
+
+  async function syncOnLogin(user) {
+    cloudReady = false;
+    showStatus("Syncing your study data...");
+    const cloudData = {};
+    try {
+      for (const [storageKey, docId] of Object.entries(collections)) {
+        const ref = doc(db, "users", user.uid, "campusData", docId);
+        const snapshot = await getDoc(ref);
+        if (snapshot.exists() && Array.isArray(snapshot.data().items)) {
+          cloudData[docId] = snapshot.data().items;
+
+} else {
+  // New account: do not copy another account's browser data.
+  const emptyItems = [];
+  await setDoc(ref, {
+    items: emptyItems,
+    updatedAt: new Date().toISOString()
+  });
+  cloudData[docId] = emptyItems;
+}
+
+      }
+      if (window.CampusKitCloud) window.CampusKitCloud.applyCloudData(cloudData);
+      cloudReady = true;
+      showStatus("Cloud sync on ✓");
+    } catch (error) {
+      console.error("CampusKit cloud sync error:", error);
+      showStatus("Cloud sync failed: " + (error.code || error.message));
+    }
+  }
+
+  window.CampusKitCloudSave = (storageKey, value) => {
+    const docId = collections[storageKey];
+    if (!currentUser || !cloudReady || !docId) return;
+    const userId = currentUser.uid;
+    saveQueue = saveQueue.then(() => setDoc(
+      doc(db, "users", userId, "campusData", docId),
+      { items: value, updatedAt: new Date().toISOString() }
+    )).then(() => {
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync on ✓");
+    }).catch(error => {
+      console.error("CampusKit save error:", error);
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud save failed: " + (error.code || error.message));
+    });
+  };
+
+  // Google Drive uploads use the student's own Google authorization.
+  const DRIVE_CLIENT_ID = "900160377191-o1gh5h2a0n03gue021b1ri9npg3gonst.apps.googleusercontent.com";
+  const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+  const connectDriveBtn = document.getElementById("connectDriveBtn");
+  const driveStatus = document.getElementById("driveStatus");
+  let driveAccessToken = null;
+  let driveTokenClient = null;
+  let driveTokenPending = null;
+
+  function setDriveStatus(message, isError = false) {
+    driveStatus.textContent = message;
+    driveStatus.style.color = isError ? "#ff9cab" : "#d8c8ff";
+  }
+
+  function waitForGoogleIdentity() {
+    return new Promise((resolve, reject) => {
+      const started = Date.now();
+      const check = () => {
+        if (window.google?.accounts?.oauth2) return resolve();
+        if (Date.now() - started > 12000) return reject(new Error("Google authorization did not load. Check your connection and reload."));
+        setTimeout(check, 150);
+      };
+      check();
+    });
+  }
+
+  async function requestDriveToken(prompt = "consent") {
+    if (driveAccessToken && prompt === "none") return driveAccessToken;
+    await waitForGoogleIdentity();
+    if (!driveTokenClient) {
+      driveTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: DRIVE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: response => {
+          if (response?.error) driveTokenPending?.reject(new Error(response.error_description || response.error || "Google Drive authorization failed."));
+          else if (response?.access_token) {
+            driveAccessToken = response.access_token;
+            driveTokenPending?.resolve(driveAccessToken);
+          } else driveTokenPending?.reject(new Error("Google did not return a Drive access token."));
+          driveTokenPending = null;
+        },
+        error_callback: error => {
+          driveTokenPending?.reject(new Error(error?.message || "Google authorization popup was blocked. Allow popups and try again."));
+          driveTokenPending = null;
+        }
+      });
+    }
+    return new Promise((resolve, reject) => {
+      driveTokenPending = { resolve, reject };
+      try { driveTokenClient.requestAccessToken({ prompt }); }
+      catch (error) { driveTokenPending = null; reject(error); }
+    });
+  }
+
+  async function driveApiError(response) {
+    let detail = "";
+    try { const data = await response.json(); detail = data?.error?.message || ""; } catch (_) {}
+    if (response.status === 401) driveAccessToken = null;
+    return new Error(`Google Drive error (${response.status})${detail ? ": " + detail : ". Reconnect Drive and try again."}`);
+  }
+
+  window.CampusKitNotesStorage = {
+    async connect() {
+      setDriveStatus("Waiting for Google Drive authorization…");
+      try {
+        await requestDriveToken("consent");
+        setDriveStatus("Google Drive connected ✓. Files stay private in your Drive.");
+      } catch (error) {
+        setDriveStatus(error.message || "Could not connect Google Drive.", true);
+        throw error;
+      }
+    },
+    async upload(file, noteId) {
+      if (!auth.currentUser) throw new Error("Sign in to CampusKit first.");
+      let token = driveAccessToken;
+      if (!token) token = await requestDriveToken("consent");
+      setDriveStatus("Uploading to your Google Drive…");
+      const metadata = { name: file.name, mimeType: file.type || "application/octet-stream", description: `CampusKit note attachment. Note ID: ${noteId}` };
+      // Resumable upload supports larger attachments (up to the app's 100 MB UI limit).
+      const startResponse = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,name,mimeType,size,webViewLink", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-Upload-Content-Type": metadata.mimeType,
+          "X-Upload-Content-Length": String(file.size)
+        },
+        body: JSON.stringify(metadata)
+      });
+      if (!startResponse.ok) throw await driveApiError(startResponse);
+      const uploadUrl = startResponse.headers.get("Location");
+      if (!uploadUrl) throw new Error("Google Drive did not provide an upload URL. Please reconnect and try again.");
+      const response = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": metadata.mimeType },
+        body: file
+      });
+      if (!response.ok) throw await driveApiError(response);
+      const saved = await response.json();
+      if (!saved.id) throw new Error("Google Drive did not return a file ID.");
+      setDriveStatus("File uploaded to your Google Drive ✓");
+      return {
+        name: saved.name || file.name, driveFileId: saved.id,
+        url: saved.webViewLink || `https://drive.google.com/file/d/${saved.id}/view`,
+        size: Number(saved.size || file.size), contentType: saved.mimeType || file.type || "application/octet-stream",
+        provider: "google-drive"
+      };
+    },
+    async delete(driveFileId) {
+      if (!driveFileId) return;
+      if (!driveAccessToken) throw new Error("Reconnect Google Drive before deleting its attachment.");
+      const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFileId)}`, {
+        method: "DELETE", headers: { Authorization: `Bearer ${driveAccessToken}` }
+      });
+      if (!response.ok && response.status !== 404) throw await driveApiError(response);
+    }
+  };
+
+  connectDriveBtn?.addEventListener("click", async () => {
+    connectDriveBtn.disabled = true;
+    try { await window.CampusKitNotesStorage.connect(); }
+    catch (error) { console.warn("Google Drive connection failed:", error); }
+    finally { connectDriveBtn.disabled = false; }
+  });
+
+  // Shared relaxation playlist: all students read the same Firestore collection.
+  const musicForm = document.getElementById("musicForm");
+  const musicList = document.getElementById("musicList");
+  const musicStatus = document.getElementById("musicStatus");
+  const musicPlayer = document.getElementById("musicPlayer");
+  const musicPlayerHint = document.getElementById("musicPlayerHint");
+  function safeMusicUrl(raw) {
+    try {
+      const u = new URL(raw.trim());
+      if (u.protocol !== "https:") return null;
+      const host = u.hostname.toLowerCase();
+      const validId = id => /^[A-Za-z0-9_-]{6,40}$/.test(id || "");
+
+      // YouTube video, Shorts, embed, youtu.be, and playlist links.
+      if (host === "youtu.be") {
+        const id = u.pathname.split("/").filter(Boolean)[0] || "";
+        if (!validId(id)) return null;
+        return { type: "youtube-video", id, list: u.searchParams.get("list") || "", url: u.href };
+      }
+      if (["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
+        const list = u.searchParams.get("list") || "";
+        if (u.pathname === "/playlist" && validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
+        const parts = u.pathname.split("/").filter(Boolean);
+        let id = "";
+        if (u.pathname === "/watch") id = u.searchParams.get("v") || "";
+        else if (["embed", "shorts", "live"].includes(parts[0])) id = parts[1] || "";
+        if (validId(id)) return { type: "youtube-video", id, list, url: u.href };
+        if (validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
+      }
+
+      // Spotify track, album, playlist, episode, or show URLs.
+      if (["open.spotify.com", "www.open.spotify.com"].includes(host)) {
+        const match = u.pathname.match(/^\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)\/?$/);
+        if (match) return { type: "spotify", kind: match[1], id: match[2], url: u.href };
+      }
+    } catch (_) {}
+    return null;
+  }
+  function playMusic(item) {
+    const parsed = safeMusicUrl(item.url || "");
+    if (!parsed) {
+      musicStatus.textContent = "This link is not supported. Use a YouTube video/playlist or Spotify track/playlist link.";
+      return;
+    }
+    musicPlayerHint.textContent = item.title || "Relaxation track";
+    if (parsed.type === "youtube-playlist") {
+      musicPlayer.src = `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(parsed.list)}&autoplay=1`;
+    } else if (parsed.type === "youtube-video") {
+      const listPart = parsed.list ? `&list=${encodeURIComponent(parsed.list)}` : "";
+      musicPlayer.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(parsed.id)}?autoplay=1&rel=0${listPart}`;
+    } else {
+      musicPlayer.src = `https://open.spotify.com/embed/${parsed.kind}/${encodeURIComponent(parsed.id)}?utm_source=generator`;
+    }
+    musicPlayer.title = `Player: ${item.title || "Relaxation track"}`;
+    musicStatus.textContent = "Player loaded. If playback does not start automatically, press Play inside the player.";
+  }
+  function renderMusic(items) {
+    musicList.replaceChildren();
+    if (!items.length) { const li = document.createElement("li"); li.textContent = "No tracks yet. Sign in and add the first one."; musicList.append(li); return; }
+    items.forEach(item => {
+      const li = document.createElement("li"); li.className = "music-item";
+      const info = document.createElement("div");
+      const title = document.createElement("strong"); title.textContent = item.title || "Untitled track";
+      const link = document.createElement("a"); link.href = item.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "Open track";
+      info.append(title, document.createElement("br"), link);
+      const play = document.createElement("button"); play.type = "button"; play.textContent = "Play"; play.addEventListener("click", () => playMusic(item));
+      li.append(info, play); musicList.append(li);
+    });
+  }
+  onSnapshot(query(collection(db, "publicMusic"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
+    renderMusic(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  }, error => {
+    console.error("Shared music playlist error:", error);
+    musicList.textContent = "Playlist needs Firestore rules setup. See the instructions provided with this code.";
+  });
+  musicForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const title = document.getElementById("musicTitle").value.trim();
+    const rawUrl = document.getElementById("musicUrl").value.trim();
+    const parsed = safeMusicUrl(rawUrl);
+    if (!parsed) { musicStatus.textContent = "Unsupported link. Use an HTTPS YouTube video/playlist or Spotify track/album/playlist/episode link."; return; }
+    if (!auth.currentUser) { musicStatus.textContent = "Sign in with Google before adding a shared track."; return; }
+    musicStatus.textContent = "Adding track…";
+    try {
+      await addDoc(collection(db, "publicMusic"), { title, url: parsed.url, type: parsed.type, addedBy: auth.currentUser.displayName || "CampusKit student", createdAt: new Date().toISOString() });
+      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students ✓";
+    } catch (error) {
+      console.error("Could not add shared music:", error);
+      musicStatus.textContent = "Could not add: " + (error.code || error.message || "unknown error") + ". Check Firestore rules for publicMusic and confirm you are signed in.";
+    }
+  });
+
+  loginBtn.addEventListener("click", async () => {
+    showStatus("Opening Google sign-in...");
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      showStatus("Sign-in failed: " + (error.code || error.message));
+      console.error("Google sign-in error:", error);
+    }
+  });
+
+  async function campusKitSignOut() {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      showStatus("Sign-out failed: " + (error.code || error.message));
+    }
+  }
+  document.getElementById("ck-logout").addEventListener("click", campusKitSignOut);
+  document.getElementById("ck-sidebar-logout").addEventListener("click", campusKitSignOut);
+
+  onAuthStateChanged(auth, async user => {
+    currentUser = user;
+    cloudReady = false;
+    document.body.classList.toggle("authenticated", Boolean(user));
+    document.getElementById("campuskit-login-screen").setAttribute("aria-hidden", user ? "true" : "false");
+    loginBtn.style.display = user ? "none" : "inline-block";
+    userBox.style.display = "none";
+
+    if (!user) {
+      showStatus("Sign in to open CampusKit and sync your study data.");
+      return;
+    }
+
+    document.getElementById("ck-name").textContent = user.displayName || user.email || "Student";
+    const avatar = document.getElementById("ck-avatar");
+    avatar.src = user.photoURL || "";
+    avatar.style.display = user.photoURL ? "block" : "none";
+    await syncOnLogin(user);
+  });
+</script>
+
+<script>
+(() => {
+  const form = document.getElementById("aiForm");
+  const questionInput = document.getElementById("aiQuestion");
+  const sendButton = document.getElementById("aiSend");
+  const chat = document.getElementById("aiChat");
+  const status = document.getElementById("aiStatus");
+
+const WORKER_URL = "/api/ask";
+
+  function addMessage(label, message) {
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText =
+      "margin:12px 0;padding:12px;border-radius:10px;" +
+      "background:rgba(105,85,170,.18);overflow-wrap:anywhere;";
+
+    const heading = document.createElement("strong");
+    heading.textContent = label;
+
+    const content = document.createElement("p");
+    content.style.whiteSpace = "pre-wrap";
+    content.textContent = message;
+
+    wrapper.append(heading, content);
+    chat.appendChild(wrapper);
+    return wrapper;
+  }
+
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const question = questionInput.value.trim();
+    if (!question) return;
+
+    addMessage("You", question);
+    questionInput.value = "";
+    sendButton.disabled = true;
+    status.textContent = "AI is thinking...";
+
+    try {
+      const idToken = await window.CampusKitAuth?.getIdToken();
+      if (!idToken) throw new Error("Please sign in with Google before using CampusKit AI.");
+
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "AI request failed.");
+      }
+
+      addMessage("CampusKit AI", data.answer || "No answer received.");
+      status.textContent = "Answer received.";
+    } catch (error) {
+      addMessage("CampusKit AI", error.message || "Sorry, the AI could not respond. Please try again.");
+      status.textContent = "Request failed.";
+      console.error("CampusKit AI error:", error);
+    } finally {
+      sendButton.disabled = false;
+    }
+  });
+})();
+</script>
+
+
+<script>
+(() => {
+  const links = [...document.querySelectorAll('.side-nav a[href^="#"]')];
+  links.forEach(link => link.addEventListener('click', () => {
+    links.forEach(item => item.classList.toggle('active', item === link));
+  }));
+  const targets = links.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a,b) => b.intersectionRatio-a.intersectionRatio)[0];
+      if (visible) links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + visible.target.id));
+    }, {rootMargin:'-15% 0px -65% 0px', threshold:[0,.1,.3]});
+    targets.forEach(target => observer.observe(target));
+  }
+})();
+</script>
+
+
+<script>
+(() => {
+  const nav = document.querySelector('.side-nav');
+  const links = [...nav.querySelectorAll('a[href^="#"]')];
+  const views = ['dashboard','search-section','study-tools-view','notes-library','ai-assistant','relaxation-section'];
+  function setView(name) {
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'] };
+    const selected = map[name] || map.dashboard;
+    views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
+    const tools = document.getElementById('study-tools');
+    if (tools) {
+      tools.querySelectorAll(':scope > section').forEach(card => card.style.display = (name === 'study-tools' && card.id !== 'notes-library') || (name === 'notes-library' && card.id === 'notes-library') ? '' : 'none');
+      const notes = document.getElementById('notes-library');
+      if (notes) notes.style.display = name === 'notes-library' ? '' : 'none';
+    }
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name)));
+    if (name === 'notes-library') { document.getElementById('notes-library').style.display = ''; }
+    if (name === 'study-tools') document.getElementById('study-tools').querySelectorAll(':scope > section').forEach(card => card.style.display = card.id === 'notes-library' ? 'none' : '');
+    if (name === 'dashboard') { document.getElementById('search-section').classList.add('active-view'); }
+    history.replaceState(null, '', '#' + name);
+  }
+  links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
+  const initial = location.hash.slice(1);
+  setView(['study-tools','notes-library','ai-assistant','relaxation-section'].includes(initial) ? initial : 'dashboard');
+})();
+</script>
+
+</body>
+</html>
