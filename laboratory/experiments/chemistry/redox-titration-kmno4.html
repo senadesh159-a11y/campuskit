@@ -1,0 +1,228 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redox Titration | CampusKit</title>
+<style>
+:root {
+    --bg:#090909; --card:#151515; --lime:#b7f34a;
+    --text:#f5f5f5; --muted:#aaa; --border:#303030;
+}
+* {box-sizing:border-box;margin:0;padding:0}
+body {
+    background:var(--bg);color:var(--text);
+    font-family:Arial,sans-serif;line-height:1.7;padding:18px;
+}
+.container {max-width:950px;margin:auto}
+header {padding:28px 0;border-bottom:1px solid var(--border);margin-bottom:22px}
+.tag {color:var(--lime);font-size:13px;letter-spacing:2px;font-weight:bold}
+h1 {font-size:30px;margin:10px 0}
+header p,.muted {color:var(--muted)}
+section {
+    background:var(--card);border:1px solid var(--border);
+    border-radius:13px;padding:22px;margin:17px 0;
+}
+h2 {color:var(--lime);font-size:20px;margin-bottom:12px}
+ul,ol {padding-left:22px}
+li {margin:7px 0}
+.formula {
+    background:#202820;border:1px solid #526d2c;color:var(--lime);
+    padding:17px;border-radius:9px;text-align:center;
+    font-size:18px;font-weight:bold;margin:14px 0;
+}
+.table-wrap {overflow-x:auto}
+table {width:100%;border-collapse:collapse;min-width:520px;margin-top:12px}
+th,td {border:1px solid var(--border);padding:11px;text-align:center}
+th {color:var(--lime);background:#242424}
+input {
+    width:85px;padding:8px;background:#090909;color:white;
+    border:1px solid #555;border-radius:6px;text-align:center;
+}
+button {
+    background:var(--lime);color:#111;border:0;padding:11px 17px;
+    border-radius:8px;font-weight:bold;cursor:pointer;margin-top:12px;
+}
+.result,.note {
+    background:#202820;padding:14px;border-radius:9px;margin-top:14px;
+}
+.result {color:var(--lime);font-weight:bold}
+.note {border-left:4px solid var(--lime)}
+footer {text-align:center;color:var(--muted);padding:25px;font-size:13px}
+@media(max-width:600px) {
+    body {padding:11px} h1 {font-size:25px} section {padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+<div class="tag">CAMPUSKIT • CHEMISTRY LABORATORY</div>
+<h1>Redox Titration</h1>
+<p>Estimation of Ferrous Ammonium Sulphate using standard potassium permanganate solution.</p>
+</header>
+
+<section>
+<h2>1. Aim</h2>
+<p>To determine the concentration of the given Ferrous Ammonium Sulphate (FAS) solution by titrating it against standard potassium permanganate (KMnO₄) solution in an acidic medium.</p>
+</section>
+
+<section>
+<h2>2. Apparatus Required</h2>
+<ul>
+<li>Burette and burette stand</li>
+<li>Volumetric pipette</li>
+<li>Conical flask</li>
+<li>Beaker and funnel</li>
+<li>Measuring cylinder</li>
+<li>White tile</li>
+</ul>
+</section>
+
+<section>
+<h2>3. Chemicals Required</h2>
+<ul>
+<li>Standard potassium permanganate (KMnO₄) solution</li>
+<li>Ferrous Ammonium Sulphate (FAS) solution</li>
+<li>Dilute sulphuric acid (H₂SO₄)</li>
+<li>Distilled water</li>
+</ul>
+</section>
+
+<section>
+<h2>4. Theory</h2>
+<p>Redox titration is based on an oxidation-reduction reaction in which electrons are transferred between two reacting substances.</p>
+<p>In this experiment, ferrous ions (Fe²⁺) are oxidised to ferric ions (Fe³⁺), while permanganate ions (MnO₄⁻) are reduced to manganese ions (Mn²⁺) in an acidic medium.</p>
+<div class="formula">
+MnO₄⁻ + 5Fe²⁺ + 8H⁺
+<br>→ Mn²⁺ + 5Fe³⁺ + 4H₂O
+</div>
+<p>KMnO₄ acts as a self-indicator. The endpoint is indicated by the appearance of a faint permanent pink colour.</p>
+</section>
+
+<section>
+<h2>5. Formula</h2>
+<div class="formula">
+N₁V₁ = N₂V₂
+</div>
+<ul>
+<li>N₁ = Normality of KMnO₄</li>
+<li>V₁ = Volume of KMnO₄ used</li>
+<li>N₂ = Normality of FAS</li>
+<li>V₂ = Volume of FAS taken</li>
+</ul>
+<p>Therefore:</p>
+<div class="formula">
+N(FAS) = [N(KMnO₄) × V(KMnO₄)] / V(FAS)
+</div>
+</section>
+
+<section>
+<h2>6. Procedure</h2>
+<ol>
+<li>Wash the burette and rinse it with KMnO₄ solution.</li>
+<li>Fill the burette with standard KMnO₄ solution and note its initial reading.</li>
+<li>Rinse the pipette with FAS solution.</li>
+<li>Transfer 20 ml of FAS solution into a clean conical flask.</li>
+<li>Add about 10 ml of dilute sulphuric acid.</li>
+<li>Titrate with KMnO₄ while continuously swirling the flask.</li>
+<li>Add KMnO₄ dropwise near the endpoint.</li>
+<li>Stop when a faint pink colour persists for about 30 seconds.</li>
+<li>Record the final burette reading and repeat for concordant readings.</li>
+</ol>
+<div class="note">The reaction mixture may be kept at room temperature for this FAS titration. Do not heat it unless your laboratory procedure specifically instructs you to.</div>
+</section>
+
+<section>
+<h2>7. Observation Table</h2>
+<p class="muted">Illustrative readings only. Replace these with your actual laboratory observations.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Trial</th><th>Initial (ml)</th><th>Final (ml)</th><th>KMnO₄ Used (ml)</th></tr>
+</thead>
+<tbody id="readings">
+<tr><td>1</td><td><input type="number" value="0" step="0.1"></td><td><input type="number" value="19.8" step="0.1"></td><td class="used">19.80</td></tr>
+<tr><td>2</td><td><input type="number" value="0" step="0.1"></td><td><input type="number" value="19.7" step="0.1"></td><td class="used">19.70</td></tr>
+<tr><td>3</td><td><input type="number" value="0" step="0.1"></td><td><input type="number" value="19.8" step="0.1"></td><td class="used">19.80</td></tr>
+</tbody>
+</table>
+</div>
+<button onclick="calculate()">Calculate Readings</button>
+<div class="result" id="average">Average titre: 19.77 ml (illustrative)</div>
+</section>
+
+<section>
+<h2>8. Calculation</h2>
+<p>Suppose the following values are used:</p>
+<ul>
+<li>Normality of KMnO₄ = 0.1 N</li>
+<li>Volume of KMnO₄ = 19.77 ml</li>
+<li>Volume of FAS = 20 ml</li>
+</ul>
+<div class="formula">
+N₁V₁ = N₂V₂
+<br><br>
+0.1 × 19.77 = N₂ × 20
+<br><br>
+N₂ = 0.09885 N
+</div>
+<p>The illustrative normality of FAS is 0.09885 N.</p>
+</section>
+
+<section>
+<h2>9. Result</h2>
+<p>The normality of the given Ferrous Ammonium Sulphate solution is determined by titration against standard potassium permanganate solution in an acidic medium.</p>
+<div class="note">Write the final numerical result using your actual concordant readings.</div>
+</section>
+
+<section>
+<h2>10. Precautions</h2>
+<ul>
+<li>Use only dilute sulphuric acid to provide the acidic medium.</li>
+<li>Do not use hydrochloric acid or nitric acid in this titration.</li>
+<li>Ensure there are no air bubbles in the burette tip.</li>
+<li>Read the burette at eye level.</li>
+<li>Add KMnO₄ dropwise near the endpoint.</li>
+<li>Use clean apparatus and avoid contamination.</li>
+<li>Wear safety goggles and gloves.</li>
+</ul>
+</section>
+
+<footer>CampusKit • Student Laboratory Resources</footer>
+</div>
+
+<script>
+function calculate() {
+    const rows = document.querySelectorAll("#readings tr");
+    let values = [];
+
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const initial = Number(inputs[0].value);
+        const final = Number(inputs[1].value);
+        const used = final - initial;
+
+        row.querySelector(".used").textContent =
+            used >= 0 ? used.toFixed(2) : "Invalid";
+
+        if (inputs[0].value !== "" && inputs[1].value !== "" && used >= 0) {
+            values.push(used);
+        }
+    });
+
+    const output = document.getElementById("average");
+
+    if (!values.length) {
+        output.textContent = "Please enter valid readings.";
+        return;
+    }
+
+    const avg = values.reduce((a,b) => a+b, 0) / values.length;
+    output.textContent = "Average titre: " + avg.toFixed(2) + " ml";
+}
+</script>
+</body>
+</html>
