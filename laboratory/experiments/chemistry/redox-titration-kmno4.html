@@ -55,7 +55,96 @@ footer {text-align:center;color:var(--muted);padding:25px;font-size:13px}
 }
 </style>
 </head>
-<body>
+<body><style>
+.ck3d-wrap{max-width:1500px;margin:18px auto 26px;padding:0 18px;color:#f5f8ff;font-family:Arial,sans-serif}
+.ck3d-card{background:linear-gradient(145deg,#101f34,#080f1d);border:1px solid #34536b;border-radius:20px;padding:16px;box-shadow:0 18px 55px #0007}
+.ck3d-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.ck3d-kicker{color:#c6ff00;font-size:11px;font-weight:800;letter-spacing:.16em}
+.ck3d-title{font-size:clamp(20px,3vw,30px);margin:4px 0;color:#fff}.ck3d-desc{color:#b9c9d9;margin:0;font-size:14px}
+#ck3d-viewer{height:min(68vh,760px);min-height:360px;position:relative;overflow:hidden;border-radius:14px;border:1px solid #294863;background:#07111f;touch-action:none}
+#ck3d-viewer canvas{display:block;width:100%;height:100%;touch-action:none}
+.ck3d-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ck3d-toolbar button{border:1px solid #4d6b82;border-radius:10px;padding:10px 14px;background:#172b40;color:#f4f8ff;font-weight:700;cursor:pointer}
+.ck3d-toolbar button.primary{background:#c6ff00;color:#142000;border-color:#c6ff00}
+.ck3d-hint{position:absolute;left:12px;bottom:12px;padding:8px 11px;background:#050b16d9;border:1px solid #ffffff24;border-radius:9px;color:#e8f4ff;font-size:12px;pointer-events:none}
+#ck3d-viewer:fullscreen{width:100vw;height:100vh;max-width:none;min-height:100vh;border:0;border-radius:0}
+#ck3d-viewer:fullscreen canvas{width:100%;height:100%}
+.ck3d-status{font-size:12px;color:#c6ff00;margin:8px 2px 0}
+@media(max-width:600px){.ck3d-wrap{padding:0 10px}.ck3d-card{padding:11px}#ck3d-viewer{height:56vh;min-height:300px}}
+</style>
+<section class="ck3d-wrap"><div class="ck3d-card">
+<div class="ck3d-head"><div><div class="ck3d-kicker">CAMPUSKIT • CHEMISTRY • IMMERSIVE 3D LAB</div><h2 class="ck3d-title">Redox Titration (KMnO₄) — 3D View</h2><p class="ck3d-desc">Explore the burette and conical flask used for permanganate redox titration.</p></div></div>
+<div id="ck3d-viewer"><div class="ck3d-hint">🖱️ Drag = rotate · Scroll/pinch = zoom · Right-drag = pan</div></div>
+<div class="ck3d-toolbar"><button class="primary" id="ck3d-full">⛶ Full screen</button><button id="ck3d-reset">↺ Reset view</button><button id="ck3d-auto">Auto-rotate: OFF</button></div><div class="ck3d-status" id="ck3d-status">Interactive 3D model • High-resolution responsive rendering</div>
+</div></section>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+const host=document.getElementById('ck3d-viewer'),scene=new THREE.Scene();
+scene.background=new THREE.Color(0x07111f);
+const camera=new THREE.PerspectiveCamera(42,host.clientWidth/host.clientHeight,.1,100);
+camera.position.set(7,5.5,8);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));
+renderer.setSize(host.clientWidth,host.clientHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+host.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;controls.dampingFactor=.06;controls.enablePan=true;controls.enableZoom=true;controls.minDistance=2;controls.maxDistance=24;
+scene.add(new THREE.HemisphereLight(0xd9efff,0x18243a,2));
+const key=new THREE.DirectionalLight(0xffffff,2.4);key.position.set(6,9,7);scene.add(key);
+const rim=new THREE.DirectionalLight(0x55bfff,1.2);rim.position.set(-7,3,-6);scene.add(rim);
+scene.add(new THREE.GridHelper(12,12,0x34516c,0x1c3047));
+const root=new THREE.Group();scene.add(root);
+const mat=(color,roughness=.45,metalness=.05,transparent=false,opacity=1)=>new THREE.MeshStandardMaterial({color,roughness,metalness,transparent,opacity});
+function sphere(x,y,z,r,c){const o=new THREE.Mesh(new THREE.SphereGeometry(r,28,20),mat(c));o.position.set(x,y,z);root.add(o);return o}
+function box(x,y,z,w,h,d,c){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));o.position.set(x,y,z);root.add(o);return o}
+function rod(a,b,r,c,r2=r){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),v=B.clone().sub(A);const o=new THREE.Mesh(new THREE.CylinderGeometry(r2,r,v.length(),18),mat(c));o.position.copy(A).add(B).multiplyScalar(.5);o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());root.add(o);return o}
+function line(points,c=0xffffff){const g=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(...p)));const o=new THREE.Line(g,new THREE.LineBasicMaterial({color:c}));root.add(o);return o}
+let moving=null;
+const type="titration";
+if(type==='pendulum'){
+ box(0,2.8,0,3,.18,.65,0x8aa5bd);rod([0,2.7,0],[0,2.35,0],.08,0xb9d5e8);
+ const string=rod([0,2.35,0],[0,.2,0],.025,0xe9f4ff);
+ const bob=sphere(0,.2,0,.34,0x35c8ff);bob.material.metalness=.45;
+ moving={string,bob};
+ line([0,2.35,0].map((v,i)=>[i===0?0:i===1?v:0,i===1?v:0,i===2?0:0]),0x35c8ff);
+}else if(type==='prism'){
+ const shape=new THREE.Shape();shape.moveTo(0,1.9);shape.lineTo(-1.8,-1.45);shape.lineTo(1.8,-1.45);shape.closePath();
+ const geo=new THREE.ExtrudeGeometry(shape,{depth:1.1,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.06,bevelThickness:.06});
+ const prism=new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:0x8bdcff,transparent:true,opacity:.34,roughness:.12,metalness:.1,transmission:.2,side:THREE.DoubleSide}));prism.position.z=-.55;root.add(prism);
+ rod([-4,.1,.05],[-1.55,.1,.05],.035,0xffffff);rod([-.65,-.2,.08],[3.8,-1.15,.08],.035,0xffd45b);
+ for(let i=0;i<5;i++)rod([-.65,-.2,.08],[3.8,-1.15+i*.12,.08],.012,[0xff5a5a,0xffa34d,0xffff70,0x63e58a,0x64baff][i]);
+}else if(type==='caliper'){
+ box(0,0,0,6,.22,.42,0x9eb4c5);box(-2.55,.25,0,.18,.8,.42,0xc3d2dc);box(-2.0,.15,0,.18,.6,.42,0x8ca9bd);
+ box(1.3,.18,0,.18,.65,.42,0xc3d2dc);box(1.8,.1,0,.18,.5,.42,0x8ca9bd);
+ box(.1,.18,0,2.2,.07,.18,0xc6ff00);
+ for(let i=0;i<31;i++)box(-2.7+i*.18,-.15,0,.018,(i%5===0?.18:.1),.03,0xe8f3ff);
+ box(.8,-.38,0,.12,.5,.12,0xc3d2dc);
+}else if(type==='titration'){
+ const purple=true;
+ rod([-.9,2.8,0],[-.9,-.2,0],.075,0x9dc8df);
+ const burette= new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,2.7,24,1,true),new THREE.MeshPhysicalMaterial({color:0xa8e8ff,transparent:true,opacity:.28,side:THREE.DoubleSide}));burette.position.set(-.9,1.45,0);root.add(burette);
+ for(let i=0;i<10;i++)box(-.78,2.5-i*.23,.02,.12,.018,.025,0xeaf7ff);
+ rod([-.9,.05,0],[-.9,-.35,0],.025,0xc8e3f2);sphere(-.9,-.38,0,.07,0xffd84d);
+ const flask=new THREE.Mesh(new THREE.ConeGeometry(.8,1.3,32,1,true),new THREE.MeshPhysicalMaterial({color:0xbfeaff,transparent:true,opacity:.22,side:THREE.DoubleSide}));flask.position.set(.65,-.45,0);flask.rotation.z=Math.PI;root.add(flask);
+ rod([.65,-1.08,0],[.65,-1.35,0],.42,0xa9cde1,.42);
+ sphere(.65,-.85,0,.35,purple?0x8c3cff:0x4b9cff).scale.set(1,.6,1);
+}else if(type==='viscometer'){
+ const pts=[[-1.4,1.8,0],[-1.4,-1.1,0],[-1.15,-1.55,0],[-.7,-1.72,0],[.7,-1.72,0],[1.15,-1.55,0],[1.4,-1.1,0],[1.4,1.8,0]];
+ const curve=new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)));
+ const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,100,.12,20,false),new THREE.MeshPhysicalMaterial({color:0x9edfff,transparent:true,opacity:.38,roughness:.1,side:THREE.DoubleSide}));root.add(tube);
+ rod([-1.4,1.2,.02],[-1.4,.9,.02],.02,0xc6ff00);rod([1.4,1.2,.02],[1.4,.9,.02],.02,0xc6ff00);
+}
+function resetView(){camera.position.set(7,5.5,8);controls.target.set(0,0,0);controls.update();root.rotation.set(0,0,0)}
+document.getElementById('ck3d-reset').onclick=resetView;
+document.getElementById('ck3d-auto').onclick=e=>{controls.autoRotate=!controls.autoRotate;e.currentTarget.textContent=controls.autoRotate?'Auto-rotate: ON':'Auto-rotate: OFF'};
+document.getElementById('ck3d-full').onclick=async()=>{try{if(!document.fullscreenElement)await host.requestFullscreen();else await document.exitFullscreen()}catch(err){document.getElementById('ck3d-status').textContent='Fullscreen is not available in this browser.'}};
+function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));renderer.setSize(w,h)}
+new ResizeObserver(resize).observe(host);window.addEventListener('resize',resize);
+function animate(t){requestAnimationFrame(animate);if(moving){const a=Math.sin(t*.0015)*.42;const L=2.15;const x=Math.sin(a)*L,y=2.35-Math.cos(a)*L;moving.bob.position.set(x,y,0);moving.string.position.set(x/2, (2.35+y)/2,0);moving.string.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(x,y-2.35,0).normalize())}controls.update();renderer.render(scene,camera)}
+animate();
+</script>
 <div class="container">
 
 <header>
