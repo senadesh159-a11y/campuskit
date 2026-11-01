@@ -1601,7 +1601,7 @@ window.CampusKitCloud = {
   const chat = document.getElementById("aiChat");
   const status = document.getElementById("aiStatus");
 
-const WORKER_URL = "/api/ask";
+const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
 
   function addMessage(label, message) {
     const wrapper = document.createElement("div");
@@ -1794,8 +1794,12 @@ async function loadLabExperiments(subject) {
 
             link.textContent = "Open Practical →";
 
-            link.href =
-                `/campuskit/laboratory/experiments/${folder}/${encodeURIComponent(file.name)}`;
+           const LAB_BASE_PATH = location.hostname.endsWith("github.io")
+    ? "/campuskit"
+    : "";
+
+link.href =
+    `${LAB_BASE_PATH}/laboratory/experiments/${folder}/${encodeURIComponent(file.name)}`;
 
             card.append(title, description, link);
 
