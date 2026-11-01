@@ -64,11 +64,31 @@ module.exports = async function handler(req, res) {
       model: "gemini-3.8-flash"
     });
 
-    const result = await model.generateContent(
-      `You are CampusKit AI, a helpful student assistant. Answer clearly and simply.
+ let result;
+const prompt = `You are CampusKit AI, a helpful student assistant. Answer clearly and simply.
 
-Student question: ${question.trim()}`
+Student question: ${question.trim()}`;
+
+for (let attempt = 1; attempt <= 3; attempt++) {
+  try {
+    result = await model.generateContent(prompt);
+    break;
+  } catch (error) {
+    const retryable = [429, 500, 502, 503, 504].includes(error.status);
+
+    if (!retryable || attempt === 3) {
+      console.error("Gemini retry failed:", error);
+
+      return res.status(error.status === 503 ? 503 : 500).json({
+        error: "CampusKit AI is temporarily busy. Please try again in a minute."
+      });
+    }
+
+    await new Promise(resolve =>
+      setTimeout(resolve, attempt * 2000)
     );
+  }
+}
 
     return res.status(200).json({
       answer: result.response.text()
