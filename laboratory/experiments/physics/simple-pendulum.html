@@ -1,1 +1,161 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lab | Simple Pendulum</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d12;color:#eaf2f5;font-family:Arial,sans-serif}
+header{padding:18px 24px;background:#111b22;border-bottom:1px solid #293942}
+h1{font-size:22px;margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;padding:18px}
+#scene{height: min(70vh,620px);min-height:400px;background:#101c24;border:1px solid #34434c;border-radius:14px;overflow:hidden}
+.panel{background:#111b22;border:1px solid #34434c;border-radius:14px;padding:18px}
+label{display:block;margin:18px 0 8px}
+input{width:100%;accent-color:#a3e635}
+button{background:#a3e635;color:#101810;border:0;border-radius:8px;padding:11px 14px;font-weight:bold;cursor:pointer;margin:5px 3px 5px 0}
+.output{padding:12px;background:#1b2a32;border-radius:8px;margin-top:12px}
+small{color:#aab8bf}
+@media(max-width:800px){main{grid-template-columns:1fr}#scene{height:55vh}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header><h1>Physics Laboratory / Simple Pendulum</h1></header>
+<main>
+<section id="scene"></section>
+<aside class="panel">
+<h2>Experiment Controls</h2>
+<label>Length: <b id="lengthValue">1.00 m</b></label>
+<input id="length" type="range" min="0.3" max="2" step="0.05" value="1">
+
+<label>Mass: <b id="massValue">100 g</b></label>
+<input id="mass" type="range" min="50" max="500" step="10" value="100">
+
+<label>Initial angle: <b id="angleValue">20°</b></label>
+<input id="angle" type="range" min="5" max="45" value="20">
+
+<div>
+<button id="start">Start</button>
+<button id="pause">Pause</button>
+<button id="reset">Reset</button>
+</div>
+
+<div class="output">
+<p>Time: <b id="time">0.00 s</b></p>
+<p>Period: <b id="period">2.01 s</b></p>
+<p>Gravity: <b>9.81 m/s²</b></p>
+</div>
+<p><small>Change the controls and observe the pendulum motion.</small></p>
+</aside>
+</main>
+
+<script type="module">
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+const container=document.getElementById("scene");
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x101c24);
+
+const camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
+camera.position.set(3,2.5,5);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(container.clientWidth,container.clientHeight);
+container.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x263746,2));
+const light=new THREE.DirectionalLight(0xffffff,2);
+light.position.set(3,5,4);
+scene.add(light);
+
+const floor=new THREE.GridHelper(8,20,0x526b70,0x263b43);
+floor.position.y=-0.05;
+scene.add(floor);
+
+const support=new THREE.Mesh(
+ new THREE.BoxGeometry(2.5,0.12,0.25),
+ new THREE.MeshStandardMaterial({color:0x82949a,metalness:.6,roughness:.3})
+);
+support.position.y=2.6;
+scene.add(support);
+
+const pivot=new THREE.Vector3(0,2.53,0);
+const rod=new THREE.Mesh(
+ new THREE.CylinderGeometry(.018,.018,1,16),
+ new THREE.MeshStandardMaterial({color:0xc4d1d5,metalness:.7})
+);
+scene.add(rod);
+
+const bob=new THREE.Mesh(
+ new THREE.SphereGeometry(.14,32,32),
+ new THREE.MeshStandardMaterial({color:0xa3e635,metalness:.25,roughness:.25})
+);
+scene.add(bob);
+
+const gravity=9.81;
+let running=false,elapsed=0,last=0,angle=20*Math.PI/180;
+let length=1;
+
+function updatePendulum(){
+ const x=length*Math.sin(angle);
+ const y=-length*Math.cos(angle);
+ bob.position.set(x,pivot.y+y,0);
+ rod.position.set(x/2,pivot.y+y/2,0);
+ rod.scale.y=length;
+ rod.rotation.z=-angle;
+}
+function updateValues(){
+ document.getElementById("lengthValue").textContent=length.toFixed(2)+" m";
+ document.getElementById("massValue").textContent=document.getElementById("mass").value+" g";
+ document.getElementById("angleValue").textContent=document.getElementById("angle").value+"°";
+ document.getElementById("period").textContent=(2*Math.PI*Math.sqrt(length/gravity)).toFixed(2)+" s";
+}
+document.getElementById("length").oninput=e=>{
+ length=Number(e.target.value);updateValues();updatePendulum();
+};
+document.getElementById("mass").oninput=updateValues;
+document.getElementById("angle").oninput=e=>{
+ if(!running)angle=Number(e.target.value)*Math.PI/180;
+ updateValues();updatePendulum();
+};
+document.getElementById("start").onclick=()=>{running=true;last=performance.now()};
+document.getElementById("pause").onclick=()=>running=false;
+document.getElementById("reset").onclick=()=>{
+ running=false;elapsed=0;
+ angle=Number(document.getElementById("angle").value)*Math.PI/180;
+ document.getElementById("time").textContent="0.00 s";
+ updatePendulum();
+};
+function animate(now){
+ requestAnimationFrame(animate);
+ if(running){
+  const dt=Math.min((now-last)/1000,.04);
+  last=now;elapsed+=dt;
+  const omega=Math.sqrt(gravity/length);
+  angle=Number(document.getElementById("angle").value)*Math.PI/180*Math.cos(omega*elapsed);
+  document.getElementById("time").textContent=elapsed.toFixed(2)+" s";
+  updatePendulum();
+ }
+ controls.update();
+ renderer.render(scene,camera);
+}
+window.addEventListener("resize",()=>{
+ camera.aspect=container.clientWidth/container.clientHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(container.clientWidth,container.clientHeight);
+});
+updateValues();updatePendulum();requestAnimationFrame(animate);
+</script>
+</body>
+</html>
+
