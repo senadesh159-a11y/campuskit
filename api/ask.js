@@ -1,6 +1,12 @@
+
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const { initializeApp, cert, getApps } = require("firebase-admin/app");
+const {
+  initializeApp,
+  cert,
+  getApps
+} = require("firebase-admin/app");
+
 const { getAuth } = require("firebase-admin/auth");
 
 module.exports = async function handler(req, res) {
@@ -19,6 +25,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // Firebase initialization
     if (getApps().length === 0) {
       const serviceAccount = JSON.parse(
         process.env.FIREBASE_SERVICE_ACCOUNT
@@ -29,6 +36,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // Verify Firebase user
     const authHeader = req.headers.authorization || "";
     const token = authHeader.startsWith("Bearer ")
       ? authHeader.slice(7)
@@ -42,6 +50,7 @@ module.exports = async function handler(req, res) {
 
     await getAuth().verifyIdToken(token);
 
+    // Validate question
     const question = req.body?.question;
 
     if (typeof question !== "string" || !question.trim()) {
@@ -60,38 +69,54 @@ module.exports = async function handler(req, res) {
       process.env.GEMINI_API_KEY
     );
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3.8-flash"
-    });
-
- let result;
-const prompt = `You are CampusKit AI, a helpful student assistant. Answer clearly and simply.
+    const prompt = `You are CampusKit AI, a helpful student assistant.
+Answer clearly, accurately and simply.
 
 Student question: ${question.trim()}`;
 
-for (let attempt = 1; attempt <= 3; attempt++) {
-  try {
-    result = await model.generateContent(prompt);
-    break;
-  } catch (error) {
-    const retryable = [429, 500, 502, 503, 504].includes(error.status);
+    // Primary and fallback models
+    const models = [
+      "gemini-3.8-flash",
+      "gemini-3.5-flash-lite"
+    ];
 
-    if (!retryable || attempt === 3) {
-      console.error("Gemini retry failed:", error);
+    let lastError;
 
-      return res.status(error.status === 503 ? 503 : 500).json({
-        error: "CampusKit AI is temporarily busy. Please try again in a minute."
-      });
+    for (const modelName of models) {
+      try {
+        const model = genAI.getGenerativeModel({
+          model: modelName
+        });
+
+        const result = await model.generateContent(prompt);
+
+        return res.status(200).json({
+          answer: result.response.text(),
+          model: modelName
+        });
+
+      } catch (error) {
+        lastError = error;
+
+        console.error(
+          `CampusKit model ${modelName} failed:`,
+          error
+        );
+
+        const retryable = [
+          429, 500, 502, 503, 504
+        ].includes(error.status);
+
+        if (!retryable) {
+          break;
+        }
+      }
     }
 
-    await new Promise(resolve =>
-      setTimeout(resolve, attempt * 2000)
-    );
-  }
-}
+    console.error("All Gemini models failed:", lastError);
 
-    return res.status(200).json({
-      answer: result.response.text()
+    return res.status(503).json({
+      error: "CampusKit AI is temporarily busy. Please try again shortly."
     });
 
   } catch (error) {
