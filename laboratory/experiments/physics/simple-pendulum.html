@@ -4,158 +4,894 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Lab | Simple Pendulum</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#080d12;color:#eaf2f5;font-family:Arial,sans-serif}
-header{padding:18px 24px;background:#111b22;border-bottom:1px solid #293942}
-h1{font-size:22px;margin:0}
-main{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;padding:18px}
-#scene{height: min(70vh,620px);min-height:400px;background:#101c24;border:1px solid #34434c;border-radius:14px;overflow:hidden}
-.panel{background:#111b22;border:1px solid #34434c;border-radius:14px;padding:18px}
-label{display:block;margin:18px 0 8px}
-input{width:100%;accent-color:#a3e635}
-button{background:#a3e635;color:#101810;border:0;border-radius:8px;padding:11px 14px;font-weight:bold;cursor:pointer;margin:5px 3px 5px 0}
-.output{padding:12px;background:#1b2a32;border-radius:8px;margin-top:12px}
-small{color:#aab8bf}
-@media(max-width:800px){main{grid-template-columns:1fr}#scene{height:55vh}}
-</style>
+<title>CampusKit | Simple Pendulum Virtual Lab</title>
+
 <script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
 </script>
+
+<style>
+:root{
+  --bg:#080d12;--panel:#111b22;--panel2:#17252e;
+  --line:#30424c;--text:#edf5f5;--muted:#9eafb7;
+  --lime:#a3e635;--cyan:#55ddeb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif
+}
+header{
+  padding:17px 22px;background:#101a21;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap
+}
+header h1{font-size:20px;margin:0}
+header small{color:var(--muted)}
+button{
+  border:0;border-radius:8px;padding:10px 14px;
+  background:var(--lime);color:#101810;font-weight:bold;cursor:pointer
+}
+button.secondary{background:#263943;color:var(--text);border:1px solid #40545e}
+button.danger{background:#512d32;color:#ffdfe1}
+button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:1500px;margin:auto;padding:18px}
+.panel{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:13px;padding:17px;min-width:0
+}
+.section-title{font-size:17px;margin:0 0 14px}
+.top-grid{
+  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);
+  gap:16px
+}
+#scene{
+  width:100%;height:560px;min-height:400px;
+  overflow:hidden;border-radius:10px;background:#101c24;position:relative
+}
+#scene canvas{display:block}
+.scene-label{
+  position:absolute;top:12px;left:12px;background:#081016cc;
+  border:1px solid #3c515c;border-radius:7px;padding:8px 10px;
+  font-size:12px;color:#cfe1e5;pointer-events:none
+}
+.scene-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.control{margin:17px 0}
+.control label{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:13px}
+.control output{color:var(--lime);font-weight:bold}
+input[type=range]{width:100%;accent-color:var(--lime)}
+input[type=number],input[type=text]{
+  background:#0a1319;border:1px solid #40545e;border-radius:6px;
+  color:var(--text);padding:8px;width:100%;min-width:65px
+}
+select{
+  background:#0a1319;color:var(--text);border:1px solid #40545e;
+  padding:8px;border-radius:6px
+}
+.button-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.status{
+  padding:11px;background:#172831;border:1px solid #344c56;
+  border-radius:8px;margin-top:14px;font-size:13px;color:#c9d9de
+}
+.readouts{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px
+}
+.readout{background:var(--panel2);padding:11px;border-radius:8px}
+.readout span{display:block;font-size:11px;color:var(--muted)}
+.readout strong{display:block;margin-top:6px;font-size:18px;color:var(--lime)}
+.content-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px
+}
+p,li{line-height:1.55;color:#d0dcdf;font-size:14px}
+.formula{
+  background:#0a141a;border:1px solid #344a54;border-radius:8px;
+  padding:12px;margin:9px 0;font-family:Georgia,serif;font-size:17px;
+  color:#dff9ae;overflow-wrap:anywhere
+}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13px}
+th,td{border:1px solid #354852;padding:8px;text-align:center}
+th{background:#1a2a33;color:#dff9ae}
+td input{width:90px!important;text-align:center}
+.empty{text-align:center;color:var(--muted);padding:20px}
+.timer{font-size:27px;font-weight:bold;color:var(--lime);font-variant-numeric:tabular-nums}
+.footer-note{color:var(--muted);font-size:12px;margin-top:12px}
+@media(max-width:900px){
+ .top-grid,.content-grid{grid-template-columns:1fr}
+ #scene{height:470px}
+}
+@media(max-width:520px){
+ main{padding:10px}
+ #scene{height:390px;min-height:330px}
+ header{padding:14px}
+ .readouts{grid-template-columns:1fr 1fr}
+}
+@media print{
+ body{background:white;color:black}
+ header,.scene-actions,.button-row,.control,.no-print{display:none!important}
+ .panel{background:white;color:black;border:1px solid #aaa;break-inside:avoid}
+ p,li{color:black}
+ table{color:black}
+ th{background:#eee;color:black}
+ .formula{color:black;background:#f5f5f5}
+}
+</style>
 </head>
+
 <body>
-<header><h1>Physics Laboratory / Simple Pendulum</h1></header>
+<header>
+  <div>
+    <h1>Physics Virtual Laboratory</h1>
+    <small>Experiment: Simple Pendulum</small>
+  </div>
+  <small>CampusKit Laboratory • Physics</small>
+</header>
+
 <main>
-<section id="scene"></section>
-<aside class="panel">
-<h2>Experiment Controls</h2>
-<label>Length: <b id="lengthValue">1.00 m</b></label>
-<input id="length" type="range" min="0.3" max="2" step="0.05" value="1">
+  <section class="top-grid">
 
-<label>Mass: <b id="massValue">100 g</b></label>
-<input id="mass" type="range" min="50" max="500" step="10" value="100">
+    <div class="panel">
+      <h2 class="section-title">3D Experimental Apparatus</h2>
+      <div id="scene">
+        <div class="scene-label">Drag: Rotate • Scroll: Zoom • Right-drag: Pan</div>
+      </div>
+      <div class="scene-actions no-print">
+        <button class="secondary" id="viewReset">Reset Camera</button>
+        <button class="secondary" id="viewFront">Front View</button>
+        <button class="secondary" id="viewTop">Top View</button>
+        <button class="secondary" id="fullScreen">Fullscreen</button>
+      </div>
+      <div class="footer-note">
+        The bob and thread are mechanically represented as one connected pendulum.
+      </div>
+    </div>
 
-<label>Initial angle: <b id="angleValue">20°</b></label>
-<input id="angle" type="range" min="5" max="45" value="20">
+    <div class="panel">
+      <h2 class="section-title">Experiment Controls</h2>
 
-<div>
-<button id="start">Start</button>
-<button id="pause">Pause</button>
-<button id="reset">Reset</button>
-</div>
+      <div class="control">
+        <label>Length of pendulum <output id="lengthOut">1.00 m</output></label>
+        <input id="length" type="range" min="0.30" max="1.80" step="0.01" value="1">
+      </div>
 
-<div class="output">
-<p>Time: <b id="time">0.00 s</b></p>
-<p>Period: <b id="period">2.01 s</b></p>
-<p>Gravity: <b>9.81 m/s²</b></p>
-</div>
-<p><small>Change the controls and observe the pendulum motion.</small></p>
-</aside>
+      <div class="control">
+        <label>Bob mass <output id="massOut">100 g</output></label>
+        <input id="mass" type="range" min="20" max="500" step="10" value="100">
+      </div>
+
+      <div class="control">
+        <label>Initial angular displacement <output id="angleOut">15°</output></label>
+        <input id="angle" type="range" min="2" max="35" step="1" value="15">
+      </div>
+
+      <div class="control">
+        <label>Damping</label>
+        <select id="damping">
+          <option value="0">No damping (ideal)</option>
+          <option value="0.015">Low air resistance</option>
+          <option value="0.04">Medium air resistance</option>
+        </select>
+      </div>
+
+      <div class="button-row no-print">
+        <button id="start">Start Oscillation</button>
+        <button class="secondary" id="pause">Pause</button>
+        <button class="secondary" id="reset">Reset</button>
+      </div>
+
+      <div class="status" id="status">Ready. Adjust the settings and start the experiment.</div>
+
+      <div class="readouts">
+        <div class="readout">
+          <span>Elapsed time</span>
+          <strong id="elapsed">0.00 s</strong>
+        </div>
+        <div class="readout">
+          <span>Oscillations</span>
+          <strong id="cycles">0</strong>
+        </div>
+        <div class="readout">
+          <span>Theoretical period</span>
+          <strong id="period">2.01 s</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    <div class="panel">
+      <h2 class="section-title">1. Aim</h2>
+      <p>
+        To determine the acceleration due to gravity using a simple pendulum
+        and to study the relationship between the length and time period
+        of a simple pendulum.
+      </p>
+
+      <h2 class="section-title">2. Apparatus Required</h2>
+      <ul>
+        <li>Rigid retort stand and clamp</li>
+        <li>Light, inextensible thread</li>
+        <li>Spherical metallic bob</li>
+        <li>Metre scale</li>
+        <li>Stopwatch</li>
+        <li>Protractor</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">3. Theory</h2>
+      <p>
+        A simple pendulum consists of a small heavy bob suspended from a
+        fixed support by a light inextensible thread. When displaced slightly
+        from its mean position and released, it performs periodic oscillations.
+      </p>
+      <p>
+        For small angular displacements, the motion is approximately simple
+        harmonic.
+      </p>
+
+      <h2 class="section-title">4. Formula</h2>
+      <div class="formula">T = 2π √(L / g)</div>
+      <div class="formula">g = 4π²L / T²</div>
+      <p>
+        L = effective length in metres; T = time period in seconds;
+        g = acceleration due to gravity.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">5. Procedure</h2>
+      <ol>
+        <li>Measure the length from the point of suspension to the centre of the bob.</li>
+        <li>Displace the bob through a small angle.</li>
+        <li>Release it gently without pushing.</li>
+        <li>Measure the time taken for a selected number of complete oscillations.</li>
+        <li>Repeat the measurement and calculate the mean time period.</li>
+        <li>Use the measured length and period to calculate g.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">6. Stopwatch & Measurement</h2>
+      <div class="timer" id="stopwatch">00:00.00</div>
+      <p>Use the stopwatch to time the oscillations. The simulation also counts complete cycles.</p>
+      <div class="button-row no-print">
+        <button id="timerStart">Start Stopwatch</button>
+        <button class="secondary" id="timerStop">Stop</button>
+        <button class="secondary" id="timerReset">Reset Timer</button>
+      </div>
+      <div class="control">
+        <label>Number of oscillations to record</label>
+        <input type="number" id="oscCount" value="20" min="1" max="500">
+      </div>
+      <div class="button-row no-print">
+        <button id="addReading">Add Reading to Table</button>
+      </div>
+      <p class="footer-note">
+        For a real practical, enter the stopwatch time you actually observe.
+        The simulated cycle counter is provided as a learning aid.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <h2 class="section-title">7. Observation Table</h2>
+    <p>Enter the measured time for each trial. You can edit or delete any row.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Trial</th>
+            <th>Length L (m)</th>
+            <th>No. of oscillations (n)</th>
+            <th>Total time t (s)</th>
+            <th>Time period T = t/n (s)</th>
+            <th>g (m/s²)</th>
+            <th class="no-print">Action</th>
+          </tr>
+        </thead>
+        <tbody id="observations">
+          <tr><td colspan="7" class="empty">No readings recorded yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="button-row no-print">
+      <button class="secondary" id="addBlank">Add Empty Row</button>
+      <button class="secondary" id="exportCSV">Download CSV</button>
+      <button class="secondary" id="clearTable">Clear Table</button>
+      <button id="printReport">Print Practical Report</button>
+    </div>
+    <div class="readouts">
+      <div class="readout">
+        <span>Mean time period</span>
+        <strong id="meanPeriod">—</strong>
+      </div>
+      <div class="readout">
+        <span>Mean experimental g</span>
+        <strong id="meanGravity">—</strong>
+      </div>
+      <div class="readout">
+        <span>Number of trials</span>
+        <strong id="trialCount">0</strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-grid">
+    <div class="panel">
+      <h2 class="section-title">8. Calculations</h2>
+      <p>For each trial:</p>
+      <div class="formula">T = t / n</div>
+      <div class="formula">g = 4π²L / T²</div>
+      <p id="calculationText">Add observation readings to display calculations here.</p>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">9. Result</h2>
+      <p id="resultText">
+        The experimental value of acceleration due to gravity will be displayed
+        after entering valid observations.
+      </p>
+      <h2 class="section-title">10. Precautions</h2>
+      <ol>
+        <li>The point of suspension should be rigid.</li>
+        <li>The thread should be light and inextensible.</li>
+        <li>The bob should be released gently without a push.</li>
+        <li>The angular displacement should be small.</li>
+        <li>Measure the length up to the centre of the bob.</li>
+        <li>Take repeated readings to reduce random error.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p class="footer-note">
+    Educational simulation. The ideal theoretical period assumes small oscillations
+    and negligible air resistance. Actual experimental readings may differ.
+  </p>
 </main>
 
 <script type="module">
 import * as THREE from "three";
-import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-const container=document.getElementById("scene");
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x101c24);
+/* ---------------- 3D SCENE ---------------- */
 
-const camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,0.1,100);
-camera.position.set(3,2.5,5);
+const container = document.getElementById("scene");
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x101c24);
 
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(container.clientWidth,container.clientHeight);
+const camera = new THREE.PerspectiveCamera(
+  38, container.clientWidth / container.clientHeight, 0.1, 100
+);
+camera.position.set(3.2, 2.7, 5.5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 container.appendChild(renderer.domElement);
 
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 1.35, 0);
+controls.minDistance = 2.5;
+controls.maxDistance = 10;
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x263746,2));
-const light=new THREE.DirectionalLight(0xffffff,2);
-light.position.set(3,5,4);
-scene.add(light);
+scene.add(new THREE.HemisphereLight(0xe6f5ff, 0x35404a, 1.8));
 
-const floor=new THREE.GridHelper(8,20,0x526b70,0x263b43);
-floor.position.y=-0.05;
-scene.add(floor);
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
+keyLight.position.set(3, 6, 4);
+keyLight.castShadow = true;
+scene.add(keyLight);
 
-const support=new THREE.Mesh(
- new THREE.BoxGeometry(2.5,0.12,0.25),
- new THREE.MeshStandardMaterial({color:0x82949a,metalness:.6,roughness:.3})
-);
-support.position.y=2.6;
-scene.add(support);
+const fillLight = new THREE.PointLight(0x69d9e8, 35, 8);
+fillLight.position.set(-3, 3, 2);
+scene.add(fillLight);
 
-const pivot=new THREE.Vector3(0,2.53,0);
-const rod=new THREE.Mesh(
- new THREE.CylinderGeometry(.018,.018,1,16),
- new THREE.MeshStandardMaterial({color:0xc4d1d5,metalness:.7})
-);
-scene.add(rod);
-
-const bob=new THREE.Mesh(
- new THREE.SphereGeometry(.14,32,32),
- new THREE.MeshStandardMaterial({color:0xa3e635,metalness:.25,roughness:.25})
-);
-scene.add(bob);
-
-const gravity=9.81;
-let running=false,elapsed=0,last=0,angle=20*Math.PI/180;
-let length=1;
-
-function updatePendulum(){
- const x=length*Math.sin(angle);
- const y=-length*Math.cos(angle);
- bob.position.set(x,pivot.y+y,0);
- rod.position.set(x/2,pivot.y+y/2,0);
- rod.scale.y=length;
- rod.rotation.z=-angle;
-}
-function updateValues(){
- document.getElementById("lengthValue").textContent=length.toFixed(2)+" m";
- document.getElementById("massValue").textContent=document.getElementById("mass").value+" g";
- document.getElementById("angleValue").textContent=document.getElementById("angle").value+"°";
- document.getElementById("period").textContent=(2*Math.PI*Math.sqrt(length/gravity)).toFixed(2)+" s";
-}
-document.getElementById("length").oninput=e=>{
- length=Number(e.target.value);updateValues();updatePendulum();
-};
-document.getElementById("mass").oninput=updateValues;
-document.getElementById("angle").oninput=e=>{
- if(!running)angle=Number(e.target.value)*Math.PI/180;
- updateValues();updatePendulum();
-};
-document.getElementById("start").onclick=()=>{running=true;last=performance.now()};
-document.getElementById("pause").onclick=()=>running=false;
-document.getElementById("reset").onclick=()=>{
- running=false;elapsed=0;
- angle=Number(document.getElementById("angle").value)*Math.PI/180;
- document.getElementById("time").textContent="0.00 s";
- updatePendulum();
-};
-function animate(now){
- requestAnimationFrame(animate);
- if(running){
-  const dt=Math.min((now-last)/1000,.04);
-  last=now;elapsed+=dt;
-  const omega=Math.sqrt(gravity/length);
-  angle=Number(document.getElementById("angle").value)*Math.PI/180*Math.cos(omega*elapsed);
-  document.getElementById("time").textContent=elapsed.toFixed(2)+" s";
-  updatePendulum();
- }
- controls.update();
- renderer.render(scene,camera);
-}
-window.addEventListener("resize",()=>{
- camera.aspect=container.clientWidth/container.clientHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(container.clientWidth,container.clientHeight);
+const metal = new THREE.MeshStandardMaterial({
+  color: 0x87969c, metalness: 0.82, roughness: 0.24
 });
-updateValues();updatePendulum();requestAnimationFrame(animate);
+const darkMetal = new THREE.MeshStandardMaterial({
+  color: 0x35454c, metalness: 0.7, roughness: 0.32
+});
+const bobMaterial = new THREE.MeshStandardMaterial({
+  color: 0xb8c5ca, metalness: 0.88, roughness: 0.19
+});
+const wood = new THREE.MeshStandardMaterial({
+  color: 0x60472f, roughness: 0.72
+});
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: 0x18242b, roughness: 0.88
+});
+
+function addBox(w, h, d, x, y, z, material, parent = scene) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+function addCylinder(radiusTop, radiusBottom, height, x, y, z, material, parent = scene) {
+  const mesh = new THREE.Mesh(
+    new THREE.CylinderGeometry(radiusTop, radiusBottom, height, 32),
+    material
+  );
+  mesh.position.set(x, y, z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  parent.add(mesh);
+  return mesh;
+}
+
+/* Floor and base */
+addBox(8, 0.12, 6, 0, -0.09, 0, floorMaterial);
+const grid = new THREE.GridHelper(8, 32, 0x50636b, 0x293a42);
+grid.position.y = -0.02;
+scene.add(grid);
+
+/* Heavy laboratory base */
+addBox(1.65, 0.16, 0.85, 0, 0.08, 0, darkMetal);
+addBox(1.45, 0.055, 0.70, 0, 0.19, 0, metal);
+
+/* Vertical retort stand */
+const standX = -0.42;
+addCylinder(0.055, 0.065, 3.05, standX, 1.72, 0, metal);
+
+/* Vertical scale beside the thread */
+addBox(0.035, 2.25, 0.045, 0.18, 1.40, 0.12, wood);
+
+for (let i = 0; i <= 20; i++) {
+  const y = 0.35 + i * 0.105;
+  const length = i % 5 === 0 ? 0.19 : 0.10;
+  addBox(length, 0.012, 0.025, 0.18 + length / 2, y, 0.15, metal);
+}
+
+/* Horizontal clamp arm */
+addCylinder(0.035, 0.035, 0.95, 0.05, 3.17, 0, metal).rotation.z = Math.PI / 2;
+addBox(0.23, 0.10, 0.15, 0.34, 3.17, 0, darkMetal);
+
+/* Pivot assembly */
+const pivot = new THREE.Group();
+scene.add(pivot);
+pivot.position.set(0.42, 3.10, 0);
+
+addCylinder(0.07, 0.07, 0.16, 0, 0, 0, darkMetal, pivot);
+addCylinder(0.035, 0.035, 0.20, 0, -0.12, 0, metal, pivot);
+
+/* Thread: its endpoints are updated every frame */
+const threadMaterial = new THREE.MeshStandardMaterial({
+  color: 0xd8d4c5, roughness: 0.8
+});
+const threadGeometry = new THREE.CylinderGeometry(0.009, 0.009, 1, 12);
+const thread = new THREE.Mesh(threadGeometry, threadMaterial);
+thread.castShadow = true;
+scene.add(thread);
+
+/* Bob with a small eyelet */
+const bobGroup = new THREE.Group();
+scene.add(bobGroup);
+
+const bob = new THREE.Mesh(
+  new THREE.SphereGeometry(0.105, 48, 32),
+  bobMaterial
+);
+bob.castShadow = true;
+bob.receiveShadow = true;
+bobGroup.add(bob);
+
+const eyelet = addCylinder(0.018, 0.018, 0.07, 0, 0.11, 0, darkMetal, bobGroup);
+
+/* Small bob highlight */
+const highlight = new THREE.Mesh(
+  new THREE.SphereGeometry(0.025, 16, 12),
+  new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15 })
+);
+highlight.position.set(-0.035, 0.04, 0.085);
+bobGroup.add(highlight);
+
+/* Protractor arc behind pivot */
+const arcPoints = [];
+for (let i = 0; i <= 50; i++) {
+  const a = THREE.MathUtils.degToRad(-40 + i * 1.6);
+  arcPoints.push(new THREE.Vector3(0.62 * Math.sin(a), -0.62 * Math.cos(a), -0.12));
+}
+const arc = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints(arcPoints),
+  new THREE.LineBasicMaterial({ color: 0x6c9aa0 })
+);
+pivot.add(arc);
+
+/* Pendulum state */
+const gravity = 9.81;
+let length = 1.0;
+let mass = 100;
+let initialAngle = THREE.MathUtils.degToRad(15);
+let theta = initialAngle;
+let angularVelocity = 0;
+let damping = 0;
+let running = false;
+let elapsed = 0;
+let cycles = 0;
+let previousTheta = theta;
+let timerStartedAt = null;
+let stopwatchElapsed = 0;
+let stopwatchRunning = false;
+
+function theoreticalPeriod() {
+  return 2 * Math.PI * Math.sqrt(length / gravity);
+}
+
+function updateThreadAndBob() {
+  const pivotPosition = pivot.position.clone();
+  const bobDistance = length;
+  const bobPosition = new THREE.Vector3(
+    pivotPosition.x + bobDistance * Math.sin(theta),
+    pivotPosition.y - bobDistance * Math.cos(theta),
+    pivotPosition.z
+  );
+
+  bobGroup.position.copy(bobPosition);
+
+  const eyeletPosition = bobPosition.clone();
+  eyeletPosition.y += 0.12;
+
+  const direction = eyeletPosition.clone().sub(pivotPosition);
+  const distance = direction.length();
+
+  thread.position.copy(pivotPosition).add(eyeletPosition).multiplyScalar(0.5);
+  thread.scale.set(1, distance, 1);
+  thread.quaternion.setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0), direction.normalize()
+  );
+}
+
+function updateApparatusLength() {
+  length = Number(document.getElementById("length").value);
+  mass = Number(document.getElementById("mass").value);
+  initialAngle = THREE.MathUtils.degToRad(
+    Number(document.getElementById("angle").value)
+  );
+  damping = Number(document.getElementById("damping").value);
+
+  document.getElementById("lengthOut").textContent = length.toFixed(2) + " m";
+  document.getElementById("massOut").textContent = mass + " g";
+  document.getElementById("angleOut").textContent =
+    document.getElementById("angle").value + "°";
+
+  bob.scale.setScalar(Math.cbrt(mass / 100));
+  document.getElementById("period").textContent =
+    theoreticalPeriod().toFixed(3) + " s";
+
+  if (!running) {
+    theta = initialAngle;
+    angularVelocity = 0;
+    updateThreadAndBob();
+  }
+}
+
+/* Accurate numerical pendulum integration */
+function physicsStep(dt) {
+  const steps = 4;
+  const h = dt / steps;
+
+  for (let i = 0; i < steps; i++) {
+    const acceleration = -gravity / length * Math.sin(theta) - damping * angularVelocity;
+    angularVelocity += acceleration * h;
+    theta += angularVelocity * h;
+
+    if (previousTheta > 0 && theta <= 0 && angularVelocity < 0) {
+      cycles++;
+      document.getElementById("cycles").textContent = cycles;
+    }
+    previousTheta = theta;
+  }
+  elapsed += dt;
+  updateThreadAndBob();
+  document.getElementById("elapsed").textContent = elapsed.toFixed(2) + " s";
+}
+
+function resetMotion() {
+  running = false;
+  elapsed = 0;
+  cycles = 0;
+  theta = initialAngle;
+  angularVelocity = 0;
+  previousTheta = theta;
+  document.getElementById("elapsed").textContent = "0.00 s";
+  document.getElementById("cycles").textContent = "0";
+  document.getElementById("status").textContent = "Pendulum reset. Ready to start.";
+  updateThreadAndBob();
+}
+
+document.getElementById("length").addEventListener("input", updateApparatusLength);
+document.getElementById("mass").addEventListener("input", updateApparatusLength);
+document.getElementById("angle").addEventListener("input", updateApparatusLength);
+document.getElementById("damping").addEventListener("change", updateApparatusLength);
+
+document.getElementById("start").onclick = () => {
+  if (!running) {
+    if (elapsed === 0) {
+      theta = initialAngle;
+      angularVelocity = 0;
+      previousTheta = theta;
+    }
+    running = true;
+    document.getElementById("status").textContent = "Pendulum is oscillating.";
+  }
+};
+
+document.getElementById("pause").onclick = () => {
+  running = false;
+  document.getElementById("status").textContent = "Simulation paused.";
+};
+
+document.getElementById("reset").onclick = resetMotion;
+
+/* Camera controls */
+document.getElementById("viewReset").onclick = () => {
+  camera.position.set(3.2, 2.7, 5.5);
+  controls.target.set(0, 1.35, 0);
+  controls.update();
+};
+document.getElementById("viewFront").onclick = () => {
+  camera.position.set(0.4, 2.2, 7);
+  controls.target.set(0.1, 1.5, 0);
+  controls.update();
+};
+document.getElementById("viewTop").onclick = () => {
+  camera.position.set(0, 7, 0.01);
+  controls.target.set(0, 1.2, 0);
+  controls.update();
+};
+document.getElementById("fullScreen").onclick = () => {
+  if (container.requestFullscreen) container.requestFullscreen();
+};
+
+/* Stopwatch */
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return String(mins).padStart(2, "0") + ":" + secs.toFixed(2).padStart(5, "0");
+}
+function updateStopwatchDisplay() {
+  document.getElementById("stopwatch").textContent = formatTime(stopwatchElapsed);
+}
+document.getElementById("timerStart").onclick = () => {
+  if (!stopwatchRunning) {
+    timerStartedAt = performance.now() - stopwatchElapsed * 1000;
+    stopwatchRunning = true;
+  }
+};
+document.getElementById("timerStop").onclick = () => {
+  if (stopwatchRunning) {
+    stopwatchElapsed = (performance.now() - timerStartedAt) / 1000;
+    stopwatchRunning = false;
+    updateStopwatchDisplay();
+  }
+};
+document.getElementById("timerReset").onclick = () => {
+  stopwatchRunning = false;
+  stopwatchElapsed = 0;
+  updateStopwatchDisplay();
+};
+
+/* Observation table */
+const STORAGE_KEY = "campuskit_simple_pendulum_observations";
+const tbody = document.getElementById("observations");
+let readings = [];
+
+try {
+  readings = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  if (!Array.isArray(readings)) readings = [];
+} catch {
+  readings = [];
+}
+
+function saveReadings() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(readings));
+}
+
+function calculateReading(row) {
+  const L = Number(row.length);
+  const n = Number(row.count);
+  const t = Number(row.time);
+
+  if (!(L > 0 && n > 0 && t > 0)) return null;
+
+  const T = t / n;
+  const g = (4 * Math.PI * Math.PI * L) / (T * T);
+  return { T, g };
+}
+
+function renderTable() {
+  tbody.innerHTML = "";
+
+  if (!readings.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">No readings recorded yet.</td></tr>';
+  }
+
+  readings.forEach((row, index) => {
+    const result = calculateReading(row);
+    const tr = document.createElement("tr");
+
+    const values = [
+      index + 1,
+      row.length,
+      row.count,
+      row.time,
+      result ? result.T.toFixed(3) : "—",
+      result ? result.g.toFixed(3) : "—"
+    ];
+
+    values.forEach((value, column) => {
+      const td = document.createElement("td");
+
+      if (column >= 1 && column <= 3) {
+        const input = document.createElement("input");
+        input.type = "number";
+        input.step = column === 1 ? "0.01" : "0.01";
+        input.min = "0.01";
+        input.value = value;
+        input.addEventListener("change", () => {
+          row[["", "length", "count", "time"][column]] = Number(input.value);
+          saveReadings();
+          renderTable();
+        });
+        td.appendChild(input);
+      } else {
+        td.textContent = value;
+      }
+      tr.appendChild(td);
+    });
+
+    const action = document.createElement("td");
+    action.className = "no-print";
+    const remove = document.createElement("button");
+    remove.className = "danger";
+    remove.textContent = "Delete";
+    remove.onclick = () => {
+      readings.splice(index, 1);
+      saveReadings();
+      renderTable();
+    };
+    action.appendChild(remove);
+    tr.appendChild(action);
+    tbody.appendChild(tr);
+  });
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const valid = readings.map(calculateReading).filter(Boolean);
+  document.getElementById("trialCount").textContent = readings.length;
+
+  if (!valid.length) {
+    document.getElementById("meanPeriod").textContent = "—";
+    document.getElementById("meanGravity").textContent = "—";
+    document.getElementById("calculationText").textContent =
+      "Add valid observation readings to display calculations here.";
+    document.getElementById("resultText").textContent =
+      "The experimental value of acceleration due to gravity will be displayed after entering valid observations.";
+    return;
+  }
+
+  const meanT = valid.reduce((sum, x) => sum + x.T, 0) / valid.length;
+  const meanG = valid.reduce((sum, x) => sum + x.g, 0) / valid.length;
+
+  document.getElementById("meanPeriod").textContent = meanT.toFixed(3) + " s";
+  document.getElementById("meanGravity").textContent = meanG.toFixed(3) + " m/s²";
+  document.getElementById("calculationText").textContent =
+    "Mean time period = " + meanT.toFixed(3) +
+    " s. Mean experimental acceleration due to gravity = " +
+    meanG.toFixed(3) + " m/s², calculated from the individual trials.";
+
+  document.getElementById("resultText").textContent =
+    "The mean experimental value of acceleration due to gravity is " +
+    meanG.toFixed(3) + " m/s². Compare this value with the accepted value near 9.81 m/s².";
+}
+
+function addObservation(lengthValue, countValue, timeValue) {
+  readings.push({
+    length: Number(lengthValue),
+    count: Number(countValue),
+    time: Number(timeValue)
+  });
+  saveReadings();
+  renderTable();
+}
+
+document.getElementById("addReading").onclick = () => {
+  const n = Number(document.getElementById("oscCount").value);
+  const t = stopwatchRunning
+    ? (performance.now() - timerStartedAt) / 1000
+    : stopwatchElapsed;
+
+  if (!(n > 0 && t > 0)) {
+    alert("Start and stop the stopwatch first, then add the reading.");
+    return;
+  }
+  addObservation(length, n, t);
+};
+
+document.getElementById("addBlank").onclick = () => {
+  readings.push({ length, count: 20, time: 0 });
+  saveReadings();
+  renderTable();
+};
+
+document.getElementById("clearTable").onclick = () => {
+  if (confirm("Delete all observation readings?")) {
+    readings = [];
+    saveReadings();
+    renderTable();
+  }
+};
+
+document.getElementById("exportCSV").onclick = () => {
+  const rows = [
+    ["Trial", "Length (m)", "Oscillations", "Total time (s)", "Period (s)", "g (m/s^2)"]
+  ];
+
+  readings.forEach((row, index) => {
+    const result = calculateReading(row);
+    rows.push([
+      index + 1, row.length, row.count, row.time,
+      result ? result.T.toFixed(4) : "",
+      result ? result.g.toFixed(4) : ""
+    ]);
+  });
+
+  const csv = rows.map(row => row.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "simple-pendulum-observations.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById("printReport").onclick = () => window.print();
+
+/* Animation loop */
+let previousFrame = performance.now();
+
+function animate(now) {
+  requestAnimationFrame(animate);
+  const dt = Math.min((now - previousFrame) / 1000, 0.04);
+  previousFrame = now;
+
+  if (running) physicsStep(dt);
+
+  if (stopwatchRunning) {
+    stopwatchElapsed = (performance.now() - timerStartedAt) / 1000;
+    updateStopwatchDisplay();
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+window.addEventListener("resize", () => {
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height);
+});
+
+updateApparatusLength();
+resetMotion();
+renderTable();
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>
-
