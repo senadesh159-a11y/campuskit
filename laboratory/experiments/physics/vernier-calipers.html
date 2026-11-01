@@ -1,466 +1,64 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Lab | Vernier Calipers</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vernier Caliper | CampusKit Physics Lab</title>
 <style>
-:root {
-  --bg:#080d12; --panel:#111a22; --line:#263642;
-  --lime:#b8f34a; --text:#edf4f5; --muted:#91a2ad;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
-font-family:Arial,sans-serif}
-header{padding:22px 5%;border-bottom:1px solid var(--line)}
-header h1{margin:0;color:var(--lime);font-size:25px}
-header p{color:var(--muted);margin:7px 0 0}
-main{max-width:1250px;margin:auto;padding:22px}
-h2{font-size:19px;margin:0 0 15px}
-.panel{background:var(--panel);border:1px solid var(--line);
-border-radius:14px;padding:18px;margin-bottom:20px}
-#scene{height:410px;width:100%;border-radius:10px;
-overflow:hidden;background:radial-gradient(#24333e,#080d12)}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px}
-label{display:block;color:var(--muted);font-size:13px;margin-bottom:8px}
-input[type=range]{width:100%;accent-color:var(--lime)}
-input[type=number],input[type=text]{width:100%;padding:10px;
-background:#081117;border:1px solid var(--line);color:white;
-border-radius:8px}
-button{background:var(--lime);color:#10170a;border:0;
-border-radius:8px;padding:10px 14px;font-weight:bold;cursor:pointer}
-button.secondary{background:#263642;color:white}
-button.danger{background:#532b31;color:#fff}
-.buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
-.readings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.metric{background:#091219;padding:15px;border:1px solid var(--line);border-radius:10px}
-.metric small{color:var(--muted)}
-.metric strong{display:block;color:var(--lime);font-size:23px;margin-top:7px}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{padding:11px;border-bottom:1px solid var(--line);text-align:center}
-th{color:var(--lime);font-size:13px}
-td input{max-width:100px}
-.table-wrap{overflow-x:auto}
-.note{color:var(--muted);font-size:13px;line-height:1.6}
-.formula{background:#091219;padding:13px;border-radius:8px;
-margin:8px 0;line-height:1.7}
-footer{text-align:center;color:var(--muted);padding:25px}
-@media(max-width:600px){main{padding:12px}#scene{height:310px}}
+:root{--bg:#06101d;--panel:rgba(9,25,43,.88);--line:#168bd0;--cyan:#35c8ff;--lime:#c6ff00;--muted:#a9bfd2;--white:#f4f9ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#12375b 0,#071525 48%,#030912 100%);color:var(--white);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+.shell{width:min(1440px,100%);margin:auto;padding:28px 24px 48px}
+header{text-align:center;margin:0 auto 24px}header .eyebrow{color:var(--cyan);letter-spacing:.24em;text-transform:uppercase;font-size:12px;font-weight:800}
+h1{font-size:clamp(30px,5vw,54px);margin:8px 0 6px;text-shadow:0 0 24px #40baff70}header p{color:var(--muted);margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:20px}
+.panel{background:linear-gradient(145deg,rgba(13,38,62,.94),rgba(4,15,28,.96));border:1px solid #168bd0;border-radius:22px;padding:20px;box-shadow:0 0 24px #087dc333,inset 0 1px #ffffff12}
+.panel h2{margin:0 0 14px;font-size:19px}.stage{min-height:380px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:radial-gradient(ellipse,#153b5c 0,#071728 65%,#04101c 100%);border:1px solid #236b9a;border-radius:16px}
+.stage svg{width:100%;height:auto;max-height:500px}.controls{display:grid;gap:15px}.control{background:#071827;border:1px solid #1c5478;border-radius:13px;padding:12px}
+.control-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.control label{font-weight:700}.value{color:var(--lime);font-variant-numeric:tabular-nums;font-weight:800}
+input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer}input[type=number]{width:100%;background:#061321;color:white;border:1px solid #28719b;border-radius:8px;padding:10px;font-size:15px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.metric{background:#061827;border:1px solid #1a5578;border-radius:12px;padding:12px}.metric small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}.metric strong{display:block;color:var(--lime);font-size:22px;margin-top:5px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px}button{border:0;border-radius:999px;padding:11px 17px;font-weight:800;cursor:pointer;background:var(--lime);color:#111b00;box-shadow:0 0 16px #c6ff0050}button.secondary{background:transparent;border:1px solid var(--cyan);color:var(--cyan);box-shadow:none}button.danger{background:#44202a;color:#ffdce2;box-shadow:none;border:1px solid #a84b60}
+.note{color:var(--muted);font-size:12px;line-height:1.5;margin:12px 0 0}
+.table-panel{margin-top:20px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:12px;border-bottom:1px solid #1b4563;font-size:13px}th{color:var(--cyan);font-size:11px;text-transform:uppercase;letter-spacing:.08em}td{color:#e7f3fc}.empty{text-align:center;color:var(--muted);padding:24px}
+.back{display:inline-block;color:var(--cyan);text-decoration:none;margin-bottom:14px;font-size:13px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stage{min-height:280px}.metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){.shell{padding:18px 12px 32px}.panel{padding:14px}.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:span 2}}
 </style>
 </head>
 <body>
+<div class="shell">
+<a class="back" href="../../../index.html">← CampusKit Laboratory</a>
+<header><div class="eyebrow">CampusKit • Interactive Physics Lab</div><h1>Vernier Caliper</h1><p>Explore main scale, vernier coincidence, least count and zero correction.</p></header>
 
-<header>
-<h1>Vernier Calipers — Virtual Practical</h1>
-<p>Interactive instrument simulation and measurement experiment</p>
-</header>
-
-<main>
-<section class="panel">
-<h2>01. Virtual Instrument</h2>
-<div id="scene"></div>
-<p class="note">
-Drag to rotate the instrument. Scroll to zoom. The movable jaw can
-be adjusted using the slider below.
-</p>
-
-<div class="controls">
-<div>
-<label>Movable vernier position (mm)</label>
-<input id="position" type="range" min="0" max="80" step="0.1" value="24.6">
-<strong id="positionText">24.6 mm</strong>
-</div>
-<div>
-<label>Object diameter (mm)</label>
-<input id="diameter" type="range" min="1" max="30" step="0.1" value="12">
-<strong id="diameterText">12.0 mm</strong>
-</div>
-<div>
-<label>Zero error (mm)</label>
-<input id="zeroError" type="number" step="0.1" value="0">
-</div>
-<div>
-<label>Least count (mm)</label>
-<input type="number" value="0.1" readonly>
-</div>
-</div>
-<div class="buttons">
-<button class="secondary" id="reset">Reset Instrument</button>
-<button class="secondary" id="front">Front View</button>
-</div>
+<div class="layout">
+<section class="panel"><h2>📏 Interactive vernier caliper</h2>
+<div class="stage"><svg viewBox="0 0 760 400" aria-label="Vernier caliper illustration">
+<defs><linearGradient id="metal" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#f2fbff"/><stop offset=".4" stop-color="#7da8c1"/><stop offset="1" stop-color="#244b65"/></linearGradient></defs>
+<rect x="70" y="180" width="620" height="42" rx="8" fill="url(#metal)" stroke="#d8f4ff" stroke-width="2"/>
+<path id="slider" d="M300 130 V275 H330 V210 H410 V275 H440 V130 H410 V180 H330 V130 Z" fill="url(#metal)" stroke="#d8f4ff" stroke-width="3"/>
+<path d="M90 180 V160 M130 180 V168 M170 180 V160 M210 180 V168 M250 180 V160 M290 180 V168 M330 180 V160 M370 180 V168 M410 180 V160 M450 180 V168 M490 180 V160 M530 180 V168 M570 180 V160 M610 180 V168 M650 180 V160" stroke="#092033" stroke-width="3"/>
+<g fill="#dff6ff" font-size="14"><text x="88" y="145">0</text><text x="166" y="145">10</text><text x="246" y="145">20</text><text x="326" y="145">30</text><text x="406" y="145">40</text><text x="486" y="145">50</text><text x="566" y="145">60</text><text x="646" y="145">70 mm</text></g>
+<text x="80" y="320" fill="#c6ff00" font-size="18" id="vernierSvgText">Main scale 24 mm • Vernier 6 divisions</text>
+</svg></div>
+<div class="metrics"><div class="metric"><small>Main scale</small><strong id="msMetric">24.00 mm</strong></div><div class="metric"><small>Vernier reading</small><strong id="vrMetric">0.60 mm</strong></div><div class="metric"><small>Total reading</small><strong id="totalMetric">24.60 mm</strong></div></div>
 </section>
+<aside class="panel"><h2>⚙️ Customize readings</h2><div class="controls">
+<div class="control"><div class="control-top"><label for="mainScale">Main scale reading</label><span class="value" id="mainScaleVal">24 mm</span></div><input id="mainScale" type="range" min="0" max="100" step=".5" value="24"></div>
+<div class="control"><div class="control-top"><label for="coincidence">Coinciding vernier division</label><span class="value" id="coincidenceVal">6</span></div><input id="coincidence" type="range" min="0" max="10" value="6"></div>
+<div class="control"><div class="control-top"><label for="leastCount">Least count</label><span class="value" id="leastCountVal">0.1 mm</span></div><input id="leastCount" type="range" min=".01" max=".1" step=".01" value=".1"></div>
+<div class="control"><div class="control-top"><label for="zeroError">Zero error</label><span class="value" id="zeroErrorVal">0.00 mm</span></div><input id="zeroError" type="range" min="-1" max="1" step=".01" value="0"></div>
+</div><div class="actions"><button id="addObs">＋ Add observation</button><button class="secondary" id="reset">Reset values</button></div>
+<p class="note">Corrected reading = main scale + (coinciding division × least count) − zero error. Adjust the controls to simulate different measurements.</p>
+</aside></div>
+<section class="panel table-panel"><h2>📋 Observation table</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>Main scale</th><th>Coinciding division</th><th>Least count</th><th>Zero error</th><th>Observed</th><th>Corrected</th></tr></thead><tbody id="obsBody"><tr><td colspan="7" class="empty">No observations yet.</td></tr></tbody></table></div><div class="actions"><button class="secondary" id="clearObs">Clear table</button></div></section>
 
-<section class="panel">
-<h2>02. Live Measurement</h2>
-<div class="readings">
-<div class="metric"><small>Main scale reading</small><strong id="msr">24 mm</strong></div>
-<div class="metric"><small>Vernier coincidence</small><strong id="vc">6</strong></div>
-<div class="metric"><small>Least count</small><strong>0.1 mm</strong></div>
-<div class="metric"><small>Observed reading</small><strong id="observed">24.6 mm</strong></div>
-<div class="metric"><small>Zero correction</small><strong id="correction">0 mm</strong></div>
-<div class="metric"><small>Final reading</small><strong id="final">24.6 mm</strong></div>
 </div>
-<div class="formula">
-<strong>Formula</strong><br>
-Observed Reading = MSR + (Vernier coincidence × Least Count)<br>
-Corrected Reading = Observed Reading − Zero Error
-</div>
-<p class="note" id="explanation"></p>
-</section>
-
-<section class="panel">
-<h2>03. Aim & Apparatus</h2>
-<p>To measure the diameter of a given object using Vernier Calipers.</p>
-<p><strong>Apparatus:</strong> Vernier calipers, given object and cleaning cloth.</p>
-</section>
-
-<section class="panel">
-<h2>04. Theory</h2>
-<p>
-Vernier calipers are used to measure small lengths accurately.
-They consist of a main scale and a sliding vernier scale.
-The instrument has outside jaws, inside jaws and a depth rod.
-The difference between one main scale division and one vernier
-scale division gives the least count.
-</p>
-<div class="formula">
-1 Main Scale Division = 1 mm<br>
-10 Vernier Scale Divisions = 9 mm<br>
-1 Vernier Scale Division = 0.9 mm<br>
-<strong>Least Count = 1 − 0.9 = 0.1 mm</strong>
-</div>
-</section>
-
-<section class="panel">
-<h2>05. Procedure</h2>
-<ol>
-<li>Clean the jaws and check the zero position.</li>
-<li>Determine the zero error, if any.</li>
-<li>Place the object between the outside jaws.</li>
-<li>Move the sliding jaw until it gently touches the object.</li>
-<li>Note the main scale reading.</li>
-<li>Find the coinciding vernier division.</li>
-<li>Calculate the observed and corrected readings.</li>
-<li>Repeat the experiment and calculate the mean.</li>
-</ol>
-</section>
-
-<section class="panel">
-<h2>06. Observation Table</h2>
-<p class="note">Add the current live reading or enter your own observations.</p>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Trial</th><th>MSR (mm)</th><th>Vernier division</th>
-<th>Observed (mm)</th><th>Corrected (mm)</th><th>Action</th>
-</tr>
-</thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
-<div class="buttons">
-<button id="add">Add Current Reading</button>
-<button class="secondary" id="blank">Add Blank Row</button>
-<button class="secondary" id="csv">Download CSV</button>
-<button class="danger" id="clear">Clear Table</button>
-</div>
-<div class="formula">
-<strong>Mean corrected reading:</strong>
-<strong id="mean">—</strong>
-</div>
-</section>
-
-<section class="panel">
-<h2>07. Result</h2>
-<p>
-The diameter of the given object is determined from the mean
-of the corrected readings.
-</p>
-<strong id="result" style="color:var(--lime)">Take readings to calculate the result.</strong>
-</section>
-
-<section class="panel">
-<h2>08. Precautions</h2>
-<ul>
-<li>Clean the jaws before taking measurements.</li>
-<li>Do not apply excessive pressure on the object.</li>
-<li>Check zero error before starting.</li>
-<li>Read the scales without parallax error.</li>
-<li>Take multiple readings for accuracy.</li>
-</ul>
-</section>
-</main>
-
-<footer>CampusKit Virtual Laboratory · Physics Practical</footer>
-
 <script>
-const LC = 0.1;
-const $ = id => document.getElementById(id);
-
-let scene, camera, renderer, instrument, movable;
-let tableData = [];
-let saved = false;
-
-function box(parent,x,y,z,w,h,d,color){
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(w,h,d),
-    new THREE.MeshStandardMaterial({color,roughness:.55,metalness:.45})
-  );
-  mesh.position.set(x,y,z);
-  parent.add(mesh);
-  return mesh;
-}
-
-function line(parent,x1,y1,z1,x2,y2,z2,color=0xffffff){
-  const points=[new THREE.Vector3(x1,y1,z1),new THREE.Vector3(x2,y2,z2)];
-  const geo=new THREE.BufferGeometry().setFromPoints(points);
-  const obj=new THREE.Line(geo,new THREE.LineBasicMaterial({color}));
-  parent.add(obj);
-}
-
-function textSprite(text,color="#ffffff"){
-  const canvas=document.createElement("canvas");
-  canvas.width=256;canvas.height=64;
-  const ctx=canvas.getContext("2d");
-  ctx.fillStyle=color;
-  ctx.font="bold 28px Arial";
-  ctx.fillText(text,8,42);
-  const texture=new THREE.CanvasTexture(canvas);
-  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true}));
-  sprite.scale.set(1.25,.31,1);
-  return sprite;
-}
-
-function initScene(){
-  const host=$("scene");
-  scene=new THREE.Scene();
-  camera=new THREE.PerspectiveCamera(42,host.clientWidth/host.clientHeight,.1,100);
-  camera.position.set(0,5,12);
-
-  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
-  renderer.setSize(host.clientWidth,host.clientHeight);
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  host.appendChild(renderer.domElement);
-
-  scene.add(new THREE.HemisphereLight(0xffffff,0x334455,2));
-  const light=new THREE.DirectionalLight(0xffffff,2.2);
-  light.position.set(4,8,6);scene.add(light);
-
-  instrument=new THREE.Group();scene.add(instrument);
-
-  // Main scale body
-  box(instrument,0,0,0,9,.24,.48,0x9baab1);
-  box(instrument,0,.15,0,9,.045,.5,0x263944);
-
-  // Main scale markings: 1 mm division
-  for(let i=0;i<=80;i++){
-    const x=-4+i*.1;
-    const height=i%10===0?.28:(i%5===0?.19:.11);
-    line(instrument,x,.19,.27,x,.19+height,.27,0x101820);
-    if(i%10===0){
-      const label=textSprite(String(i));
-      label.position.set(x,.63,.3);
-      instrument.add(label);
-    }
-  }
-
-  // Fixed outside jaw
-  box(instrument,-3.65,-.62,0,.24,1.45,.5,0xb9c8cd);
-  box(instrument,-3.35,-1.22,0,.85,.2,.5,0xb9c8cd);
-
-  // Fixed inside jaw
-  box(instrument,-3.65,.65,0,.18,.65,.5,0xc9d5d8);
-  box(instrument,-3.35,1.02,0,.8,.16,.5,0xc9d5d8);
-
-  // Depth rod
-  box(instrument,4.55,-.1,0,.8,.09,.12,0xc2d0d5);
-
-  movable=new THREE.Group();
-  instrument.add(movable);
-
-  // Movable jaw and vernier slider
-  box(movable,0,-.62,0,.22,1.45,.58,0xb8c8ce);
-  box(movable,.32,-1.22,0,.85,.2,.58,0xb8c8ce);
-  box(movable,0,.65,0,.18,.65,.58,0xc8d5da);
-  box(movable,.32,1.02,0,.8,.16,.58,0xc8d5da);
-  box(movable,0,.28,.02,1.25,.12,.65,0x354b58);
-
-  // Vernier scale divisions: 10 divisions over 9 mm
-  for(let i=0;i<=10;i++){
-    const x=-.45+i*.09;
-    line(movable,x,.36,.36,x,.36+(i%5===0?.2:.12),.36,0xb8f34a);
-  }
-
-  // Measurement object
-  const object=new THREE.Mesh(
-    new THREE.CylinderGeometry(.45,.45,.75,48),
-    new THREE.MeshStandardMaterial({color:0x8ac7df,metalness:.5,roughness:.25})
-  );
-  object.rotation.z=Math.PI/2;
-  object.position.set(-2.3,-.92,.15);
-  instrument.add(object);
-
-  // Ground grid
-  const grid=new THREE.GridHelper(14,28,0x435966,0x1d303b);
-  grid.position.y=-1.55;scene.add(grid);
-
-  function animate(){
-    requestAnimationFrame(animate);
-    renderer.render(scene,camera);
-  }
-  animate();
-
-  window.addEventListener("resize",()=>{
-    const w=host.clientWidth,h=host.clientHeight;
-    camera.aspect=w/h;camera.updateProjectionMatrix();
-    renderer.setSize(w,h);
-  });
-}
-
-function updateInstrument(){
-  const position=Number($("position").value);
-  const diameter=Number($("diameter").value);
-  const x=-4+position*.1;
-
-  movable.position.x=x;
-  $("positionText").textContent=position.toFixed(1)+" mm";
-  $("diameterText").textContent=diameter.toFixed(1)+" mm";
-
-  // Illustrative object diameter follows the diameter control.
-  // The scale reading itself is controlled by the vernier slider.
-  const obj=instrument.children.find(o=>o.geometry &&
-    o.geometry.type==="CylinderGeometry");
-  if(obj){
-    obj.scale.y=diameter/12;
-    obj.position.x=-2.3+diameter*.025;
-  }
-  calculate();
-}
-
-function calculate(){
-  const position=Number($("position").value);
-  const msr=Math.floor(position);
-  const vc=Math.round((position-msr)/LC);
-  const observed=msr+vc*LC;
-  const zeroError=Number($("zeroError").value)||0;
-  const correction=-zeroError;
-  const final=observed+correction;
-
-  $("msr").textContent=msr+" mm";
-  $("vc").textContent=vc;
-  $("observed").textContent=observed.toFixed(1)+" mm";
-  $("correction").textContent=correction.toFixed(1)+" mm";
-  $("final").textContent=final.toFixed(1)+" mm";
-  $("explanation").textContent=
-    `Reading = ${msr} + (${vc} × ${LC}) = ${observed.toFixed(1)} mm. `+
-    `Zero correction = ${correction.toFixed(1)} mm.`;
-
-  return {msr,vc,observed,final};
-}
-
-function renderTable(){
-  const body=$("rows");
-  body.innerHTML="";
-  tableData.forEach((r,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${i+1}</td>
-      <td><input type="number" step="0.1" value="${r.msr??""}" data-i="${i}" data-k="msr"></td>
-      <td><input type="number" step="1" value="${r.vc??""}" data-i="${i}" data-k="vc"></td>
-      <td>${r.observed==null?"—":Number(r.observed).toFixed(1)}</td>
-      <td>${r.corrected==null?"—":Number(r.corrected).toFixed(1)}</td>
-      <td><button class="danger" data-delete="${i}">Delete</button></td>`;
-    body.appendChild(tr);
-  });
-
-  body.querySelectorAll("input").forEach(input=>{
-    input.addEventListener("change",e=>{
-      const i=Number(e.target.dataset.i);
-      const key=e.target.dataset.k;
-      tableData[i][key]=e.target.value===""?null:Number(e.target.value);
-      recalculateRow(i);
-      renderTable();
-    });
-  });
-  body.querySelectorAll("[data-delete]").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      tableData.splice(Number(btn.dataset.delete),1);
-      renderTable();updateMean();
-    });
-  });
-  updateMean();
-}
-
-function recalculateRow(i){
-  const r=tableData[i];
-  if(r.msr==null||r.vc==null){r.observed=null;r.corrected=null;return}
-  r.observed=Number(r.msr)+Number(r.vc)*LC;
-  r.corrected=r.observed-(Number($("zeroError").value)||0);
-}
-
-function addCurrent(){
-  const r=calculate();
-  tableData.push({...r,corrected:r.final});
-  renderTable();
-}
-
-function updateMean(){
-  const values=tableData.map(r=>r.corrected).filter(v=>v!=null&&!isNaN(v));
-  if(!values.length){
-    $("mean").textContent="—";
-    $("result").textContent="Take readings to calculate the result.";
-    return;
-  }
-  const mean=values.reduce((a,b)=>a+b,0)/values.length;
-  $("mean").textContent=mean.toFixed(2)+" mm";
-  $("result").textContent="Mean diameter = "+mean.toFixed(2)+" mm";
-}
-
-function downloadCSV(){
-  const header=["Trial","MSR (mm)","Vernier division","Observed (mm)","Corrected (mm)"];
-  const rows=tableData.map((r,i)=>[i+1,r.msr,r.vc,r.observed,r.corrected]);
-  const csv=[header,...rows].map(row=>row.join(",")).join("\n");
-  const blob=new Blob([csv],{type:"text/csv"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download="vernier-calipers-observations.csv";a.click();
-  URL.revokeObjectURL(url);
-}
-
-$("position").addEventListener("input",updateInstrument);
-$("diameter").addEventListener("input",updateInstrument);
-$("zeroError").addEventListener("input",()=>{
-  tableData.forEach((r,i)=>recalculateRow(i));
-  renderTable();calculate();
-});
-$("add").addEventListener("click",addCurrent);
-$("blank").addEventListener("click",()=>{
-  tableData.push({msr:null,vc:null,observed:null,corrected:null});
-  renderTable();
-});
-$("clear").addEventListener("click",()=>{
-  if(confirm("Clear all observation rows?")){
-    tableData=[];renderTable();
-  }
-});
-$("csv").addEventListener("click",downloadCSV);
-$("reset").addEventListener("click",()=>{
-  $("position").value=24.6;
-  $("diameter").value=12;
-  $("zeroError").value=0;
-  updateInstrument();
-});
-$("front").addEventListener("click",()=>{
-  camera.position.set(0,5,12);
-  camera.lookAt(0,0,0);
-});
-
-initScene();
-updateInstrument();
-renderTable();
+const $=id=>document.getElementById(id);let rows=0;
+function readings(){const ms=+$('mainScale').value,cv=+$('coincidence').value,lc=+$('leastCount').value,ze=+$('zeroError').value;const vr=cv*lc,observed=ms+vr,corrected=observed-ze;return {ms,cv,lc,ze,vr,observed,corrected}}
+function update(){const r=readings();$('mainScaleVal').textContent=r.ms.toFixed(1)+' mm';$('coincidenceVal').textContent=r.cv;$('leastCountVal').textContent=r.lc.toFixed(2)+' mm';$('zeroErrorVal').textContent=r.ze.toFixed(2)+' mm';$('msMetric').textContent=r.ms.toFixed(2)+' mm';$('vrMetric').textContent=r.vr.toFixed(2)+' mm';$('totalMetric').textContent=r.corrected.toFixed(2)+' mm';$('vernierSvgText').textContent=`Main scale ${r.ms.toFixed(1)} mm • Vernier ${r.cv} divisions`}
+['mainScale','coincidence','leastCount','zeroError'].forEach(id=>$(id).addEventListener('input',update));update();
+$('addObs').onclick=()=>{rows++;const r=readings(),body=$('obsBody');if(rows===1)body.innerHTML='';const vals=[rows,r.ms.toFixed(2)+' mm',r.cv,r.lc.toFixed(2)+' mm',r.ze.toFixed(2)+' mm',r.observed.toFixed(2)+' mm',r.corrected.toFixed(2)+' mm'];const tr=document.createElement('tr');vals.forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});body.append(tr)};
+$('reset').onclick=()=>{$('mainScale').value=24;$('coincidence').value=6;$('leastCount').value=.1;$('zeroError').value=0;update()};
+$('clearObs').onclick=()=>{rows=0;$('obsBody').innerHTML='<tr><td colspan="7" class="empty">No observations yet.</td></tr>'};
 </script>
-</body>
-</html>
+</body></html>
