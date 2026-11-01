@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Physics Lab | Prism Deviation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d12;color:#edf5f5;font-family:Arial,sans-serif}
+header{padding:18px 24px;background:#111b22;border-bottom:1px solid #34434c}
+h1{font-size:21px;margin:0}
+main{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;padding:18px}
+#scene{height: min(70vh,620px);min-height:400px;border:1px solid #34434c;border-radius:14px;overflow:hidden}
+.panel{background:#111b22;border:1px solid #34434c;border-radius:14px;padding:18px}
+label{display:block;margin:18px 0 8px}
+input{width:100%;accent-color:#a3e635}
+button{background:#a3e635;color:#101810;border:0;border-radius:8px;padding:11px 14px;font-weight:bold;cursor:pointer;margin-top:12px}
+.output{background:#1b2a32;border-radius:8px;padding:12px;margin-top:15px}
+small{color:#aab8bf}
+@media(max-width:800px){main{grid-template-columns:1fr}#scene{height:55vh}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<header><h1>Physics Laboratory / Prism – Angle of Deviation</h1></header>
+<main>
+<section id="scene"></section>
+<aside class="panel">
+<h2>Prism Controls</h2>
+
+<label>Angle of incidence: <b id="iValue">45°</b></label>
+<input id="incidence" type="range" min="10" max="70" value="45">
+
+<label>Prism angle: <b id="aValue">60°</b></label>
+<input id="apex" type="range" min="30" max="75" value="60">
+
+<label>Refractive index: <b id="nValue">1.50</b></label>
+<input id="refractive" type="range" min="1.1" max="1.8" step="0.01" value="1.5">
+
+<div class="output">
+<p>Angle of refraction (r₁): <b id="r1">—</b></p>
+<p>Internal angle (r₂): <b id="r2">—</b></p>
+<p>Angle of emergence (e): <b id="e">—</b></p>
+<p>Angle of deviation (δ): <b id="d">—</b></p>
+<p id="status">Ready</p>
+</div>
+<button id="reset">Reset experiment</button>
+<p><small>Adjust the controls and observe how the light ray bends through the prism.</small></p>
+</aside>
+</main>
+
+<script type="module">
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+const container=document.getElementById("scene");
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x101c24);
+
+const camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,.1,100);
+camera.position.set(0,2.5,7);
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(container.clientWidth,container.clientHeight);
+container.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x263746,2));
+const light=new THREE.DirectionalLight(0xffffff,2);
+light.position.set(3,5,4);
+scene.add(light);
+
+const grid=new THREE.GridHelper(8,20,0x526b70,0x263b43);
+grid.position.y=-1.2;
+scene.add(grid);
+
+// Triangular prism
+const shape=new THREE.Shape();
+shape.moveTo(-1.25,-0.85);
+shape.lineTo(1.25,-0.85);
+shape.lineTo(0,1.25);
+shape.close();
+
+const prismGeometry=new THREE.ExtrudeGeometry(shape,{
+ depth:.65,bevelEnabled:false
+});
+prismGeometry.center();
+
+const prism=new THREE.Mesh(
+ prismGeometry,
+ new THREE.MeshPhysicalMaterial({
+  color:0x66d9e8,
+  transparent:true,
+  opacity:.38,
+  roughness:.08,
+  metalness:.05,
+  transmission:.25,
+  side:THREE.DoubleSide
+ })
+);
+scene.add(prism);
+
+const edges=new THREE.LineSegments(
+ new THREE.EdgesGeometry(prismGeometry),
+ new THREE.LineBasicMaterial({color:0x9cf5ff})
+);
+scene.add(edges);
+
+const rayGroup=new THREE.Group();
+scene.add(rayGroup);
+
+function addRay(points,color){
+ const geometry=new THREE.BufferGeometry().setFromPoints(
+  points.map(p=>new THREE.Vector3(p[0],p[1],.42))
+ );
+ const line=new THREE.Line(
+  geometry,
+  new THREE.LineBasicMaterial({color})
+ );
+ rayGroup.add(line);
+}
+
+function draw(){
+ rayGroup.clear();
+
+ const i=Number(document.getElementById("incidence").value);
+ const A=Number(document.getElementById("apex").value);
+ const n=Number(document.getElementById("refractive").value);
+
+ document.getElementById("iValue").textContent=i+"°";
+ document.getElementById("aValue").textContent=A+"°";
+ document.getElementById("nValue").textContent=n.toFixed(2);
+
+ const rad=Math.PI/180;
+ const r1=Math.asin(Math.sin(i*rad)/n)/rad;
+ const r2=A-r1;
+ const critical=Math.asin(1/n)/rad;
+
+ document.getElementById("r1").textContent=r1.toFixed(2)+"°";
+ document.getElementById("r2").textContent=r2.toFixed(2)+"°";
+
+ // Incoming ray
+ const entry=[-1.05,-.25];
+ const exit=[.95,-.25];
+
+ addRay([[-3,-.25],entry],0xffd34e);
+
+ if(r2>critical){
+  addRay([entry,exit],0x55e7ff);
+  document.getElementById("e").textContent="Not possible";
+  document.getElementById("d").textContent="—";
+  document.getElementById("status").textContent="Total internal reflection condition";
+ }else{
+  const e=Math.asin(n*Math.sin(r2*rad))/rad;
+  const deviation=i+e-A;
+
+  document.getElementById("e").textContent=e.toFixed(2)+"°";
+  document.getElementById("d").textContent=deviation.toFixed(2)+"°";
+  document.getElementById("status").textContent="Light ray emerges from prism";
+
+  // Schematic internal and emergent ray
+  const bendX=.55*Math.cos(r1*rad);
+  const bendY=.55*Math.sin(r1*rad);
+  const middle=[entry[0]+bendX,entry[1]+bendY];
+
+  const outAngle=(e-i)*rad;
+  const end=[exit[0]+1.7*Math.cos(outAngle),exit[1]+1.7*Math.sin(outAngle)];
+
+  addRay([entry,middle,exit],0x55e7ff);
+  addRay([exit,end],0x55e7ff);
+ }
+}
+
+["incidence","apex","refractive"].forEach(id=>{
+ document.getElementById(id).addEventListener("input",draw);
+});
+
+document.getElementById("reset").onclick=()=>{
+ document.getElementById("incidence").value=45;
+ document.getElementById("apex").value=60;
+ document.getElementById("refractive").value=1.5;
+ draw();
+};
+
+window.addEventListener("resize",()=>{
+ camera.aspect=container.clientWidth/container.clientHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(container.clientWidth,container.clientHeight);
+});
+
+draw();
+
+function animate(){
+ requestAnimationFrame(animate);
+ controls.update();
+ renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
