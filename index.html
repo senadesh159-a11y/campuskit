@@ -299,6 +299,47 @@ body.authenticated #campuskit-login-screen{display:none!important}
   .lab-panel { grid-template-columns: 1fr; }
 }
 
+#labExperimentsList {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(230px, 1fr)
+    );
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.lab-experiment-card {
+    background: #0b1725;
+    border: 1px solid #168bd0;
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    transition: .3s;
+}
+
+.lab-experiment-card:hover {
+    transform: translateY(-5px);
+    border-color: #c6ff00;
+    box-shadow: 0 0 20px #c6ff0040;
+}
+
+.lab-experiment-card h3 {
+    color: #c6ff00;
+    margin-top: 0;
+}
+
+.lab-experiment-card a {
+    display: inline-block;
+    margin-top: 12px;
+    color: #c6ff00;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.lab-experiment-card a:hover {
+    text-decoration: underline;
+}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -535,6 +576,9 @@ body.authenticated #campuskit-login-screen{display:none!important}
   <div class="lab-card">
     <h3 id="labDepartmentTitle">⚛️ Physics Laboratory</h3>
     <p id="labDepartmentDescription">Explore physics experiments and calculations.</p>
+    <div id="labExperimentsList">
+    <p>Loading Physics practicals...</p>
+</div>
   </div>
 
   <div class="lab-panel">
@@ -1673,6 +1717,120 @@ const WORKER_URL = "/api/ask";
   setView(['study-tools','notes-library','ai-assistant','relaxation-section'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
+<script>
+const LAB_OWNER = "senadesh159-a11y";
+const LAB_REPO = "campuskit";
+const LAB_BRANCH = "main";
 
+const LAB_SUBJECT_PATH = {
+    Physics: "physics",
+    Mathematics: "mathematics",
+    Chemistry: "chemistry",
+    Biology: "biology",
+    Anthropology: "anthropology"
+};
+
+async function loadLabExperiments(subject) {
+
+    const container = document.getElementById(
+        "labExperimentsList"
+    );
+
+    if (!container) return;
+
+    const folder = LAB_SUBJECT_PATH[subject];
+
+    if (!folder) {
+        container.textContent = "Subject folder not configured.";
+        return;
+    }
+
+    container.innerHTML = "<p>Loading practicals...</p>";
+
+    const apiURL =
+        `https://api.github.com/repos/${LAB_OWNER}/${LAB_REPO}/contents/laboratory/experiments/${folder}?ref=${LAB_BRANCH}`;
+
+    try {
+
+        const response = await fetch(apiURL);
+
+        if (!response.ok) {
+            throw new Error("GitHub folder could not be loaded.");
+        }
+
+        const files = await response.json();
+
+        const experiments = files.filter(file =>
+            file.type === "file" &&
+            file.name.toLowerCase().endsWith(".html") &&
+            file.name.toLowerCase() !== "index.html"
+        );
+
+        container.innerHTML = "";
+
+        if (experiments.length === 0) {
+            container.innerHTML =
+                "<p>No practical files found.</p>";
+            return;
+        }
+
+        experiments.forEach((file, index) => {
+
+            const card = document.createElement("div");
+            card.className = "lab-experiment-card";
+
+            const title = document.createElement("h3");
+
+            title.textContent =
+                `${String(index + 1).padStart(2, "0")} · ` +
+                file.name.replace(/\.html$/i, "")
+                    .replace(/[-_]/g, " ");
+
+            const description = document.createElement("p");
+            description.textContent =
+                "Interactive Physics Practical";
+
+            const link = document.createElement("a");
+
+            link.textContent = "Open Practical →";
+
+            link.href =
+                `/campuskit/laboratory/experiments/${folder}/${encodeURIComponent(file.name)}`;
+
+            card.append(title, description, link);
+
+            container.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.error("Laboratory error:", error);
+
+        container.innerHTML =
+            "<p>Unable to load practicals. Please check GitHub folder.</p>";
+
+    }
+}
+
+
+// Connect department buttons
+
+document.querySelectorAll(".lab-department").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        loadLabExperiments(button.dataset.lab);
+
+    });
+
+});
+
+
+// Initially load Physics
+
+loadLabExperiments("Physics");
+
+</script>
 </body>
 </html>
