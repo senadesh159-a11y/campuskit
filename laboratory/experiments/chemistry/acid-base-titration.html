@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acid-Base Titration | CampusKit</title>
+
+<style>
+:root {
+    --bg: #090909;
+    --card: #151515;
+    --lime: #b7f34a;
+    --text: #f5f5f5;
+    --muted: #aaaaaa;
+    --border: #303030;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    line-height: 1.7;
+    padding: 20px;
+}
+
+.container {
+    max-width: 950px;
+    margin: auto;
+}
+
+header {
+    padding: 30px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 25px;
+}
+
+.tag {
+    color: var(--lime);
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+h1 {
+    font-size: 32px;
+    margin: 10px 0;
+}
+
+header p, .muted {
+    color: var(--muted);
+}
+
+section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    margin: 18px 0;
+}
+
+h2 {
+    color: var(--lime);
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+ul, ol {
+    padding-left: 22px;
+}
+
+li {
+    margin: 7px 0;
+}
+
+.formula {
+    background: #202820;
+    border: 1px solid #526d2c;
+    color: var(--lime);
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 19px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    min-width: 550px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+th, td {
+    border: 1px solid var(--border);
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #242424;
+    color: var(--lime);
+}
+
+input {
+    width: 85px;
+    padding: 8px;
+    background: #090909;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 6px;
+    text-align: center;
+}
+
+button {
+    background: var(--lime);
+    color: #111;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.result {
+    background: #202820;
+    padding: 15px;
+    border-radius: 9px;
+    margin-top: 15px;
+    color: var(--lime);
+    font-weight: bold;
+}
+
+.note {
+    border-left: 4px solid var(--lime);
+    padding: 12px;
+    background: #202020;
+    margin-top: 12px;
+}
+
+footer {
+    text-align: center;
+    color: var(--muted);
+    padding: 25px 0;
+    font-size: 13px;
+}
+
+@media(max-width:600px) {
+    body { padding: 12px; }
+    h1 { font-size: 25px; }
+    section { padding: 16px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <div class="tag">CAMPUSKIT • CHEMISTRY LABORATORY</div>
+    <h1>Acid-Base Titration</h1>
+    <p>Determination of the concentration of hydrochloric acid using standard sodium hydroxide solution.</p>
+</header>
+
+<section>
+    <h2>1. Aim</h2>
+    <p>
+        To determine the concentration of the given hydrochloric acid
+        (HCl) solution by titrating it against a standard sodium
+        hydroxide (NaOH) solution using phenolphthalein indicator.
+    </p>
+</section>
+
+<section>
+    <h2>2. Apparatus Required</h2>
+    <ul>
+        <li>Burette</li>
+        <li>Volumetric pipette</li>
+        <li>Conical flask</li>
+        <li>Burette stand</li>
+        <li>Funnel</li>
+        <li>White tile</li>
+        <li>Beaker and wash bottle</li>
+    </ul>
+</section>
+
+<section>
+    <h2>3. Chemicals Required</h2>
+    <ul>
+        <li>Hydrochloric acid (HCl) solution – unknown concentration</li>
+        <li>Standard sodium hydroxide (NaOH) solution</li>
+        <li>Phenolphthalein indicator</li>
+        <li>Distilled water</li>
+    </ul>
+</section>
+
+<section>
+    <h2>4. Theory</h2>
+    <p>
+        Acid-base titration is a quantitative analytical technique
+        used to determine the unknown concentration of an acid or
+        base by reacting it with a solution of known concentration.
+    </p>
+    <p>
+        In this experiment, hydrochloric acid reacts with sodium
+        hydroxide to form sodium chloride and water. This is a
+        neutralization reaction.
+    </p>
+
+    <div class="formula">
+        HCl + NaOH → NaCl + H₂O
+    </div>
+
+    <p>
+        Phenolphthalein is used as an indicator. The solution changes
+        from colourless to a faint permanent pink at the endpoint
+        when NaOH is added to the acid.
+    </p>
+</section>
+
+<section>
+    <h2>5. Formula</h2>
+    <div class="formula">
+        M₁V₁ = M₂V₂
+    </div>
+    <p>Where:</p>
+    <ul>
+        <li>M₁ = Molarity of HCl</li>
+        <li>V₁ = Volume of HCl</li>
+        <li>M₂ = Molarity of NaOH</li>
+        <li>V₂ = Volume of NaOH used</li>
+    </ul>
+    <p>
+        This formula applies because HCl and NaOH react in a 1:1
+        mole ratio.
+    </p>
+</section>
+
+<section>
+    <h2>6. Procedure</h2>
+    <ol>
+        <li>Wash the burette with distilled water and rinse it with standard NaOH solution.</li>
+        <li>Fill the burette with standard NaOH solution and note the initial reading.</li>
+        <li>Wash the pipette with the given HCl solution.</li>
+        <li>Transfer 20 ml of HCl into a clean conical flask using the pipette.</li>
+        <li>Add 2–3 drops of phenolphthalein indicator.</li>
+        <li>Add NaOH from the burette slowly while continuously swirling the flask.</li>
+        <li>Stop when a faint pink colour persists for about 30 seconds.</li>
+        <li>Note the final burette reading and repeat to obtain concordant readings.</li>
+    </ol>
+</section>
+
+<section>
+    <h2>7. Observation Table</h2>
+    <p class="muted">
+        Illustrative readings only. Enter your actual laboratory readings.
+    </p>
+
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Trial</th>
+                <th>Initial (ml)</th>
+                <th>Final (ml)</th>
+                <th>NaOH Used (ml)</th>
+            </tr>
+        </thead>
+        <tbody id="readings">
+            <tr>
+                <td>1</td>
+                <td><input type="number" step="0.1" value="0"></td>
+                <td><input type="number" step="0.1" value="19.8"></td>
+                <td class="used">19.8</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><input type="number" step="0.1" value="0"></td>
+                <td><input type="number" step="0.1" value="19.7"></td>
+                <td class="used">19.7</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><input type="number" step="0.1" value="0"></td>
+                <td><input type="number" step="0.1" value="19.8"></td>
+                <td class="used">19.8</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <button onclick="calculateReadings()">Calculate Readings</button>
+    <div class="result" id="average">
+        Average titre: 19.77 ml (illustrative)
+    </div>
+</section>
+
+<section>
+    <h2>8. Calculation</h2>
+    <p>Suppose the following values are used:</p>
+    <ul>
+        <li>Volume of HCl = 20 ml</li>
+        <li>Molarity of NaOH = 0.1 M</li>
+        <li>Average volume of NaOH = 19.77 ml</li>
+    </ul>
+
+    <div class="formula">
+        M₁ × 20 = 0.1 × 19.77
+        <br><br>
+        M₁ = (0.1 × 19.77) / 20
+        <br><br>
+        M₁ = 0.09885 M
+    </div>
+    <p>
+        Therefore, the illustrative concentration of HCl is
+        approximately 0.09885 M.
+    </p>
+</section>
+
+<section>
+    <h2>9. Result</h2>
+    <p>
+        The concentration of the given hydrochloric acid solution
+        is determined by acid-base titration using standard
+        sodium hydroxide solution.
+    </p>
+    <div class="note">
+        The final numerical result must be calculated using the
+        actual concordant readings obtained in the laboratory.
+    </div>
+</section>
+
+<section>
+    <h2>10. Precautions</h2>
+    <ul>
+        <li>Ensure that there are no air bubbles in the burette tip.</li>
+        <li>Read the burette at eye level.</li>
+        <li>Add NaOH dropwise near the endpoint.</li>
+        <li>Use only 2–3 drops of indicator.</li>
+        <li>Do not overshoot the endpoint.</li>
+        <li>Wear safety goggles and gloves while handling chemicals.</li>
+    </ul>
+</section>
+
+<footer>
+    CampusKit • Student Laboratory Resources
+</footer>
+
+</div>
+
+<script>
+function calculateReadings() {
+    const rows = document.querySelectorAll("#readings tr");
+    let values = [];
+
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const initial = Number(inputs[0].value);
+        const final = Number(inputs[1].value);
+        const used = final - initial;
+
+        row.querySelector(".used").textContent =
+            used >= 0 ? used.toFixed(2) : "Invalid";
+
+        if (inputs[0].value !== "" &&
+            inputs[1].value !== "" &&
+            used >= 0) {
+            values.push(used);
+        }
+    });
+
+    if (values.length === 0) {
+        document.getElementById("average").textContent =
+            "Please enter valid readings.";
+        return;
+    }
+
+    const average = values.reduce((a, b) => a + b, 0) /
+                    values.length;
+
+    document.getElementById("average").textContent =
+        "Average titre: " + average.toFixed(2) + " ml";
+}
+</script>
+
+</body>
+</html>
