@@ -127,6 +127,178 @@ body.authenticated #campuskit-login-screen{display:none!important}
 #ck-status{min-height:20px;color:#d7d2f0}
 .login-privacy{margin:18px 0 0!important;font-size:11px!important;color:#a7a3c6!important}
 @media(max-width:480px){.login-card{padding:28px 20px}.login-orb{width:95vw}}
+
+/* ===== CAMPUSKIT LABORATORY ===== */
+#laboratory-section {
+  display: none;
+  width: 100%;
+}
+
+#laboratory-section.active-view {
+  display: block;
+}
+
+.lab-heading {
+  margin-bottom: 22px;
+}
+
+.lab-heading h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.lab-heading p {
+  color: var(--muted, #aaa);
+}
+
+.lab-departments {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.lab-department {
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: .2s;
+}
+
+.lab-department:hover,
+.lab-department.selected {
+  border-color: #a3e635;
+  background: rgba(163,230,53,.10);
+  transform: translateY(-2px);
+}
+
+.lab-department .lab-icon {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.lab-department strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.lab-department small {
+  color: var(--muted, #aaa);
+}
+
+.lab-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 22px 0;
+}
+
+.lab-card {
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  background: rgba(255,255,255,.045);
+}
+
+.lab-card h3 {
+  margin: 0 0 14px;
+}
+
+.lab-card input,
+.lab-card textarea,
+.lab-card select {
+  width: 100%;
+  padding: 11px;
+  margin: 7px 0;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 9px;
+  background: rgba(0,0,0,.25);
+  color: inherit;
+  font: inherit;
+}
+
+.lab-card input::placeholder,
+.lab-card textarea::placeholder {
+  color: #999;
+}
+
+.lab-card button,
+.lab-action {
+  padding: 10px 15px;
+  border: 0;
+  border-radius: 9px;
+  background: #a3e635;
+  color: #172000;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.lab-result {
+  margin-top: 13px;
+  padding: 12px;
+  border-radius: 9px;
+  background: rgba(163,230,53,.10);
+  color: #c7f77b;
+  overflow-wrap: anywhere;
+}
+
+.lab-record {
+  padding: 14px;
+  margin: 10px 0;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 11px;
+  background: rgba(255,255,255,.035);
+}
+
+.lab-record button {
+  background: #ef4444;
+  color: white;
+  margin-left: 8px;
+}
+
+.lab-viva-item {
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  background: rgba(255,255,255,.045);
+}
+
+.lab-viva-item button {
+  margin-top: 8px;
+}
+
+.lab-answer {
+  display: none;
+  color: #c7f77b;
+  margin-top: 9px;
+}
+
+.lab-progress {
+  height: 9px;
+  background: rgba(255,255,255,.12);
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.lab-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #a3e635;
+  transition: width .3s;
+}
+
+@media(max-width:600px) {
+  .lab-heading h2 { font-size: 23px; }
+  .lab-panel { grid-template-columns: 1fr; }
+}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -154,6 +326,12 @@ body.authenticated #campuskit-login-screen{display:none!important}
   <a href="#notes-library">🗂️ Notes Library</a>
   <a href="#ai-assistant">🤖 AI Assistant</a>
   <a href="#relaxation-section">🎵 Relaxation</a>
+  
+<a href="#laboratory">
+  <span>🔬</span>
+  <span>Laboratory</span>
+</a>
+
   <div class="side-hint">Your college life,<br>organized in one place.</div>
   <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
 </nav>
@@ -304,6 +482,97 @@ body.authenticated #campuskit-login-screen{display:none!important}
     </div>
   </div>
 </section>
+  
+<section class="card app-view" id="laboratory-section">
+
+  <div class="lab-heading">
+    <h2>🔬 Laboratory</h2>
+    <p>Your digital practical laboratory — Learn, Experiment, Record and Practice.</p>
+  </div>
+
+  <div class="lab-card">
+    <h3>📊 Laboratory Progress</h3>
+    <p id="labProgressText">0 practical records saved</p>
+    <div class="lab-progress">
+      <div class="lab-progress-fill" id="labProgressFill"></div>
+    </div>
+  </div>
+
+  <div class="lab-departments">
+
+    <button class="lab-department selected" data-lab="Physics">
+      <span class="lab-icon">⚛️</span>
+      <strong>Physics Lab</strong>
+      <small>Experiments & calculations</small>
+    </button>
+
+    <button class="lab-department" data-lab="Mathematics">
+      <span class="lab-icon">📐</span>
+      <strong>Mathematics Lab</strong>
+      <small>Equations & geometry</small>
+    </button>
+
+    <button class="lab-department" data-lab="Chemistry">
+      <span class="lab-icon">🧪</span>
+      <strong>Chemistry Lab</strong>
+      <small>Reactions & solutions</small>
+    </button>
+
+    <button class="lab-department" data-lab="Biology">
+      <span class="lab-icon">🧬</span>
+      <strong>Biology Lab</strong>
+      <small>Microscope & biology</small>
+    </button>
+
+    <button class="lab-department" data-lab="Anthropology">
+      <span class="lab-icon">🦴</span>
+      <strong>Anthropology Lab</strong>
+      <small>Human measurements</small>
+    </button>
+
+  </div>
+
+  <div class="lab-card">
+    <h3 id="labDepartmentTitle">⚛️ Physics Laboratory</h3>
+    <p id="labDepartmentDescription">Explore physics experiments and calculations.</p>
+  </div>
+
+  <div class="lab-panel">
+
+    <div class="lab-card">
+      <h3>🧮 Interactive Practical Tool</h3>
+      <div id="labToolArea"></div>
+      <div class="lab-result" id="labToolResult" aria-live="polite">
+        Select a department to begin.
+      </div>
+    </div>
+
+    <div class="lab-card">
+      <h3>📒 Practical Notebook</h3>
+      <form id="labRecordForm">
+        <input id="labExperiment" placeholder="Experiment name" required>
+        <input id="labObservation" placeholder="Observation / readings" required>
+        <textarea id="labConclusion" rows="3" placeholder="Result / conclusion"></textarea>
+        <button type="submit">＋ Save Practical Record</button>
+      </form>
+      <div id="labRecordStatus" aria-live="polite"></div>
+    </div>
+
+  </div>
+
+  <div class="lab-card">
+    <h3>📚 My Practical Records</h3>
+    <div id="labRecordsList"></div>
+  </div>
+
+  <div class="lab-card" style="margin-top:18px">
+    <h3>🎯 Viva Preparation</h3>
+    <p>Practice important questions from your selected department.</p>
+    <div id="labVivaArea"></div>
+  </div>
+
+</section>
+
 
 <!-- CampusKit AI Study Assistant -->
 <section class="card app-view" id="ai-assistant" aria-labelledby="aiTitle">
@@ -1374,9 +1643,17 @@ const WORKER_URL = "/api/ask";
 (() => {
   const nav = document.querySelector('.side-nav');
   const links = [...nav.querySelectorAll('a[href^="#"]')];
-  const views = ['dashboard','search-section','study-tools-view','notes-library','ai-assistant','relaxation-section'];
+ const views = [
+  'dashboard',
+  'search-section',
+  'study-tools-view',
+  'notes-library',
+  'ai-assistant',
+  'relaxation-section',
+  'laboratory-section'
+];
   function setView(name) {
-    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'] };
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
