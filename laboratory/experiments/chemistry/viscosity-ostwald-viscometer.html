@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viscosity Experiment | CampusKit</title>
+
+<style>
+:root {
+    --bg:#090909;
+    --card:#151515;
+    --lime:#b7f34a;
+    --text:#f5f5f5;
+    --muted:#aaa;
+    --border:#303030;
+}
+* {box-sizing:border-box;margin:0;padding:0}
+body {
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,sans-serif;
+    line-height:1.7;
+    padding:18px;
+}
+.container {max-width:950px;margin:auto}
+header {
+    padding:28px 0;
+    border-bottom:1px solid var(--border);
+    margin-bottom:22px;
+}
+.tag {
+    color:var(--lime);
+    font-size:13px;
+    letter-spacing:2px;
+    font-weight:bold;
+}
+h1 {font-size:30px;margin:10px 0}
+header p,.muted {color:var(--muted)}
+section {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:22px;
+    margin:17px 0;
+}
+h2 {color:var(--lime);font-size:20px;margin-bottom:12px}
+ul,ol {padding-left:22px}
+li {margin:7px 0}
+.formula {
+    background:#202820;
+    border:1px solid #526d2c;
+    color:var(--lime);
+    padding:17px;
+    border-radius:9px;
+    text-align:center;
+    font-size:18px;
+    font-weight:bold;
+    margin:14px 0;
+}
+.table-wrap {overflow-x:auto}
+table {
+    width:100%;
+    border-collapse:collapse;
+    min-width:530px;
+    margin-top:12px;
+}
+th,td {
+    border:1px solid var(--border);
+    padding:11px;
+    text-align:center;
+}
+th {color:var(--lime);background:#242424}
+input {
+    width:90px;
+    padding:8px;
+    background:#090909;
+    color:white;
+    border:1px solid #555;
+    border-radius:6px;
+    text-align:center;
+}
+button {
+    background:var(--lime);
+    color:#111;
+    border:0;
+    padding:11px 17px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:12px;
+}
+.result,.note {
+    background:#202820;
+    padding:14px;
+    border-radius:9px;
+    margin-top:14px;
+}
+.result {color:var(--lime);font-weight:bold}
+.note {border-left:4px solid var(--lime)}
+footer {
+    text-align:center;
+    color:var(--muted);
+    padding:25px;
+    font-size:13px;
+}
+@media(max-width:600px) {
+    body {padding:11px}
+    h1 {font-size:25px}
+    section {padding:16px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <div class="tag">CAMPUSKIT • CHEMISTRY LABORATORY</div>
+    <h1>Determination of Viscosity</h1>
+    <p>Determination of the coefficient of viscosity of a given liquid using an Ostwald viscometer.</p>
+</header>
+
+<section>
+<h2>1. Aim</h2>
+<p>
+To determine the coefficient of viscosity of the given liquid
+using an Ostwald viscometer by comparing its flow time with
+that of water at the same temperature.
+</p>
+</section>
+
+<section>
+<h2>2. Apparatus Required</h2>
+<ul>
+<li>Ostwald viscometer</li>
+<li>Stopwatch</li>
+<li>Thermometer</li>
+<li>Beaker</li>
+<li>Measuring pipette</li>
+<li>Rubber suction bulb</li>
+<li>Water bath</li>
+</ul>
+</section>
+
+<section>
+<h2>3. Chemicals Required</h2>
+<ul>
+<li>Distilled water</li>
+<li>Given liquid or glycerol solution</li>
+</ul>
+</section>
+
+<section>
+<h2>4. Theory</h2>
+<p>
+Viscosity is the property of a fluid by which it resists
+the relative motion between its different layers.
+It is also known as the internal friction of a liquid.
+</p>
+<p>
+An Ostwald viscometer is used to determine the viscosity
+of a liquid by measuring the time taken by a fixed volume
+of liquid to flow through a narrow capillary tube.
+</p>
+<p>
+The viscosity of a liquid depends on its density and
+the time required to flow through the capillary.
+</p>
+</section>
+
+<section>
+<h2>5. Formula</h2>
+<div class="formula">
+η₁ / η₂ = (ρ₁ × t₁) / (ρ₂ × t₂)
+</div>
+<p>Where:</p>
+<ul>
+<li>η₁ = Viscosity of the given liquid</li>
+<li>η₂ = Viscosity of water</li>
+<li>ρ₁ = Density of the given liquid</li>
+<li>ρ₂ = Density of water</li>
+<li>t₁ = Flow time of the given liquid</li>
+<li>t₂ = Flow time of water</li>
+</ul>
+<div class="formula">
+η₁ = η₂ × (ρ₁t₁ / ρ₂t₂)
+</div>
+<p>
+The viscosity of water (η₂) and densities must be taken
+at the experimental temperature.
+</p>
+</section>
+
+<section>
+<h2>6. Procedure</h2>
+<ol>
+<li>Clean the Ostwald viscometer properly and dry it.</li>
+<li>Fill the viscometer with a measured volume of distilled water.</li>
+<li>Place the viscometer vertically in a constant-temperature water bath.</li>
+<li>Allow the liquid to reach the bath temperature.</li>
+<li>Draw the liquid above the upper mark using a suction bulb.</li>
+<li>Allow it to flow freely and record the time taken by the meniscus to pass between the two marks.</li>
+<li>Repeat the measurement to obtain consistent readings.</li>
+<li>Repeat the same procedure using the given liquid.</li>
+<li>Record the densities and calculate the viscosity using the formula.</li>
+</ol>
+<div class="note">
+Use the same viscometer and maintain the same temperature for
+water and the given liquid.
+</div>
+</section>
+
+<section>
+<h2>7. Observation Table</h2>
+<p class="muted">
+Illustrative readings only. Replace them with actual laboratory readings.
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Trial</th>
+<th>Water Time (s)</th>
+<th>Liquid Time (s)</th>
+</tr>
+</thead>
+<tbody id="readings">
+<tr>
+<td>1</td>
+<td><input type="number" value="52" step="0.1"></td>
+<td><input type="number" value="95" step="0.1"></td>
+</tr>
+<tr>
+<td>2</td>
+<td><input type="number" value="53" step="0.1"></td>
+<td><input type="number" value="96" step="0.1"></td>
+</tr>
+<tr>
+<td>3</td>
+<td><input type="number" value="52" step="0.1"></td>
+<td><input type="number" value="94" step="0.1"></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<button onclick="calculate()">Calculate Average Times</button>
+<div class="result" id="average">
+Average water time: 52.33 s<br>
+Average liquid time: 95.00 s
+</div>
+</section>
+
+<section>
+<h2>8. Calculation</h2>
+<p>Illustrative values:</p>
+<ul>
+<li>Density of water = 1.00 g/cm³</li>
+<li>Density of given liquid = 1.10 g/cm³</li>
+<li>Average time of water = 52.33 s</li>
+<li>Average time of liquid = 95.00 s</li>
+<li>Viscosity of water = 0.0100 poise (illustrative)</li>
+</ul>
+
+<div class="formula">
+η₁ = η₂ × (ρ₁ × t₁) / (ρ₂ × t₂)
+<br><br>
+η₁ = 0.0100 × (1.10 × 95.00) / (1.00 × 52.33)
+<br><br>
+η₁ ≈ 0.01997 poise
+</div>
+
+<p>
+The above result is only an example. Use the actual density,
+flow times and viscosity of water at your laboratory temperature.
+</p>
+</section>
+
+<section>
+<h2>9. Result</h2>
+<p>
+The coefficient of viscosity of the given liquid is determined
+using an Ostwald viscometer by comparing its flow time with
+that of distilled water.
+</p>
+<div class="note">
+Write the final value with the correct unit after using your
+experimental readings.
+</div>
+</section>
+
+<section>
+<h2>10. Precautions</h2>
+<ul>
+<li>The viscometer must be clean and dry.</li>
+<li>Keep the viscometer vertical during the experiment.</li>
+<li>Maintain constant temperature throughout the experiment.</li>
+<li>Avoid air bubbles inside the capillary tube.</li>
+<li>Start and stop the stopwatch carefully.</li>
+<li>Take repeated readings for accuracy.</li>
+<li>Use the same volume of liquid for each measurement.</li>
+</ul>
+</section>
+
+<footer>
+CampusKit • Student Laboratory Resources
+</footer>
+
+</div>
+
+<script>
+function calculate() {
+    const rows = document.querySelectorAll("#readings tr");
+    let waterTimes = [];
+    let liquidTimes = [];
+
+    rows.forEach(row => {
+        const inputs = row.querySelectorAll("input");
+        const water = Number(inputs[0].value);
+        const liquid = Number(inputs[1].value);
+
+        if (inputs[0].value !== "" && inputs[1].value !== "" &&
+            water > 0 && liquid > 0) {
+            waterTimes.push(water);
+            liquidTimes.push(liquid);
+        }
+    });
+
+    const output = document.getElementById("average");
+
+    if (!waterTimes.length) {
+        output.textContent = "Please enter valid positive readings.";
+        return;
+    }
+
+    const avgWater = waterTimes.reduce((a,b) => a+b, 0) /
+                     waterTimes.length;
+    const avgLiquid = liquidTimes.reduce((a,b) => a+b, 0) /
+                      liquidTimes.length;
+
+    output.innerHTML =
+        "Average water time: " + avgWater.toFixed(2) +
+        " s<br>Average liquid time: " + avgLiquid.toFixed(2) + " s";
+}
+</script>
+
+</body>
+</html>
