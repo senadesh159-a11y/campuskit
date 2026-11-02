@@ -573,6 +573,45 @@ input:focus,textarea:focus{outline:2px solid rgba(198,255,0,.65)!important;box-s
 .ck-apk-footnote{font-size:12px!important;line-height:1.7;margin-top:22px!important;padding-top:18px;border-top:1px solid var(--ck-line)}
 @media(max-width:760px){.ck-download-hero{grid-template-columns:1fr}.ck-phone-art{width:175px;grid-row:1}.ck-download-copy h2{font-size:36px}.ck-download-details{grid-template-columns:1fr}.ck-download-actions{align-items:flex-start;flex-direction:column}.ck-download-button{width:100%;justify-content:space-between}}
 @media(prefers-reduced-motion:reduce){.ck-phone-art{transform:none}}
+
+/* CampusKit quality pass — accessibility, responsive polish and download clarity */
+:root{color-scheme:dark;--ck-focus:0 0 0 3px rgba(198,255,0,.28)}
+html{scroll-behavior:smooth}
+:focus-visible{outline:2px solid var(--ck-lime,#c6ff00)!important;outline-offset:3px}
+.side-nav{overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#65733d transparent}
+.side-nav a{min-height:42px}
+.side-nav a:active{transform:scale(.98)}
+.card,.lab-card,.lab-department,.lab-experiment-card{transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+button:disabled,.ck-download-button[aria-disabled="true"]{opacity:.55;cursor:not-allowed;transform:none!important}
+button:disabled{filter:grayscale(.4)}
+input,textarea,select{accent-color:var(--ck-lime,#c6ff00)}
+::selection{background:#c6ff00;color:#10150b}
+#ck-apk-build-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.ck-apk-meta-item{padding:12px;border:1px solid var(--ck-line);border-radius:12px;background:#0b0f09;min-width:0}
+.ck-apk-meta-item small{display:block;color:#9ca894;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:800}
+.ck-apk-meta-item strong{display:block;color:#f3f7ed;font-size:14px;margin-top:4px;overflow-wrap:anywhere}
+.ck-apk-meta-item strong.ck-lime{color:var(--ck-lime)}
+.ck-apk-size-note{font-size:12px!important;line-height:1.6;margin:10px 0 0!important}
+.ck-apk-size-note.is-warning{color:#ffd28a!important}
+.ck-apk-size-note.is-good{color:var(--ck-lime)!important}
+.ck-download-button:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.ck-release-link{padding:8px 0}
+@media(max-width:760px){
+ body{padding-top:72px}
+ .side-nav{gap:4px}
+ .side-brand{position:sticky;left:0;background:#070907!important;z-index:2}
+ .side-nav a{min-height:42px}
+ #ck-apk-build-meta{grid-template-columns:1fr}
+}
+@media(max-width:380px){
+ .side-brand{font-size:13px}
+ .side-nav a{font-size:11px;padding:8px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ .card,.lab-card,.lab-department,.lab-experiment-card,.ck-download-button{transition:none!important}
+}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -2215,17 +2254,39 @@ loadLabExperiments("Physics");
  const status=document.getElementById('ck-apk-status');
  const link=document.getElementById('ck-apk-download-link');
  if(!status||!link)return;
+ const section=document.getElementById('apk-download');
+ const meta=document.createElement('div');
+ meta.id='ck-apk-build-meta';
+ meta.setAttribute('aria-live','polite');
+ status.insertAdjacentElement('afterend',meta);
+ const item=(label,value,accent=false)=>{
+   const box=document.createElement('div');box.className='ck-apk-meta-item';
+   const small=document.createElement('small');small.textContent=label;
+   const strong=document.createElement('strong');strong.textContent=value;if(accent)strong.classList.add('ck-lime');
+   box.append(small,strong);return box;
+ };
+ const note=document.createElement('p');note.className='ck-apk-size-note';meta.insertAdjacentElement('afterend',note);
  try{
+  status.textContent='Checking the official GitHub release…';
   const response=await fetch('https://api.github.com/repos/senadesh159-a11y/campuskit/releases/latest',{headers:{Accept:'application/vnd.github+json'}});
-  if(response.status===404){status.textContent='No published APK release is available yet. Check back after the Android build is published.';return;}
-  if(!response.ok)throw new Error('Release lookup unavailable');
+  if(response.status===404){status.textContent='No official APK release has been published yet.';meta.append(item('Build status','Not published'),item('Download','Unavailable'),item('Target size','10 MB+'));note.classList.add('is-warning');note.textContent='The download button will point to the official release page until a real APK is published. No fake or padded APK is provided.';link.href='https://github.com/senadesh159-a11y/campuskit/releases';return;}
+  if(!response.ok)throw new Error('GitHub release lookup returned '+response.status);
   const release=await response.json();
-  const asset=(release.assets||[]).find(item=>/\.apk$/i.test(item.name));
-  if(!asset){status.textContent='Latest release found, but it does not contain an APK file yet.';return;}
+  const asset=(release.assets||[]).find(file=>/\.apk$/i.test(file.name));
+  if(!asset){status.textContent='A release exists, but it has no APK asset yet.';meta.append(item('Version',release.tag_name||'—'),item('APK asset','Missing'),item('Target size','10 MB+'));note.classList.add('is-warning');note.textContent='Publish the signed Android APK as a release asset before asking students to install it.';link.href=release.html_url||'https://github.com/senadesh159-a11y/campuskit/releases';return;}
+  const mb=asset.size/1024/1024, pretty=mb.toFixed(2)+' MB';
   link.href=asset.browser_download_url;
-  const mb=(asset.size/1024/1024).toFixed(1);
-  status.textContent='Latest build: '+release.tag_name+' · '+mb+' MB · Published '+new Date(release.published_at).toLocaleDateString();
- }catch(error){status.textContent='APK release details could not be loaded. Use “All versions & release notes” to check manually.';console.warn('CampusKit APK release check:',error);}
+  link.setAttribute('download',asset.name);
+  status.textContent='Official Android build is available · '+(release.tag_name||'Latest release');
+  meta.append(item('Version',release.tag_name||'Latest',true),item('APK size',pretty),item('Package',asset.name));
+  if(mb>=10){note.classList.add('is-good');note.textContent='Size target met: this is a real release asset of at least 10 MB. Published '+(release.published_at?new Date(release.published_at).toLocaleDateString():'date unavailable')+'.';}
+  else{note.classList.add('is-warning');note.textContent='This real APK is below the requested 10 MB target. The file is not padded; increase size only through genuine app features, resources and required libraries.';}
+ }catch(error){
+  status.textContent='Could not verify the latest APK release. Use “All versions & release notes” to check manually.';
+  meta.append(item('Build status','Could not verify'),item('Download','Check releases'),item('Target size','10 MB+'));
+  note.classList.add('is-warning');note.textContent='Release information is temporarily unavailable. Only install an APK attached to the official repository release.';
+  console.warn('CampusKit APK release check:',error);
+ }
 })();
 </script>
 </body>
