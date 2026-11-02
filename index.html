@@ -1415,8 +1415,7 @@ window.CampusKitCloud = {
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
   import {
-    initializeAuth,
-    browserLocalPersistence,
+    getAuth,
     GoogleAuthProvider,
     signInWithPopup,
     signOut,
@@ -1446,8 +1445,8 @@ window.CampusKitCloud = {
   };
 
   const app = initializeApp(firebaseConfig);
-  // Persist the Firebase session across reloads and mobile browser navigation.
-  const auth = initializeAuth(app, { persistence: [browserLocalPersistence] });
+  // Use Firebase's standard browser dependencies, including the popup resolver.
+  const auth = getAuth(app);
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
   window.CampusKitAuth = {
