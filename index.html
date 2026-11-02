@@ -683,6 +683,7 @@ footer{color:#C1E8FF!important}
 .ck-icon-heading{color:#C1E8FF}
 footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
 
+.ck-phone-grid svg{width:21px;height:21px;fill:none;stroke:#C1E8FF;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ck-phone-grid i{color:#C1E8FF!important}
 </style>
 
 
@@ -756,7 +757,7 @@ footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
     <div class="hero-top">
       <div>
         <div class="eyebrow">Your student workspace</div>
-        <h2 id="dashboardTitle">Welcome back, Student! 👋</h2>
+        <h2 id="dashboardTitle">Welcome back, Student!</h2>
         <p class="quote" id="dailyQuote">Small progress every day adds up.</p>
       </div>
       <div style="display:flex;align-items:center;gap:12px;position:relative"><div id="todayDate" aria-live="polite"></div><button id="ck-notification-button" type="button" aria-label="Open notifications" aria-expanded="false"><svg class="ck-icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><div id="ck-notification-panel" role="status"><strong>Campus notifications</strong><p id="ck-notification-copy">Your study workspace is up to date.</p></div></div>
@@ -1032,7 +1033,7 @@ footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
       </div>
       <p class="ck-apk-status" id="ck-apk-status" role="status" aria-live="polite">Checking the latest Android build…</p>
     </div>
-    <div class="ck-phone-art" aria-hidden="true"><div class="ck-phone-screen"><span class="ck-phone-dot"></span><b>CampusKit</b><small>YOUR STUDENT SPACE</small><div class="ck-phone-widget"><strong>Today</strong><span>Study • Create • Focus</span></div><div class="ck-phone-grid"><i>✓</i><i>⌁</i><i>✎</i><i>◷</i></div><div class="ck-phone-bar"></div><div class="ck-phone-bar short"></div></div></div>
+    <div class="ck-phone-art" aria-hidden="true"><div class="ck-phone-screen"><span class="ck-phone-dot"></span><b>CampusKit</b><small>YOUR STUDENT SPACE</small><div class="ck-phone-widget"><strong>Today</strong><span>Study • Create • Focus</span></div><div class="ck-phone-grid"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16M8 4v16M16 4v16"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16zM13 6l4 4"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i></div><div class="ck-phone-bar"></div><div class="ck-phone-bar short"></div></div></div>
   </div>
   <div class="ck-download-details">
     <article><span>01</span><h3>Download</h3><p>Get the latest APK from the official CampusKit GitHub release.</p></article>
@@ -1717,7 +1718,7 @@ window.CampusKitCloud = {
       }
       if (window.CampusKitCloud) window.CampusKitCloud.applyCloudData(cloudData);
       cloudReady = true;
-      showStatus("Cloud sync on ✓");
+      showStatus("Cloud sync is active.");
     } catch (error) {
       console.error("CampusKit cloud sync error:", error);
       showStatus("Cloud sync failed: " + (error.code || error.message));
@@ -1732,7 +1733,7 @@ window.CampusKitCloud = {
       doc(db, "users", userId, "campusData", docId),
       { items: value, updatedAt: new Date().toISOString() }
     )).then(() => {
-      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync on ✓");
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync is active.");
     }).catch(error => {
       console.error("CampusKit save error:", error);
       if (currentUser && currentUser.uid === userId) showStatus("Cloud save failed: " + (error.code || error.message));
@@ -1805,7 +1806,7 @@ window.CampusKitCloud = {
       setDriveStatus("Waiting for Google Drive authorization…");
       try {
         await requestDriveToken("consent");
-        setDriveStatus("Google Drive connected ✓. Files stay private in your Drive.");
+        setDriveStatus("Google Drive connected. Files stay private in your Drive.");
       } catch (error) {
         setDriveStatus(error.message || "Could not connect Google Drive.", true);
         throw error;
@@ -1839,7 +1840,7 @@ window.CampusKitCloud = {
       if (!response.ok) throw await driveApiError(response);
       const saved = await response.json();
       if (!saved.id) throw new Error("Google Drive did not return a file ID.");
-      setDriveStatus("File uploaded to your Google Drive ✓");
+      setDriveStatus("File uploaded to your Google Drive.");
       return {
         name: saved.name || file.name, driveFileId: saved.id,
         url: saved.webViewLink || `https://drive.google.com/file/d/${saved.id}/view`,
@@ -1949,7 +1950,7 @@ window.CampusKitCloud = {
     musicStatus.textContent = "Adding track…";
     try {
       await addDoc(collection(db, "publicMusic"), { title, url: parsed.url, type: parsed.type, addedBy: auth.currentUser.displayName || "CampusKit student", createdAt: new Date().toISOString() });
-      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students ✓";
+      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students.";
     } catch (error) {
       console.error("Could not add shared music:", error);
       musicStatus.textContent = "Could not add: " + (error.code || error.message || "unknown error") + ". Check Firestore rules for publicMusic and confirm you are signed in.";
