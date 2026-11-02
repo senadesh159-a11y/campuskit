@@ -85,9 +85,9 @@ private fun CampusKitApp(context: Context) {
                     "Notes" -> EntryScreen("Notes Library", "Note title", "Short note / subject", notes,
                         onAdd = { a, b -> notes.add(Entry(a,b)); persist("notes", notes) },
                         onDelete = { notes.removeAt(it); persist("notes", notes) })
-                    else -> MoreScreen(onFocus = { page = "Focus" }, onLab = { page = "Laboratory" })
                     "Focus" -> FocusScreen()
                     "Laboratory" -> LabScreen { selectedLab = it }
+                    else -> MoreScreen(onFocus = { page = "Focus" }, onLab = { page = "Laboratory" })
                 }
             }
         }
