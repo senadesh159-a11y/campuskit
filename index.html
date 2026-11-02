@@ -614,6 +614,49 @@ input,textarea,select{accent-color:var(--ck-lime,#c6ff00)}
 
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<!-- CampusKit blue palette inspired by the supplied reference -->
+<style id="campuskit-blue-palette">
+:root{--ck-navy:#021024;--ck-deep:#052659;--ck-mid:#5483B3;--ck-soft:#7DA0CA;--ck-ice:#C1E8FF;--purple:#7DA0CA;--lavender:#C1E8FF;--muted:#B7D5EA;--panel:rgba(5,38,89,.72);--border:rgba(125,160,202,.32);--ck-line:rgba(193,232,255,.20);--ck-glow:0 22px 70px rgba(2,16,36,.42)}
+html{background:#021024}
+body{color:#EAF7FF!important;background-color:#021024!important;background-image:radial-gradient(ellipse at 50% 0%,rgba(84,131,179,.48),transparent 48%),linear-gradient(180deg,#7DA0CA 0%,#5483B3 28%,#052659 68%,#021024 100%)!important;background-attachment:fixed!important}
+body::before{opacity:.12}
+body:after{background-image:linear-gradient(rgba(193,232,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(193,232,255,.045) 1px,transparent 1px)}
+header{background:linear-gradient(120deg,rgba(2,16,36,.96),rgba(5,38,89,.92))!important;border-color:rgba(193,232,255,.22)!important}
+header p,.side-nav a,.side-nav .side-hint{color:#C1E8FF}
+.side-nav{background:rgba(2,16,36,.96)!important;border-color:rgba(193,232,255,.18)!important}
+.side-brand{background:linear-gradient(100deg,#fff,#C1E8FF 60%,#7DA0CA)!important;background-clip:text!important;-webkit-background-clip:text!important}
+.side-nav a:hover,.side-nav a.active{background:linear-gradient(110deg,rgba(84,131,179,.42),rgba(193,232,255,.12))!important;border-color:rgba(193,232,255,.28)!important;color:#fff}
+.card,.lab-card,.lab-department,.lab-experiment-card{background:linear-gradient(145deg,rgba(5,38,89,.94),rgba(2,16,36,.91))!important;border-color:rgba(125,160,202,.32)!important;box-shadow:0 20px 55px rgba(2,16,36,.34),inset 0 1px rgba(193,232,255,.08)!important}
+.card:hover,.lab-card:hover,.lab-experiment-card:hover{border-color:rgba(193,232,255,.62)!important;box-shadow:0 24px 65px rgba(2,16,36,.48)!important}
+.card h2,.card h3,.lab-card h3,.note-item h4,h2,.eyebrow,.notes-status{color:#C1E8FF!important}
+p,.item-meta,.quote{color:#C4DDF0!important}
+.hero{background:linear-gradient(120deg,rgba(84,131,179,.30),rgba(5,38,89,.54)),rgba(2,16,36,.75)!important}
+.stat-box{background:linear-gradient(145deg,rgba(84,131,179,.34),rgba(5,38,89,.62))!important;border-color:rgba(193,232,255,.24)!important}
+.stat-box strong{color:#C1E8FF!important;text-shadow:0 0 20px rgba(193,232,255,.28)!important}
+.stat-box span{color:#D7EEFC!important}
+#progressFill,.lab-progress-fill{background:linear-gradient(90deg,#5483B3,#7DA0CA,#C1E8FF)!important;box-shadow:0 0 16px rgba(193,232,255,.28)!important}
+input,textarea,.notes-toolbar select,.notes-form-grid select,.lab-card input,.lab-card textarea,.lab-card select{background:rgba(2,16,36,.88)!important;border-color:rgba(125,160,202,.48)!important;color:#F4FBFF!important}
+input::placeholder,textarea::placeholder{color:#9BBBD7!important}
+input:focus,textarea:focus{outline-color:#C1E8FF!important;border-color:#C1E8FF!important;box-shadow:0 0 0 4px rgba(193,232,255,.14)!important}
+button{background:linear-gradient(120deg,#5483B3,#7DA0CA)!important;color:#021024!important;border-color:rgba(193,232,255,.35)!important;box-shadow:0 8px 24px rgba(2,16,36,.3)!important}
+button:hover{filter:brightness(1.1)}
+.delete-btn,.lab-record button{background:linear-gradient(120deg,#9D4358,#70283D)!important;color:#fff!important}
+.complete-btn{background:linear-gradient(120deg,#5483B3,#C1E8FF)!important;color:#021024!important}
+li,.note-item,.music-item,.lab-record,.lab-viva-item{background:rgba(5,38,89,.58)!important;border-color:rgba(125,160,202,.30)!important;color:#EAF7FF!important}
+.note-tag{background:rgba(84,131,179,.24)!important;border-color:rgba(193,232,255,.25)!important;color:#DFF3FF!important}
+.lab-department:hover,.lab-department.selected{border-color:#C1E8FF!important;background:rgba(84,131,179,.22)!important}
+.lab-experiment-card{background:linear-gradient(145deg,#052659,#021024)!important;border-color:#5483B3!important}
+.lab-experiment-card h3,.lab-experiment-card a{color:#C1E8FF!important}
+.lab-card button,.lab-action{background:linear-gradient(120deg,#7DA0CA,#C1E8FF)!important;color:#021024!important}
+.lab-result,.lab-answer{background:rgba(84,131,179,.18)!important;color:#C1E8FF!important}
+.login-card{background:linear-gradient(145deg,rgba(5,38,89,.97),rgba(2,16,36,.96))!important;border-color:rgba(193,232,255,.30)!important}
+.login-logo{background:linear-gradient(135deg,#5483B3,#C1E8FF)!important}
+#ck-apk-build-meta .ck-apk-meta-item{background:rgba(5,38,89,.75)!important;border-color:rgba(193,232,255,.22)!important}
+.ck-lime{color:#C1E8FF!important}
+footer{color:#C1E8FF!important}
+</style>
+
 </head>
 <body>
 <div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
