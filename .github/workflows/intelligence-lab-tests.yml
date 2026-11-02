@@ -1,0 +1,22 @@
+name: CampusKit Intelligence Lab Tests
+on:
+  push:
+    branches: ["feature/intelligence-lab-v2"]
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "index.html"
+      - "assets/intelligence-lab.js"
+      - "assets/intelligence-lab.css"
+      - "tests/**"
+      - "package.json"
+      - ".github/workflows/intelligence-lab-tests.yml"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm test
