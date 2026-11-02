@@ -1984,5 +1984,19 @@ loadLabExperiments("Physics");
 
 </script>
 <script>(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;const scan=()=>document.querySelectorAll('.app-view.active-view .card,.app-view.active-view .lab-department,.app-view.active-view .lab-experiment-card,.cinematic-hero').forEach(el=>{if(el.classList.contains('ck-reveal'))return;el.classList.add('ck-reveal');if(reduce||!('IntersectionObserver'in window)){el.classList.add('ck-visible');return}const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('ck-visible');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -35px 0px'});io.observe(el)});scan();document.addEventListener('click',e=>{if(e.target.closest('.side-nav a'))setTimeout(scan,100)});document.querySelectorAll('[data-ck-view]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector('.side-nav a[href="#'+a.dataset.ckView+'"]')?.click()}));const stage=document.querySelector('.ck-hero-stage');if(stage&&!reduce&&matchMedia('(pointer:fine)').matches){stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.style.transform='rotateY('+x*10+'deg) rotateX('+(-y*8)+'deg)'});stage.addEventListener('pointerleave',()=>stage.style.transform='')}})();</script>
+<script id="ck-motion-controller">
+(()=> {
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const wipe=document.getElementById('ck-transition-wipe');let wipeTimer;
+ document.querySelectorAll('.side-nav a[href^="#"]').forEach(link=>link.addEventListener('click',()=>{
+  if(reduce||!wipe)return;wipe.classList.remove('is-running');void wipe.offsetWidth;wipe.classList.add('is-running');clearTimeout(wipeTimer);wipeTimer=setTimeout(()=>wipe.classList.remove('is-running'),820);
+ },{capture:true}));
+ const notify=document.getElementById('ck-notification-button'),panel=document.getElementById('ck-notification-panel');
+ if(notify&&panel){notify.addEventListener('click',()=>{const open=panel.classList.toggle('open');notify.setAttribute('aria-expanded',String(open));const due=document.getElementById('dueSoonCount')?.textContent||'0',pending=document.getElementById('pendingCount')?.textContent||'0';const copy=document.getElementById('ck-notification-copy');if(copy)copy.textContent=Number(due)>0?due+' assignment(s) due in the next 3 days. Pending tasks: '+pending+'.':'No urgent deadlines. Pending tasks: '+pending+'.'});document.addEventListener('click',e=>{if(!e.target.closest('#ck-notification-button')&&!e.target.closest('#ck-notification-panel')){panel.classList.remove('open');notify.setAttribute('aria-expanded','false')}})}
+ const fine=matchMedia('(pointer:fine)').matches;
+ if(!reduce&&fine){document.addEventListener('pointermove',e=>{const card=e.target.closest('.card:not(.hero),.lab-department,.lab-experiment-card');document.querySelectorAll('.ck-tilt-active').forEach(el=>{if(el!==card){el.classList.remove('ck-tilt-active');el.style.transform=''}});if(!card)return;const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.classList.add('ck-tilt-active');card.style.transform='perspective(1000px) rotateX('+(-y*2.4)+'deg) rotateY('+(x*2.8)+'deg) translateY(-3px)'},{passive:true});document.addEventListener('pointerout',e=>{const c=e.target.closest('.ck-tilt-active');if(c&&!c.contains(e.relatedTarget)){c.classList.remove('ck-tilt-active');c.style.transform=''}})}
+ const stage=document.querySelector('.ck-hero-stage');if(stage&&!reduce&&fine){stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.style.transform='rotateY('+x*10+'deg) rotateX('+(-y*8)+'deg)'});stage.addEventListener('pointerleave',()=>stage.style.transform='')}
+})();
+</script>
 </body>
 </html>
