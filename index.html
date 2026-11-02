@@ -1650,6 +1650,7 @@ window.CampusKitCloud = {
     onSnapshot,
     query,
     orderBy,
+    where,
     limit
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
@@ -1894,7 +1895,7 @@ window.CampusKitCloud = {
       li.append(info,play); musicList.append(li);
     });
   }
-  onSnapshot(query(collection(db, "publicMusic"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
+  onSnapshot(query(collection(db, "publicMusic"), where("status", "==", "published"), where("source", "==", "google-drive"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
     const approved=snapshot.docs.map(d=>({id:d.id,...d.data()}))
       .filter(item=>item.status==="published" && item.source==="google-drive" && typeof item.downloadUrl==="string");
     renderMusic(approved);
