@@ -340,6 +340,80 @@ body.authenticated #campuskit-login-screen{display:none!important}
 .lab-experiment-card a:hover {
     text-decoration: underline;
 }
+/* CINEMATIC IMMERSIVE CAMPUSKIT */
+:root{--ck-line:rgba(193,176,255,.2);--ck-glow:0 25px 90px rgba(90,65,190,.22)}
+body{background:#070812;background-image:radial-gradient(ellipse at 18% 8%,#7347ff38,transparent 38%),radial-gradient(ellipse at 88% 22%,#2278ff2b,transparent 38%),radial-gradient(ellipse at 50% 90%,#be41ff20,transparent 44%);background-attachment:fixed;color:#f7f5ff}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.16;background-image:linear-gradient(#b4a0ff12 1px,transparent 1px),linear-gradient(90deg,#b4a0ff12 1px,transparent 1px);background-size:72px 72px;mask-image:linear-gradient(#000,transparent 82%)}
+header{background:#08081699;border-bottom:1px solid var(--ck-line);backdrop-filter:blur(24px);text-align:left;padding:22px clamp(20px,4vw,64px)}
+header h1{font-size:clamp(24px,3vw,34px);letter-spacing:-1px}header p{color:#b8b1d6}
+main{max-width:1440px;padding:0 clamp(14px,3vw,42px);margin:32px auto}
+.side-nav{background:#070814c9;border-right:1px solid var(--ck-line);backdrop-filter:blur(28px);box-shadow:15px 0 60px #0003}
+.side-brand{background:linear-gradient(100deg,#fff,#bba7ff 55%,#73d8ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.side-nav a{border:1px solid transparent;color:#aaa7c7;transition:transform .35s,background .35s,border-color .35s}
+.side-nav a:hover,.side-nav a.active{transform:translateX(4px);border-color:#ad93ff38;background:linear-gradient(110deg,#8b5cf63b,#3b82f21c);box-shadow:0 8px 30px #0002}
+.card,.lab-card,.lab-department,.lab-experiment-card{position:relative;overflow:hidden;border:1px solid var(--ck-line);background:linear-gradient(145deg,#1b1837b8,#0a0d1fba);backdrop-filter:blur(22px);box-shadow:var(--ck-glow),inset 0 1px #ffffff0e;border-radius:22px;transition:transform .45s,border-color .35s,box-shadow .35s}
+.card:before,.lab-card:before,.lab-department:before,.lab-experiment-card:before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(125deg,#ffffff17,transparent 28%,transparent 70%,#8d6fff14)}
+.card:hover,.lab-card:hover,.lab-experiment-card:hover{border-color:#ae91ff77;box-shadow:0 28px 80px #46379d3d,inset 0 1px #ffffff19}
+.card h2,.card h3,.lab-card h3{color:#e6dcff}
+p,.item-meta{color:#bcb8d2}
+.hero{background:linear-gradient(120deg,#5c3baa33,#1e539d24),#0f0e22ba}
+.stat-box{background:linear-gradient(145deg,#8b5cf62b,#375fb414);border:1px solid #b29bff38;border-radius:16px;transition:transform .3s,box-shadow .3s}
+.stat-box:hover{transform:translateY(-5px);box-shadow:0 12px 35px #825eff22}
+.stat-box strong{color:#d4c5ff;text-shadow:0 0 24px #a78bfa66}
+#progressFill,.lab-progress-fill{background:linear-gradient(90deg,#a78bfa,#60a5fa,#67e8f9);box-shadow:0 0 18px #8b5cf688}
+input,textarea,.notes-toolbar select,.notes-form-grid select{background:#050714ba;border-color:#a996ff47;border-radius:12px}
+input:focus,textarea:focus{box-shadow:0 0 0 5px #9b78ff18}
+button{background:linear-gradient(115deg,#9065ef,#526eea);border:1px solid #d2c3ff3d;box-shadow:0 8px 24px #7856dc33;transition:transform .25s,box-shadow .25s}
+button:hover{transform:translateY(-3px);box-shadow:0 12px 34px #7856dc55}
+li,.note-item,.music-item{background:#1a18378c;border-color:var(--ck-line);border-radius:14px}
+.lab-department{background:linear-gradient(145deg,#1b1837b8,#0a0d1fba);min-height:155px}
+.lab-department:hover,.lab-department.selected{border-color:#a78bfa;background:linear-gradient(145deg,#6e4bd240,#1e509926);box-shadow:0 18px 50px #7252d855}
+.lab-department .lab-icon{filter:drop-shadow(0 0 12px #9d7aff77);font-size:32px}
+.lab-experiment-card{background:linear-gradient(145deg,#1f1b42e0,#091022e8);border-color:#a48fff47}
+.lab-experiment-card h3{color:#d9caff}.lab-experiment-card a{color:#a9c6ff}
+footer{color:#918baa}
+#campuskit-login-screen{background:radial-gradient(ellipse at 50% 42%,#5037aa3d,transparent 48%),#040510dd;backdrop-filter:blur(16px)}
+.login-orb{width:min(76vw,720px);border-color:#a78bfa30;box-shadow:0 0 120px #8b5cf622,inset 0 0 100px #4f83ff13}
+.login-card{background:linear-gradient(145deg,#1d173edb,#080e22e0);border-color:#c4b5fd42;box-shadow:0 35px 120px #0009,0 0 80px #7655dc30}
+.login-logo{background:linear-gradient(135deg,#9b78ff,#3479e9);box-shadow:0 12px 50px #6c54e988}
+#ck-google-login{background:linear-gradient(100deg,#fff,#eae6ff);box-shadow:0 8px 28px #0004}
+.app-view.active-view{animation:ckViewIn .65s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ckViewIn{from{opacity:0;transform:translateY(18px) scale(.99);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+.ck-reveal{opacity:0;transform:translateY(26px) scale(.985);transition:opacity .75s,transform .75s cubic-bezier(.2,.8,.2,1)}
+.ck-reveal.ck-visible{opacity:1;transform:none}
+.cinematic-hero{position:relative;isolation:isolate;min-height:clamp(370px,48vw,590px);margin:0 0 26px;padding:clamp(26px,5vw,64px);display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:22px;overflow:hidden;border:1px solid #bca4ff40;border-radius:30px;background:radial-gradient(ellipse at 72% 50%,#644bdc47,transparent 42%),linear-gradient(115deg,#151231f0,#080e22c7);box-shadow:0 30px 110px #0009,inset 0 1px #ffffff18}
+.cinematic-hero:before{content:"";position:absolute;inset:-35%;z-index:-1;background:conic-gradient(from 90deg,transparent,#7e62ff21,transparent,#44a0ff1f,transparent);animation:ckAurora 24s linear infinite}
+.cinematic-hero:after{content:"";position:absolute;inset:0;z-index:-1;opacity:.22;background-image:radial-gradient(1px 1px at 20% 30%,#fff 50%,transparent 60%),radial-gradient(2px 2px at 80% 25%,#bdaaff 50%,transparent 60%),radial-gradient(1px 1px at 60% 80%,#7dd3fc 50%,transparent 60%);background-size:130px 130px}
+@keyframes ckAurora{to{transform:rotate(360deg)}}
+.ck-hero-copy{position:relative;z-index:3;max-width:610px}
+.ck-hero-pill{display:inline-flex;gap:9px;align-items:center;border:1px solid #b8a2ff44;border-radius:99px;padding:8px 13px;color:#d8caff;background:#a78bfa12;font-size:11px;letter-spacing:.13em;text-transform:uppercase}
+.ck-live-dot{width:7px;height:7px;border-radius:50%;background:#72e8c0;box-shadow:0 0 13px #72e8c0}
+.ck-hero-copy h1{font-size:clamp(38px,6vw,76px);line-height:.99;letter-spacing:-.065em;margin:22px 0 18px;color:#fff}
+.ck-hero-copy h1 span{background:linear-gradient(100deg,#c9b7ff,#8db9ff 58%,#75e5f0);background-clip:text;-webkit-background-clip:text;color:transparent}
+.ck-hero-copy p{font-size:clamp(14px,1.5vw,17px);max-width:470px;color:#c3bfd9}
+.ck-hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}
+.ck-hero-actions a{display:inline-flex;align-items:center;gap:9px;text-decoration:none;border-radius:12px;padding:12px 17px;font-size:13px;font-weight:800}
+.ck-hero-primary{color:#101020;background:linear-gradient(110deg,#d8c8ff,#8cc7ff);box-shadow:0 10px 34px #8e7bff44}
+.ck-hero-secondary{color:#e7e2ff;border:1px solid #c5b5ff44;background:#ffffff08}
+.ck-hero-stage{height:340px;position:relative;perspective:1100px;transform-style:preserve-3d}
+.ck-orbit{position:absolute;left:50%;top:50%;width:290px;height:290px;border:1px solid #b7a0ff44;border-radius:50%;transform:translate(-50%,-50%) rotateX(68deg);box-shadow:0 0 45px #8b5cf622,inset 0 0 35px #8b5cf611;animation:ckOrbit 18s linear infinite}
+.ck-orbit:before,.ck-orbit:after{content:"";position:absolute;inset:28px;border:1px solid #70caff3b;border-radius:50%;transform:rotate(58deg) scaleX(.55)}
+.ck-orbit:after{inset:65px;transform:rotate(-45deg) scaleX(.7);border-color:#d5a7ff55}
+@keyframes ckOrbit{to{transform:translate(-50%,-50%) rotateX(68deg) rotateZ(360deg)}}
+.ck-core{position:absolute;left:50%;top:50%;width:116px;height:116px;border-radius:34px;transform:translate(-50%,-50%) rotate(-12deg);background:linear-gradient(145deg,#a78bfa,#386fe5 65%,#43d1df);box-shadow:0 0 65px #8d75ff88,0 25px 65px #0009,inset 0 2px #fff8;display:grid;place-items:center;font-size:48px;animation:ckFloat 5s ease-in-out infinite}
+@keyframes ckFloat{50%{transform:translate(-50%,-58%) rotate(3deg)}}
+.ck-float-card{position:absolute;min-width:145px;padding:13px 15px;border:1px solid #c7b8ff44;border-radius:15px;background:linear-gradient(145deg,#28214dce,#101b37d9);backdrop-filter:blur(16px);box-shadow:0 18px 55px #0008;animation:ckCardFloat 6s ease-in-out infinite}
+.ck-float-card small{display:block;color:#aaa3c8;font-size:9px;letter-spacing:.12em;text-transform:uppercase}
+.ck-float-card strong{display:block;color:#f3efff;font-size:13px;margin-top:4px}.ck-mini-bar{height:4px;border-radius:9px;background:linear-gradient(90deg,#a78bfa,#6dd7ef);margin-top:9px}
+.ck-float-card.one{left:0;top:15%;transform:rotateY(12deg) rotateZ(-5deg)}
+.ck-float-card.two{right:0;top:28%;animation-delay:-2s;transform:rotateY(-12deg) rotateZ(5deg)}
+.ck-float-card.three{left:17%;bottom:4%;animation-delay:-4s}
+@keyframes ckCardFloat{50%{translate:0 -13px}}
+.ck-scroll-hint{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.2em;color:#aaa2ca;text-transform:uppercase}
+@media(max-width:850px){.cinematic-hero{grid-template-columns:1fr;padding-bottom:45px}.ck-hero-stage{height:285px;max-width:520px;width:100%;margin:auto}.ck-hero-copy h1{max-width:650px}}
+@media(max-width:480px){.cinematic-hero{border-radius:22px;min-height:0}.ck-hero-stage{height:240px;transform:scale(.9);margin:-5px auto}.ck-orbit{width:230px;height:230px}.ck-core{width:88px;height:88px;font-size:36px}.ck-float-card{min-width:120px;padding:10px}.ck-float-card strong{font-size:11px}.ck-float-card.one{left:-4%}.ck-float-card.two{right:-4%}}
+@media(prefers-reduced-motion:reduce){.cinematic-hero:before,.ck-orbit,.ck-core,.ck-float-card{animation:none!important}.ck-reveal{opacity:1;transform:none}}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -1836,5 +1910,6 @@ document.querySelectorAll(".lab-department").forEach(button => {
 loadLabExperiments("Physics");
 
 </script>
+<script>(()=>{const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;const scan=()=>document.querySelectorAll('.app-view.active-view .card,.app-view.active-view .lab-department,.app-view.active-view .lab-experiment-card,.cinematic-hero').forEach(el=>{if(el.classList.contains('ck-reveal'))return;el.classList.add('ck-reveal');if(reduce||!('IntersectionObserver'in window)){el.classList.add('ck-visible');return}const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('ck-visible');io.unobserve(e.target)}}),{threshold:.08,rootMargin:'0px 0px -35px 0px'});io.observe(el)});scan();document.addEventListener('click',e=>{if(e.target.closest('.side-nav a'))setTimeout(scan,100)});document.querySelectorAll('[data-ck-view]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();document.querySelector('.side-nav a[href="#'+a.dataset.ckView+'"]')?.click()}));const stage=document.querySelector('.ck-hero-stage');if(stage&&!reduce&&matchMedia('(pointer:fine)').matches){stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.style.transform='rotateY('+x*10+'deg) rotateX('+(-y*8)+'deg)'});stage.addEventListener('pointerleave',()=>stage.style.transform='')}})();</script>
 </body>
 </html>
