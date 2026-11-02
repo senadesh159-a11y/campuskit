@@ -669,6 +669,20 @@ li,.note-item,.music-item,.lab-record,.lab-viva-item{background:rgba(5,38,89,.58
 #ck-apk-build-meta .ck-apk-meta-item{background:rgba(5,38,89,.75)!important;border-color:rgba(193,232,255,.22)!important}
 .ck-lime{color:#C1E8FF!important}
 footer{color:#C1E8FF!important}
+
+/* CampusKit complete icon + blue visual system — applies to every section and nested control. */
+:root{--ck-lime:#C1E8FF;--ck-lime-soft:#7DA0CA;--ck-ink:#021024;--ck-panel:#052659;--ck-stroke:rgba(193,232,255,.28);--ck-muted:#B7D5EA;--ck-line:rgba(193,232,255,.20);--ck-focus:0 0 0 3px rgba(193,232,255,.28)}
+.ck-section-icon{border-color:rgba(125,160,202,.48)!important;background:linear-gradient(145deg,rgba(84,131,179,.38),rgba(5,38,89,.45))!important;color:#C1E8FF!important;box-shadow:inset 0 1px rgba(255,255,255,.10),0 7px 22px rgba(2,16,36,.35),0 0 18px rgba(84,131,179,.12)!important}
+.ck-section-icon svg{stroke:#C1E8FF!important}
+.card:hover .ck-section-icon,.lab-card:hover .ck-section-icon,.ck-intel-tool:hover .ck-section-icon{border-color:rgba(193,232,255,.82)!important;box-shadow:0 0 22px rgba(84,131,179,.28)!important}
+.ai-input-actions .ai-tool-btn{border-color:rgba(125,160,202,.5)!important;background:linear-gradient(145deg,rgba(84,131,179,.34),rgba(5,38,89,.75))!important;color:#EAF7FF!important}
+.ai-input-actions .ai-tool-btn .ck-icon{color:#C1E8FF!important;stroke:#C1E8FF!important}
+.ai-input-actions .ai-tool-btn:hover,.ai-input-actions .ai-tool-btn[aria-pressed="true"]{border-color:#C1E8FF!important;background:linear-gradient(145deg,rgba(84,131,179,.52),rgba(5,38,89,.88))!important;box-shadow:0 8px 24px rgba(84,131,179,.24)!important}
+.ck-bookmark-action:before,.bookmark-btn:before{content:"";display:inline-block;width:16px;height:16px;margin-right:8px;vertical-align:-3px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h12v18l-6-4-6 4z'/%3E%3C/svg%3E") center/contain no-repeat}
+.focus-lock-mark svg{width:54px;height:54px;fill:none;stroke:#C1E8FF;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ck-icon-heading{color:#C1E8FF}
+footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
+
 </style>
 
 
@@ -719,10 +733,10 @@ footer{color:#C1E8FF!important}
   <span>Laboratory</span>
 </a>
 
-  <a href="#apk-download"><span aria-hidden="true">⬇</span><span>Download App</span></a>
-  <a href="#intelligence-lab"><span aria-hidden="true">✦</span><span>Intelligence Lab</span></a>
+  <a href="#apk-download"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg><span>Download App</span></a>
+  <a href="#intelligence-lab"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg><span>Intelligence Lab</span></a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
-  <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
+  <button id="ck-sidebar-logout" type="button"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg><span>Sign out</span></button>
 </nav>
 <header>
   <h1><img class="ck-header-logo" src="./assets/campuskit-icon.svg" alt=""> CampusKit</h1>
@@ -764,7 +778,7 @@ footer{color:#C1E8FF!important}
   </section>
 
   <section class="card app-view active-view" id="search-section" aria-labelledby="searchTitle">
-    <h3 id="searchTitle">🔎 Quick Search</h3>
+    <h3 id="searchTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 5 5"/></svg></span>Quick Search</h3>
     <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
     <p id="searchMessage" aria-live="polite">Type something to search.</p>
     <button type="button" id="clearSearchBtn">Clear Search</button>
@@ -847,7 +861,7 @@ footer{color:#C1E8FF!important}
         <select id="notesSort" aria-label="Sort notes">
           <option value="updated">Recently updated</option><option value="created">Recently created</option><option value="title">Title A–Z</option>
         </select>
-        <button type="button" id="notesBookmarksOnly" aria-pressed="false">☆ Bookmarks only</button>
+        <button type="button" id="notesBookmarksOnly" class="ck-bookmark-action" aria-pressed="false">Bookmarks only</button>
       </div>
       <p id="notesCountLabel" class="notes-count" aria-live="polite">0 notes</p>
       <p id="notesLibraryStatus" class="notes-status" role="status" aria-live="polite">Your notes will appear here.</p>
@@ -887,7 +901,7 @@ footer{color:#C1E8FF!important}
         <button type="submit">Add to shared playlist</button>
         <p id="musicStatus" role="status" aria-live="polite"></p>
       </form>
-      <h3>🌿 Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
+      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/><path d="M8 12h8M12 8v8"/></svg></span>Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
     </div>
   </div>
 </section>
@@ -896,7 +910,7 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="focus-mode" aria-labelledby="focusModeTitle">
   <div class="focus-head">
     <span class="focus-kicker">CAMPUSKIT • DEEP WORK</span>
-    <h2 id="focusModeTitle">⏳ Focus Mode</h2>
+    <h2 id="focusModeTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M8 2h8"/></svg></span>Focus Mode</h2>
     <p>Set a study session and keep CampusKit as your focused workspace.</p>
   </div>
   <div class="focus-panel">
@@ -921,7 +935,7 @@ footer{color:#C1E8FF!important}
 
 <div id="focusLockScreen" class="focus-lock-screen" hidden role="dialog" aria-modal="true" aria-labelledby="focusLockTitle">
   <div class="focus-lock-card">
-    <div class="focus-lock-mark">◎</div>
+    <div class="focus-lock-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></div>
     <span class="focus-kicker">CAMPUSKIT • FOCUS SESSION</span>
     <h2 id="focusLockTitle">Stay with your goal.</h2>
     <p>Your focus session is running.</p>
@@ -1028,7 +1042,7 @@ footer{color:#C1E8FF!important}
   <p class="ck-apk-footnote">Android installation note: only install APKs published from this official repository. The current Android package is a web-connected companion; an internet connection is required for online features. APK size depends on the actual app build and is never padded artificially.</p>
 </section>
 
-<footer>Made for Students ❤️ | CampusKit</footer>
+<footer><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5-8.8 11-8.8 11s-8.8-6-8.8-11a4.2 4.2 0 0 1 7.6-2.5 4.2 4.2 0 0 1 7.6 2.5Z"/></svg> Made for Students | CampusKit</footer>
 <canvas id="neural-bg" aria-hidden="true"></canvas>
 
 <script>
@@ -1144,7 +1158,7 @@ function displayAssignments() {
     item.appendChild(meta);
 
     const toggleButton = createButton(
-      assignment.completed ? "✓ Completed" : "Mark Complete",
+      assignment.completed ? "Completed" : "Mark Complete",
       "complete-btn" + (assignment.completed ? " is-complete" : ""),
       () => {
         savedAssignments[index].completed = !savedAssignments[index].completed;
@@ -1280,7 +1294,7 @@ function displayNotes() {
     const card = document.createElement("article");
     card.className = "note-item";
     const heading = document.createElement("h4");
-    heading.textContent = `${note.bookmarked ? "★ " : ""}${note.title || "Untitled note"}`;
+    heading.textContent = `${note.title || "Untitled note"}`;
     const meta = document.createElement("span");
     meta.className = "item-meta";
     meta.textContent = `${note.subject} · Updated ${formatDate((note.updatedAt || "").slice(0, 10))}`;
@@ -1315,7 +1329,7 @@ function displayNotes() {
 
     const actions = document.createElement("div");
     actions.className = "note-actions";
-    actions.appendChild(createButton(note.bookmarked ? "★ Bookmarked" : "☆ Bookmark", "bookmark-btn", () => {
+    actions.appendChild(createButton(note.bookmarked ? "Bookmarked" : "Bookmark", "bookmark-btn", () => {
       const index = savedNotes.findIndex(item => item.id === note.id);
       if (index < 0) return;
       savedNotes[index] = { ...savedNotes[index], bookmarked: !savedNotes[index].bookmarked, updatedAt: new Date().toISOString() };
@@ -1428,7 +1442,7 @@ notesSort.addEventListener("change", displayNotes);
 notesBookmarksOnlyBtn.addEventListener("click", () => {
   bookmarksOnly = !bookmarksOnly;
   notesBookmarksOnlyBtn.setAttribute("aria-pressed", String(bookmarksOnly));
-  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "★ Show all notes" : "☆ Bookmarks only";
+  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "Show all notes" : "Bookmarks only";
   displayNotes();
 });
 
@@ -1487,7 +1501,7 @@ function updateWelcome() {
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  document.getElementById("dashboardTitle").textContent = greeting + ", Student! 👋";
+  document.getElementById("dashboardTitle").textContent = greeting + ", Student!";
   document.getElementById("todayDate").textContent = now.toLocaleDateString(undefined, {
     weekday: "long", day: "numeric", month: "long", year: "numeric"
   });
