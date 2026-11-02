@@ -29,7 +29,8 @@ import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples
 const host=document.getElementById('viewer');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x091126);
 const camera=new THREE.PerspectiveCamera(45,host.clientWidth/host.clientHeight,.1,100);camera.position.set(8,7,9);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2.5));renderer.setSize(host.clientWidth,host.clientHeight);renderer.shadowMap.enabled=true;
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2.5));renderer.setSize(host.clientWidth,host.clientHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
+renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure=1.12;
@@ -52,6 +53,7 @@ scene.traverse(object=>{
   if(object.isDirectionalLight){object.castShadow=true;object.shadow.mapSize.set(1024,1024);object.shadow.camera.near=.5;object.shadow.camera.far=40;object.shadow.bias=-0.00015;}
   if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}
 });
+scene.traverse(object=>{if(object.isDirectionalLight){object.castShadow=true;object.shadow.mapSize.set(1024,1024);object.shadow.camera.near=.5;object.shadow.camera.far=40;object.shadow.bias=-0.00015;}if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
 function animate(){requestAnimationFrame(animate);if(running)group.rotation.y+=.003;orbit.update();renderer.render(scene,camera)}animate();
 new ResizeObserver(()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)}).observe(host);
 
