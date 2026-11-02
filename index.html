@@ -1309,7 +1309,7 @@ function displayNotes() {
       attachment.href = note.attachment.url;
       attachment.target = "_blank";
       attachment.rel = "noopener noreferrer";
-      attachment.textContent = `📎 ${note.attachment.name || "Open attachment"}${note.attachment.provider === "google-drive" ? " (Google Drive)" : ""}`;
+      attachment.textContent = `Attachment: ${note.attachment.name || "Open attachment"}${note.attachment.provider === "google-drive" ? " (Google Drive)" : ""}`;
       card.appendChild(attachment);
     }
 
@@ -2127,7 +2127,7 @@ window.CampusKitCloud = {
     event.preventDefault();
     const question = questionInput.value.trim();
     if (!question) { status.textContent = "Please type or speak a question first."; questionInput.focus(); return; }
-    addMessage("You", question + (selectedImage ? "\n📷 Image attached: " + selectedImage.name : ""));
+    addMessage("You", question + (selectedImage ? "\nImage attached: " + selectedImage.name : ""));
     questionInput.value = "";
     sendButton.disabled = true;
     status.textContent = "AI is thinking…";
