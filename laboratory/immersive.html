@@ -93,10 +93,69 @@ for(let j=0;j<3;j++){let pts=[];for(let i=0;i<240;i++){let x=-3+i/239*6;pts.push
 for(let i=0;i<14;i++){let a=i/14*Math.PI*2;let pts=[];for(let j=0;j<80;j++){let t=j/79;let r=.25+t*2;pts.push(new THREE.Vector3(Math.cos(a)*r,1+Math.sin(t*Math.PI*2)*.25,Math.sin(a)*r))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x6da5c0})))}
 }else if(kind==='pendulum'){add(new THREE.BoxGeometry(3,.2,.3),blue,0,4,0);rod([0,4,0],[0,2,0],.035,white);let bob=add(new THREE.SphereGeometry(.28,32,24),orange,0,1.7,0);anim.push(t=>{let ang=(vals.angle||18)*Math.PI/180*Math.sin(t*Math.sqrt((vals.gravity||9.81)/(vals.length||1)));rodUpdate(bob,0,4,(vals.length||1),ang)})}
 else if(kind==='projectile'){let ball=add(new THREE.SphereGeometry(.18,24,16),orange,-3,.2,0);let line= new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({length:80},(_,i)=>{let t=i/79*2.8;let a=(vals.angle||45)*Math.PI/180;return new THREE.Vector3(-3+(vals.speed||20)*Math.cos(a)*t/7,.2+(vals.speed||20)*Math.sin(a)*t/7-.5*(vals.gravity||9.81)*t*t/49,0)})),new THREE.LineBasicMaterial({color:0x6da5c0}));root.add(line);anim.push(t=>{let a=(vals.angle||45)*Math.PI/180,tt=(t%3);ball.position.set(-3+(vals.speed||20)*Math.cos(a)*tt/7,.2+(vals.speed||20)*Math.sin(a)*tt/7-.5*(vals.gravity||9.81)*tt*tt/49,0)})}
-else if(['atom','molecule','lattice','dna'].includes(kind)){let n=kind==='lattice'?4:kind==='dna'?24:kind==='molecule'?5:3;for(let i=0;i<n;i++){let a=i/n*Math.PI*2;let x=Math.cos(a)*1.25,z=Math.sin(a)*1.25;add(new THREE.SphereGeometry(kind==='atom'?.28:.22,24,18),i%2?teal:orange,x,1+Math.sin(a*2)*.35,z);rod([0,1,0],[x,1+Math.sin(a*2)*.35,z],.035,white)}if(kind==='atom')for(let r of [1,1.5]){let ring=add(new THREE.TorusGeometry(r,.018,8,100),blue,0,1,0);ring.rotation.x=Math.PI/2;ring.rotation.y=.5}}
-else if(['cell','plant','evolution','ecosystem','neuron','skeleton','skull'].includes(kind)){let shell=add(new THREE.SphereGeometry(1.8,48,32),kind==='cell'?glass:kind==='plant'?teal:white,0,1,0);shell.scale.set(1.3,.85,1);for(let i=0;i<12;i++){let a=i/12*Math.PI*2;let o=add(new THREE.SphereGeometry(.22+Math.random()*.12,16,12),i%2?orange:blue,Math.cos(a)*1.25,1+Math.sin(a*3)*.5,Math.sin(a)*.8);if(kind==='skeleton'||kind==='skull')rod([0,.5,0],[Math.cos(a)*1.25,1+Math.sin(a*3)*.5,Math.sin(a)*.8],.055,white)}}
-else if(['spiral','fractal','graph','distribution','surface'].includes(kind)){let pts=[];for(let i=0;i<600;i++){let t=i/599*Math.PI*12,r=.05+i/599*1.7;pts.push(new THREE.Vector3(Math.cos(t)*r,Math.sin(t)*r,Math.sin(t*.5)*.45))}let line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x6da5c0}));root.add(line);for(let i=0;i<12;i++)add(new THREE.SphereGeometry(.08,12,8),teal,Math.cos(i)*i*.12,Math.sin(i)*i*.12,0)}
-else if(['spring','wave','field','circuit','electrolysis','diffusion','reaction','gas','orbit'].includes(kind)){for(let j=0;j<4;j++){let pts=[];for(let i=0;i<180;i++){let x=-3+i/179*6,y=1+Math.sin(i/179*Math.PI*8+j*.6)*(.3+j*.12);pts.push(new THREE.Vector3(x,y,j*.35-0.5))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:[0x6da5c0,0x0f969c,0xffb86b,0xc4eff0][j]})))}for(let i=0;i<5;i++)add(new THREE.SphereGeometry(.17,20,12),orange,Math.cos(i*1.25)*2,1,Math.sin(i*1.25)*2)}
+else if(kind==='atom'){
+// Electron-cloud teaching atom: nucleus, distinct proton/neutron spheres and shell paths.
+for(let i=0;i<8;i++){let a=i/8*Math.PI*2;add(new THREE.SphereGeometry(.19,24,18),i%2?orange:blue,Math.cos(a)*.34,1+Math.sin(a)*.34,Math.sin(a*.7)*.25)}
+for(let r of [1.05,1.65,2.15]){let ring=add(new THREE.TorusGeometry(r,.018,8,120),blue,0,1,0);ring.rotation.x=Math.PI/2;ring.rotation.y=.35}
+for(let i=0;i<6;i++){let a=i/6*Math.PI*2;let e=add(new THREE.SphereGeometry(.1,20,16),teal,Math.cos(a)*1.65,1,Math.sin(a)*1.65);anim.push(t=>{let q=t*.7+i*Math.PI/3;e.position.set(Math.cos(q)*1.65,1+Math.sin(q*1.4)*.12,Math.sin(q)*1.65)})}
+}else if(kind==='molecule'){
+// Ball-and-stick molecule with tetrahedral bonds and distinct atom types.
+let pts=[[0,1.35,0],[.95,.75,0],[-.48,.62,.83],[-.48,.62,-.83],[0,.15,0]];for(let i=1;i<pts.length;i++)rod(pts[0],pts[i],.075,white);pts.forEach((p,i)=>add(new THREE.SphereGeometry(i? .24:.34,28,20),i===0?teal:i===4?orange:white,...p));add(new THREE.TorusGeometry(1.35,.018,8,100),blue,0,1,0).rotation.x=Math.PI/2;
+}else if(kind==='lattice'){
+// Ordered cubic crystal lattice with visible bonds and unit-cell frame.
+for(let x=0;x<3;x++)for(let y=0;y<3;y++)for(let z=0;z<3;z++){let p=[(x-1)*.85,(y-1)*.85+1,(z-1)*.85];add(new THREE.SphereGeometry(.14,24,18),(x+y+z)%2?teal:orange,...p)}
+for(let x=0;x<3;x++)for(let y=0;y<3;y++)for(let z=0;z<3;z++){let p=[(x-1)*.85,(y-1)*.85+1,(z-1)*.85];if(x<2)rod(p,[(x)*.85-.85,(y-1)*.85+1,(z-1)*.85],.018,white);if(y<2)rod(p,[(x-1)*.85,y*.85+1,(z-1)*.85],.018,white);if(z<2)rod(p,[(x-1)*.85,(y-1)*.85+1,z*.85-.85],.018,white)}
+}else if(kind==='dna'){
+// Double helix with base-pair rungs.
+for(let i=0;i<90;i++){let t=i/89*Math.PI*5,y=.15+i/89*2.8,x=Math.cos(t)*.72,z=Math.sin(t)*.72;let a=add(new THREE.SphereGeometry(.075,12,10),teal,x,y,z),b=add(new THREE.SphereGeometry(.075,12,10),orange,-x,y,-z);if(i%5===0)rod([x,y,z],[-x,y,-z],.025,white)}
+}else if(kind==='cell'){
+// Animal cell cross-section with nucleus, nucleolus, mitochondria, Golgi and ER.
+let membrane=add(new THREE.SphereGeometry(1.9,56,40),glass,0,1,0);membrane.scale.set(1.35,.86,1);let nucleus=add(new THREE.SphereGeometry(.78,40,32),mat('#527fa8',.1,.25,.18),-.25,1.12,0);add(new THREE.SphereGeometry(.25,28,20),orange,-.12,1.12,.25);
+for(let i=0;i<5;i++){let a=i/5*Math.PI*2;let m=add(new THREE.SphereGeometry(.23,24,16),mat('#d58a65'),Math.cos(a)*1.15,.85+Math.sin(a)*.42,Math.sin(a)*.85);m.scale.set(1.6,.55,.7);m.rotation.z=a}
+for(let i=0;i<5;i++){let g=add(new THREE.TorusGeometry(.38+i*.09,.035,10,48),teal,.65,1.1+i*.08,-.35);g.rotation.x=.9}
+}else if(kind==='plant'){
+// Leaf cross-section with chloroplasts and light rays.
+let leaf=add(new THREE.SphereGeometry(1.7,48,32),mat('#278b69'),0,1,0);leaf.scale.set(1.5,.28,.72);leaf.rotation.z=-.2;rod([-2,.98,0],[2,.98,0],.045,white);for(let i=0;i<9;i++){let x=-1.4+i*.35;rod([x,.98,0],[x*.75,1.15,((i%2)?1:-1)*.45],.018,white)}for(let i=0;i<18;i++){let a=i/18*Math.PI*2;add(new THREE.SphereGeometry(.09,16,12),teal,Math.cos(a)*1.15,1.16,Math.sin(a)*.45)}for(let i=0;i<5;i++){let ray=rod([-.9+i*.45,3,0],[-.7+i*.4,1.55,0],.025,orange);anim.push(t=>ray.material.opacity=.55+.4*Math.sin(t*2+i))}
+}else if(kind==='evolution'){
+// Fossil sequence across a timeline, from simple to more derived forms.
+for(let i=0;i<5;i++){let x=-2+i;let body=add(new THREE.SphereGeometry(.25+i*.035,24,16),i<2?blue:teal,x,.85,0);body.scale.set(1.6,.65,.7);for(let j=0;j<3+i;j++)rod([x-.2,.8,0],[x-.25+j*.13,.35,((j%2)?1:-1)*.25],.025,white);add(new THREE.TorusGeometry(.32+i*.04,.018,8,48),orange,x,.85,0).rotation.x=Math.PI/2}
+}else if(kind==='neuron'){
+// Neuron: soma, branching dendrites, myelinated axon and synaptic terminals.
+add(new THREE.SphereGeometry(.42,32,24),orange,-1,1,0);for(let i=0;i<9;i++){let a=i/9*Math.PI*2;rod([-1,1,0],[-1+Math.cos(a)*.9,1+Math.sin(a)*.8,Math.sin(a*2)*.35],.035,teal)}rod([-.6,1,0],[2.3,1,0],.055,blue);for(let i=0;i<5;i++){let x=-.3+i*.5;let sleeve=add(new THREE.CapsuleGeometry(.12,.28,6,12),white,x,1,0);sleeve.rotation.z=Math.PI/2}for(let i=0;i<4;i++){let a=i/4*Math.PI*2;rod([2.3,1,0],[2.8,1+Math.sin(a)*.55,Math.cos(a)*.4],.03,orange);add(new THREE.SphereGeometry(.09,16,12),orange,2.8,1+Math.sin(a)*.55,Math.cos(a)*.4)}
+}else if(kind==='ecosystem'){
+// Layered food web with producers, consumers and decomposers.
+const nodes=[[-1.8,.3,0],[0,.3,0],[1.8,.3,0],[-1,1.2,0],[1,1.2,0],[0,2.15,0]];nodes.forEach((p,i)=>add(new THREE.SphereGeometry(i<3?.22:.28,24,18),i<3?teal:i<5?orange:blue,...p));[[0,3],[1,3],[1,4],[2,4],[3,5],[4,5]].forEach(([a,b])=>rod(nodes[a],nodes[b],.025,white));for(let i=0;i<3;i++)add(new THREE.ConeGeometry(.18,.45,20),teal,-1.8+i*1.8,.65,.35);
+}else if(kind==='skull'){
+// Craniometry skull teaching model with cranium, jaw, orbits and zygomatic arches.
+let cr=add(new THREE.SphereGeometry(.92,48,36),white,0,1.65,0);cr.scale.set(.82,1.08,.72);let jaw=add(new THREE.SphereGeometry(.55,36,28),mat('#c9c0ad'),0,.82,.02);jaw.scale.set(.72,.48,.65);for(let x of [-.34,.34]){add(new THREE.SphereGeometry(.2,24,18),darkMat,x,1.55,.58);add(new THREE.TorusGeometry(.22,.035,10,32),orange,x,1.55,.58)}rod([0,1.45,.67],[0,.95,.62],.04,orange);for(let i=0;i<6;i++)add(new THREE.BoxGeometry(.12,.14,.08),white,-.3+i*.12,.94,.6);
+}else if(kind==='skeleton'){
+// Anatomical torso with rib cage, spine, pelvis and articulated limbs.
+for(let i=0;i<9;i++)add(new THREE.SphereGeometry(.09,16,12),orange,0,2.45-i*.23,0);for(let i=0;i<7;i++){let y=2.35-i*.2;for(let side of [-1,1]){let rib=add(new THREE.TorusGeometry(.42-i*.025,.035,8,36,Math.PI),white,0,y,0);rib.rotation.z=side===-1?Math.PI:0;rib.rotation.x=Math.PI/2}}
+add(new THREE.SphereGeometry(.32,24,18),white,0,.72,0).scale.set(1.5,.55,.8);rod([0,2.4,0],[-.72,1.55,0],.075,white);rod([-.72,1.55,0],[-.82,.75,0],.06,white);rod([0,2.4,0],[.72,1.55,0],.075,white);rod([.72,1.55,0],[.82,.75,0],.06,white);rod([-.22,.65,0],[-.32,-.5,0],.09,white);rod([.22,.65,0],[.32,-.5,0],.09,white);
+}else if(kind==='spiral'){
+// Golden spiral with Fibonacci rectangles and golden-ratio arc.
+let squares=[];let dims=[[1,1],[1,1],[2,1],[3,2],[5,3]];let x=-2.2,y=-1;dims.forEach((d,i)=>{let q=add(new THREE.BoxGeometry(d[0]*.45,.035,d[1]*.45),blue,x+d[0]*.22,y+d[1]*.22,0);squares.push(q);x+=d[0]*.45});let pts=[];for(let i=0;i<500;i++){let t=i/499*Math.PI*3.5,r=.08*Math.exp(.19*t);pts.push(new THREE.Vector3(Math.cos(t)*r,1+Math.sin(t)*r,0))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffb86b})));
+}else if(kind==='fractal'){
+// Mandelbrot-inspired escape-time point cloud with layered iteration colours.
+for(let i=0;i<900;i++){let x=(Math.random()-.5)*3.4,z=(Math.random()-.5)*2.4;let c=Math.hypot(x*.55,z*.8);let y=.2+Math.exp(-c*2)*1.2;add(new THREE.SphereGeometry(.018,6,6),c<.55?orange:teal,x,y,z)}
+}else if(kind==='graph'){
+// Calculus surface: z = sin(r)/r with contour grid.
+for(let i=0;i<24;i++){let pts=[];for(let j=0;j<90;j++){let x=-2.6+j/89*5.2,z=-2.6+i/23*5.2,r=Math.hypot(x,z),y=.9+(r<.001?1:Math.sin(r*2)/r)*.8;pts.push(new THREE.Vector3(x,y,z))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:i%2?0x6da5c0:0x0f969c})))}}
+else if(kind==='distribution'){
+// Probability distribution bell curve and axes.
+rod([-2.8,.35,0],[2.8,.35,0],.025,white);let pts=[];for(let i=0;i<150;i++){let x=-2.6+i/149*5.2,y=.35+1.8*Math.exp(-x*x/1.2);pts.push(new THREE.Vector3(x,y,0))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0x6da5c0})));for(let x=-2;x<=2;x+=.5)rod([x,.35,0],[x,.35+1.8*Math.exp(-x*x/1.2),0],.012,teal);
+}else if(kind==='surface'){
+// Saddle surface mesh with wireframe overlay.
+let geo=new THREE.PlaneGeometry(4.5,4.5,36,36);let p=geo.attributes.position;for(let i=0;i<p.count;i++){let x=p.getX(i),z=p.getY(i);p.setZ(i,(x*x-z*z)*.16)}geo.computeVertexNormals();let mesh=add(geo,mat('#0f969c',.15,.3,.15),0,1,0);mesh.rotation.x=-Math.PI/2;let wire=new THREE.WireframeGeometry(geo);let lines=new THREE.LineSegments(wire,new THREE.LineBasicMaterial({color:0x9be9e7,transparent:true,opacity:.38}));lines.rotation.x=-Math.PI/2;lines.position.y=1;root.add(lines);
+}else if(kind==='diffusion'){
+// Diffusion chamber with gradient of particles across a membrane.
+add(new THREE.BoxGeometry(4,.12,2),blue,0,.15,0);add(new THREE.BoxGeometry(.08,1.7,1.8),white,0,1,0);for(let i=0;i<34;i++){let x=-1.7+Math.random()*.65,z=(Math.random()-.5)*1.5;let p=add(new THREE.SphereGeometry(.065,12,10),i%2?teal:orange,x,.45+Math.random()*1.1,z);anim.push(t=>{p.position.x=-1.7+((i*.137+t*.18)%3.4);p.position.z=z+Math.sin(t+i)*.06})}
+}else if(kind==='reaction'){
+// Reaction energy profile with reactants, activated complex and products.
+rod([-2.5,.3,0],[2.5,.3,0],.025,white);let pts=[];for(let i=0;i<120;i++){let x=-2.4+i/119*4.8,y=.55+1.25*Math.exp(-Math.pow(x*.9,2))-.12*x;pts.push(new THREE.Vector3(x,y,0))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xffb86b})));for(let i=0;i<5;i++){add(new THREE.SphereGeometry(.14,18,12),teal,-2+i*.22,.55,0);add(new THREE.SphereGeometry(.14,18,12),orange,1.2+i*.22,.43,0)}
+}else if(kind==='spiral'||kind==='fractal'||kind==='graph'||kind==='distribution'||kind==='surface'){
+// Distinct mathematical model generated above.
+}else if(['spring','wave','field','circuit','electrolysis','diffusion','reaction','gas','orbit'].includes(kind)){for(let j=0;j<4;j++){let pts=[];for(let i=0;i<180;i++){let x=-3+i/179*6,y=1+Math.sin(i/179*Math.PI*8+j*.6)*(.3+j*.12);pts.push(new THREE.Vector3(x,y,j*.35-0.5))}root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:[0x6da5c0,0x0f969c,0xffb86b,0xc4eff0][j]})))}for(let i=0;i<5;i++)add(new THREE.SphereGeometry(.17,20,12),orange,Math.cos(i*1.25)*2,1,Math.sin(i*1.25)*2)}
 else{add(new THREE.CylinderGeometry(.8,.8,2,48),glass,0,.6,0);add(new THREE.SphereGeometry(.45,24,16),orange,0,1.9,0);rod([-2,0,0],[2,0,0],.035,blue);for(let i=0;i<8;i++)add(new THREE.SphereGeometry(.12,12,8),teal,Math.cos(i)*1.5,.3,Math.sin(i)*1.5)}
 function rodUpdate(b,x,y,L,a){b.position.set(Math.sin(a)*L,y-L*Math.cos(a),0)}
 clock=new THREE.Clock();let resize=()=>{if(!renderer)return;let w=$('#scene').clientWidth,h=$('#scene').clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)};window.onresize=resize;let tick=()=>{raf=requestAnimationFrame(tick);if(!paused){let t=clock.getElapsedTime();anim.forEach(f=>f(t));root.rotation.y+=.0015*(vals.speed||1)}orbit.update();renderer.render(scene,camera)};tick();
