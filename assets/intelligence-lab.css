@@ -1,0 +1,18 @@
+/* Student Intelligence Lab — aligned with CampusKit's lime accent. */
+#intelligence-lab{scroll-margin-top:24px}
+#ck-intelligence-lab-style{color-scheme:dark}
+.ck-intel-head .eyebrow{color:#c6ff00}
+.ck-intel-tool{border-color:rgba(198,255,0,.18);background:linear-gradient(145deg,rgba(20,29,24,.92),rgba(7,14,13,.94));box-shadow:0 14px 38px rgba(0,0,0,.2)}
+.ck-intel-tool h3{color:#d9ff75}
+.ck-intel-tool p{color:#c4d0c0}
+.ck-intel-tool input,.ck-intel-tool textarea,.ck-intel-tool select{border-color:rgba(198,255,0,.25);background:#080e0a;color:#f4ffe9}
+.ck-intel-tool input:focus,.ck-intel-tool textarea:focus,.ck-intel-tool select:focus{outline:2px solid #c6ff00;outline-offset:2px}
+.ck-intel-tool button{background:linear-gradient(120deg,#c6ff00,#a3d900);color:#142000;border:0;box-shadow:0 5px 18px rgba(198,255,0,.12)}
+.ck-intel-result{border:1px solid rgba(198,255,0,.18);background:rgba(198,255,0,.07);color:#edffd0}
+.ck-intel-entry{border:1px solid rgba(198,255,0,.18);background:rgba(198,255,0,.035);border-radius:10px;padding:12px;margin:10px 0;overflow-wrap:anywhere}
+.ck-intel-entry small{display:block;color:#c6ff00;margin:4px 0 8px}
+.ck-intel-entry p{white-space:pre-wrap}
+.ck-intel-entry button{font-size:12px;padding:7px 10px}
+.ck-intel-foot{color:#b9c6ae}
+@media(max-width:650px){.ck-intel-grid{grid-template-columns:1fr}.ck-intel-tool{padding:15px}}
+@media(prefers-reduced-motion:reduce){.ck-intel-tool,.ck-intel-tool button{transition:none!important}}
