@@ -612,6 +612,20 @@ input,textarea,select{accent-color:var(--ck-lime,#c6ff00)}
  .card,.lab-card,.lab-department,.lab-experiment-card,.ck-download-button{transition:none!important}
 }
 
+
+/* Unified icon language: precision line icons, lime glass tiles, consistent across every section. */
+.ck-icon-heading{display:flex;align-items:center;gap:11px}
+.ck-section-icon{width:38px;height:38px;flex:0 0 38px;display:inline-grid;place-items:center;border:1px solid rgba(198,255,0,.28);border-radius:12px;background:linear-gradient(145deg,rgba(198,255,0,.14),rgba(110,150,20,.06));color:#d5ff56;box-shadow:inset 0 1px rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.18);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.ck-section-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.card:hover .ck-section-icon,.lab-card:hover .ck-section-icon,.ck-intel-tool:hover .ck-section-icon{transform:translateY(-2px);border-color:rgba(198,255,0,.65);box-shadow:0 0 20px rgba(198,255,0,.13)}
+.ai-input-actions .ai-tool-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:10px 15px;border:1px solid rgba(198,255,0,.28);border-radius:13px;background:linear-gradient(145deg,rgba(198,255,0,.13),rgba(20,32,10,.72));color:#eaffbd;box-shadow:inset 0 1px rgba(255,255,255,.07),0 7px 22px rgba(0,0,0,.2);font-weight:700;letter-spacing:.1px;transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease}
+.ai-input-actions .ai-tool-btn .ck-icon{width:19px;height:19px;color:#c6ff00}
+.ai-input-actions .ai-tool-btn:hover{transform:translateY(-2px);border-color:#c6ff00;background:linear-gradient(145deg,rgba(198,255,0,.23),rgba(20,32,10,.88));box-shadow:0 8px 24px rgba(198,255,0,.12)}
+.ai-input-actions .ai-tool-btn[aria-pressed="true"]{border-color:#c6ff00;background:rgba(198,255,0,.2);color:#f4ffd9;box-shadow:0 0 0 2px rgba(198,255,0,.1),0 0 22px rgba(198,255,0,.16)}
+.ai-input-actions .ai-tool-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+@media(max-width:480px){.ck-section-icon{width:34px;height:34px;flex-basis:34px}.ck-section-icon svg{width:19px;height:19px}.ai-input-actions .ai-tool-btn{flex:1 1 calc(50% - 10px);padding:10px 11px}}
+@media(prefers-reduced-motion:reduce){.ck-section-icon,.ai-input-actions .ai-tool-btn{transition:none!important}}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -655,6 +669,21 @@ li,.note-item,.music-item,.lab-record,.lab-viva-item{background:rgba(5,38,89,.58
 #ck-apk-build-meta .ck-apk-meta-item{background:rgba(5,38,89,.75)!important;border-color:rgba(193,232,255,.22)!important}
 .ck-lime{color:#C1E8FF!important}
 footer{color:#C1E8FF!important}
+
+/* CampusKit complete icon + blue visual system — applies to every section and nested control. */
+:root{--ck-lime:#C1E8FF;--ck-lime-soft:#7DA0CA;--ck-ink:#021024;--ck-panel:#052659;--ck-stroke:rgba(193,232,255,.28);--ck-muted:#B7D5EA;--ck-line:rgba(193,232,255,.20);--ck-focus:0 0 0 3px rgba(193,232,255,.28)}
+.ck-section-icon{border-color:rgba(125,160,202,.48)!important;background:linear-gradient(145deg,rgba(84,131,179,.38),rgba(5,38,89,.45))!important;color:#C1E8FF!important;box-shadow:inset 0 1px rgba(255,255,255,.10),0 7px 22px rgba(2,16,36,.35),0 0 18px rgba(84,131,179,.12)!important}
+.ck-section-icon svg{stroke:#C1E8FF!important}
+.card:hover .ck-section-icon,.lab-card:hover .ck-section-icon,.ck-intel-tool:hover .ck-section-icon{border-color:rgba(193,232,255,.82)!important;box-shadow:0 0 22px rgba(84,131,179,.28)!important}
+.ai-input-actions .ai-tool-btn{border-color:rgba(125,160,202,.5)!important;background:linear-gradient(145deg,rgba(84,131,179,.34),rgba(5,38,89,.75))!important;color:#EAF7FF!important}
+.ai-input-actions .ai-tool-btn .ck-icon{color:#C1E8FF!important;stroke:#C1E8FF!important}
+.ai-input-actions .ai-tool-btn:hover,.ai-input-actions .ai-tool-btn[aria-pressed="true"]{border-color:#C1E8FF!important;background:linear-gradient(145deg,rgba(84,131,179,.52),rgba(5,38,89,.88))!important;box-shadow:0 8px 24px rgba(84,131,179,.24)!important}
+.ck-bookmark-action:before,.bookmark-btn:before{content:"";display:inline-block;width:16px;height:16px;margin-right:8px;vertical-align:-3px;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h12v18l-6-4-6 4z'/%3E%3C/svg%3E") center/contain no-repeat}
+.focus-lock-mark svg{width:54px;height:54px;fill:none;stroke:#C1E8FF;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ck-icon-heading{color:#C1E8FF}
+footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
+
+.ck-phone-grid svg{width:21px;height:21px;fill:none;stroke:#C1E8FF;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ck-phone-grid i{color:#C1E8FF!important}
 </style>
 
 
@@ -705,10 +734,10 @@ footer{color:#C1E8FF!important}
   <span>Laboratory</span>
 </a>
 
-  <a href="#apk-download"><span aria-hidden="true">⬇</span><span>Download App</span></a>
-  <a href="#intelligence-lab"><span aria-hidden="true">✦</span><span>Intelligence Lab</span></a>
+  <a href="#apk-download"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg><span>Download App</span></a>
+  <a href="#intelligence-lab"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg><span>Intelligence Lab</span></a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
-  <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
+  <button id="ck-sidebar-logout" type="button"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg><span>Sign out</span></button>
 </nav>
 <header>
   <h1><img class="ck-header-logo" src="./assets/campuskit-icon.svg" alt=""> CampusKit</h1>
@@ -728,7 +757,7 @@ footer{color:#C1E8FF!important}
     <div class="hero-top">
       <div>
         <div class="eyebrow">Your student workspace</div>
-        <h2 id="dashboardTitle">Welcome back, Student! 👋</h2>
+        <h2 id="dashboardTitle">Welcome back, Student!</h2>
         <p class="quote" id="dailyQuote">Small progress every day adds up.</p>
       </div>
       <div style="display:flex;align-items:center;gap:12px;position:relative"><div id="todayDate" aria-live="polite"></div><button id="ck-notification-button" type="button" aria-label="Open notifications" aria-expanded="false"><svg class="ck-icon" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><div id="ck-notification-panel" role="status"><strong>Campus notifications</strong><p id="ck-notification-copy">Your study workspace is up to date.</p></div></div>
@@ -750,7 +779,7 @@ footer{color:#C1E8FF!important}
   </section>
 
   <section class="card app-view active-view" id="search-section" aria-labelledby="searchTitle">
-    <h3 id="searchTitle">🔎 Quick Search</h3>
+    <h3 id="searchTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="7"/><path d="m16 16 5 5"/></svg></span>Quick Search</h3>
     <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
     <p id="searchMessage" aria-live="polite">Type something to search.</p>
     <button type="button" id="clearSearchBtn">Clear Search</button>
@@ -762,7 +791,7 @@ footer{color:#C1E8FF!important}
 
   <div class="tools" id="study-tools">
     <section class="card" aria-labelledby="timetableTitle">
-      <h3 id="timetableTitle">📅 Class Timetable</h3>
+      <h3 id="timetableTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/></svg></span>Class Timetable</h3>
       <p>Organize your classes and practicals.</p>
       <form id="timetableForm">
         <input type="text" id="subject" placeholder="Subject name" required maxlength="100">
@@ -774,7 +803,7 @@ footer{color:#C1E8FF!important}
     </section>
 
     <section class="card" aria-labelledby="assignmentTitle">
-      <h3 id="assignmentTitle">📝 Assignment Tracker</h3>
+      <h3 id="assignmentTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5a2 2 0 0 0-2 2v14h18V6a2 2 0 0 0-2-2h-3"/><rect x="8" y="2" width="8" height="5" rx="2"/><path d="m8 13 2 2 5-5M8 18h8"/></svg></span>Assignment Tracker</h3>
       <p>Add deadlines and mark work as complete.</p>
       <form id="assignmentForm">
         <input id="assignmentName" type="text" placeholder="Assignment name" required maxlength="150">
@@ -786,7 +815,7 @@ footer{color:#C1E8FF!important}
     </section>
 
     <section class="card" aria-labelledby="notesTitle" id="notes-library">
-      <h3 id="notesTitle">📚 Notes Library</h3>
+      <h3 id="notesTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 11h8"/></svg></span>Notes Library</h3>
       <p>Organize notes by subject, search them, bookmark important topics, and attach PDFs.</p>
       <form id="notesForm">
         <div class="notes-form-grid">
@@ -833,7 +862,7 @@ footer{color:#C1E8FF!important}
         <select id="notesSort" aria-label="Sort notes">
           <option value="updated">Recently updated</option><option value="created">Recently created</option><option value="title">Title A–Z</option>
         </select>
-        <button type="button" id="notesBookmarksOnly" aria-pressed="false">☆ Bookmarks only</button>
+        <button type="button" id="notesBookmarksOnly" class="ck-bookmark-action" aria-pressed="false">Bookmarks only</button>
       </div>
       <p id="notesCountLabel" class="notes-count" aria-live="polite">0 notes</p>
       <p id="notesLibraryStatus" class="notes-status" role="status" aria-live="polite">Your notes will appear here.</p>
@@ -845,22 +874,22 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="intelligence-lab" aria-labelledby="ck-intel-title">
  <div class="ck-intel-head"><span class="eyebrow">CAMPUSKIT • LEARNING INTELLIGENCE</span><h2 id="ck-intel-title">Student Intelligence Lab</h2><p>Five experimental learning tools: track unfinished concepts, investigate readings, challenge explanations, map doubt patterns and learn backwards from answers.</p></div>
  <div class="ck-intel-grid">
-  <article class="ck-intel-tool"><h3>🧩 Concept Debt Tracker</h3><p>Track concepts you have postponed or only partly understood.</p><form id="ck-debt-form"><input id="ck-debt-topic" maxlength="100" placeholder="Concept / chapter" required><select id="ck-debt-level"><option value="High">High confusion</option><option value="Medium" selected>Partly understood</option><option value="Low">Needs revision</option></select><textarea id="ck-debt-note" maxlength="500" placeholder="What is unclear? (optional)"></textarea><button>Add concept debt</button></form><div id="ck-debt-list" aria-live="polite"></div></article>
-  <article class="ck-intel-tool"><h3>🧪 Lab Mistake Detective</h3><p>Enter at least three readings. Compare the median, spread and possible outliers before checking your lab notebook and procedure.</p><form id="ck-lab-form"><input id="ck-lab-values" placeholder="Readings e.g. 10.2, 10.1, 14.8, 10.3" required><input id="ck-lab-unit" maxlength="20" placeholder="Unit (e.g. cm, s, g)"><button>Inspect readings</button></form><div id="ck-lab-result" class="ck-intel-result" aria-live="polite">Your reading analysis will appear here.</div></article>
-  <article class="ck-intel-tool"><h3>🥊 Opponent Teacher</h3><p>Become your own strict examiner. Get counter-questions that expose assumptions, missing evidence and weak explanations.</p><form id="ck-opponent-form"><input id="ck-opponent-topic" maxlength="120" placeholder="Topic / question" required><textarea id="ck-opponent-answer" maxlength="3000" placeholder="Explain the concept in your own words..." required></textarea><button>Challenge my explanation</button></form><div id="ck-opponent-result" class="ck-intel-result" aria-live="polite"></div></article>
-  <article class="ck-intel-tool"><h3>🧬 Doubt DNA</h3><p>Save doubts, see your strongest confusion pattern and remove doubts once resolved.</p><form id="ck-doubt-form"><textarea id="ck-doubt-text" maxlength="500" placeholder="Write a doubt or question..." required></textarea><button>Save and classify doubt</button></form><div id="ck-doubt-summary" class="ck-intel-result" aria-live="polite"></div><div id="ck-doubt-list"></div></article>
-  <article class="ck-intel-tool"><h3>🔁 Reverse Learning</h3><p>Begin with the final answer, then reconstruct the question, assumptions, method and verification.</p><form id="ck-reverse-form"><input id="ck-reverse-answer" maxlength="500" placeholder="Enter a result / answer" required><select id="ck-reverse-kind"><option value="science">Science / numerical result</option><option value="definition">Definition / concept</option><option value="history">Historical fact / event</option></select><button>Generate reverse prompts</button></form><div id="ck-reverse-result" class="ck-intel-result" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.2 4.5L19 9l-4.8 1.5L12 15l-2.2-4.5L5 9l4.8-1.5zM19 15l1.2 2.3L23 18l-2.8.7L19 21l-1.2-2.3L15 18l2.8-.7z"/></svg></span>Concept Debt Tracker</h3><p>Track concepts you have postponed or only partly understood.</p><form id="ck-debt-form"><input id="ck-debt-topic" maxlength="100" placeholder="Concept / chapter" required><select id="ck-debt-level"><option value="High">High confusion</option><option value="Medium" selected>Partly understood</option><option value="Low">Needs revision</option></select><textarea id="ck-debt-note" maxlength="500" placeholder="What is unclear? (optional)"></textarea><button>Add concept debt</button></form><div id="ck-debt-list" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/><path d="m10 17 2 2 4-4"/></svg></span>Lab Mistake Detective</h3><p>Enter at least three readings. Compare the median, spread and possible outliers before checking your lab notebook and procedure.</p><form id="ck-lab-form"><input id="ck-lab-values" placeholder="Readings e.g. 10.2, 10.1, 14.8, 10.3" required><input id="ck-lab-unit" maxlength="20" placeholder="Unit (e.g. cm, s, g)"><button>Inspect readings</button></form><div id="ck-lab-result" class="ck-intel-result" aria-live="polite">Your reading analysis will appear here.</div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4h10a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-4l-4 4v-4H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z"/><path d="M8 10h8M8 13h5"/></svg></span>Opponent Teacher</h3><p>Become your own strict examiner. Get counter-questions that expose assumptions, missing evidence and weak explanations.</p><form id="ck-opponent-form"><input id="ck-opponent-topic" maxlength="120" placeholder="Topic / question" required><textarea id="ck-opponent-answer" maxlength="3000" placeholder="Explain the concept in your own words..." required></textarea><button>Challenge my explanation</button></form><div id="ck-opponent-result" class="ck-intel-result" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3c10 4 10 14 0 18M17 3C7 7 7 17 17 21M8 6h8M6 10h12M6 14h12M8 18h8"/></svg></span>Doubt DNA</h3><p>Save doubts, see your strongest confusion pattern and remove doubts once resolved.</p><form id="ck-doubt-form"><textarea id="ck-doubt-text" maxlength="500" placeholder="Write a doubt or question..." required></textarea><button>Save and classify doubt</button></form><div id="ck-doubt-summary" class="ck-intel-result" aria-live="polite"></div><div id="ck-doubt-list"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13a4 4 0 0 1 0 8H7M8 3 4 7l4 4M16 17l4 0-4 4"/></svg></span>Reverse Learning</h3><p>Begin with the final answer, then reconstruct the question, assumptions, method and verification.</p><form id="ck-reverse-form"><input id="ck-reverse-answer" maxlength="500" placeholder="Enter a result / answer" required><select id="ck-reverse-kind"><option value="science">Science / numerical result</option><option value="definition">Definition / concept</option><option value="history">Historical fact / event</option></select><button>Generate reverse prompts</button></form><div id="ck-reverse-result" class="ck-intel-result" aria-live="polite"></div></article>
  </div>
  <p class="ck-intel-foot">Privacy: tools use browser local storage on this device. They do not upload your study data. Lab outlier checks are statistical hints, not validation of experimental correctness.</p>
 </section>
 </main>
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
-  <h2 id="relaxTitle">🎵 Student Relaxation Corner</h2>
+  <h2 id="relaxTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Student Relaxation Corner</h2>
   <p>Take a short break with calm music. Add a YouTube or Spotify track link to the shared campus playlist.</p>
   <div class="music-grid">
     <div class="card">
-      <h3>▶️ Now playing</h3>
+      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></span>Now playing</h3>
       <p id="musicPlayerHint">Choose a track from the playlist to play it here.</p>
       <iframe id="musicPlayer" class="music-embed" title="Relaxation music player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="about:blank"></iframe>
       <p class="item-meta">Use relaxing music at a comfortable volume. Music is not a treatment for persistent headaches.</p>
@@ -873,7 +902,7 @@ footer{color:#C1E8FF!important}
         <button type="submit">Add to shared playlist</button>
         <p id="musicStatus" role="status" aria-live="polite"></p>
       </form>
-      <h3>🌿 Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
+      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/><path d="M8 12h8M12 8v8"/></svg></span>Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
     </div>
   </div>
 </section>
@@ -882,7 +911,7 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="focus-mode" aria-labelledby="focusModeTitle">
   <div class="focus-head">
     <span class="focus-kicker">CAMPUSKIT • DEEP WORK</span>
-    <h2 id="focusModeTitle">⏳ Focus Mode</h2>
+    <h2 id="focusModeTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2M8 2h8"/></svg></span>Focus Mode</h2>
     <p>Set a study session and keep CampusKit as your focused workspace.</p>
   </div>
   <div class="focus-panel">
@@ -907,7 +936,7 @@ footer{color:#C1E8FF!important}
 
 <div id="focusLockScreen" class="focus-lock-screen" hidden role="dialog" aria-modal="true" aria-labelledby="focusLockTitle">
   <div class="focus-lock-card">
-    <div class="focus-lock-mark">◎</div>
+    <div class="focus-lock-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg></div>
     <span class="focus-kicker">CAMPUSKIT • FOCUS SESSION</span>
     <h2 id="focusLockTitle">Stay with your goal.</h2>
     <p>Your focus session is running.</p>
@@ -921,12 +950,12 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="laboratory-section">
 
   <div class="lab-heading">
-    <h2>🔬 Laboratory</h2>
+    <h2 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/></svg></span>Laboratory</h2>
     <p>Your digital practical laboratory — Learn, Experiment, Record and Practice.</p>
   </div>
 
   <div class="lab-card">
-    <h3>📊 Laboratory Progress</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Laboratory Progress</h3>
     <p id="labProgressText">0 practical records saved</p>
     <div class="lab-progress">
       <div class="lab-progress-fill" id="labProgressFill"></div>
@@ -951,12 +980,12 @@ footer{color:#C1E8FF!important}
   </section>
 
   <div class="lab-card">
-    <h3>📚 My Practical Records</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 11h8"/></svg></span>My Practical Records</h3>
     <div id="labRecordsList"></div>
   </div>
 
   <div class="lab-card" style="margin-top:18px">
-    <h3>🎯 Viva Preparation</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m15 9 6-6"/></svg></span>Viva Preparation</h3>
     <p>Practice important questions from your selected department.</p>
     <div id="labVivaArea"></div>
   </div>
@@ -966,7 +995,7 @@ footer{color:#C1E8FF!important}
 
 <!-- CampusKit AI Study Assistant -->
 <section class="card app-view" id="ai-assistant" aria-labelledby="aiTitle">
-  <h3 id="aiTitle">🤖 CampusKit AI Study Assistant</h3>
+  <h3 id="aiTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M9 13h.01M15 13h.01M9 17h6"/></svg></span>CampusKit AI Study Assistant</h3>
   <p>Ask questions about Physics, Chemistry, practicals and assignments.</p>
 
   <div id="aiChat" aria-live="polite">
@@ -976,9 +1005,9 @@ footer{color:#C1E8FF!important}
   <form id="aiForm">
     <textarea id="aiQuestion" placeholder="Ask your study question here..." maxlength="4000" required></textarea>
     <div class="ai-input-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0">
-      <button type="button" id="aiVoice" aria-pressed="false">🎙️ Speak</button>
-      <button type="button" id="aiCamera">📷 Camera</button>
-      <button type="button" id="aiUpload">🖼️ Upload image</button>
+      <button type="button" id="aiVoice" class="ai-tool-btn" aria-pressed="false"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span>Speak</span></button>
+      <button type="button" id="aiCamera" class="ai-tool-btn" aria-label="Capture with camera"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></svg><span>Camera</span></button>
+      <button type="button" id="aiUpload" class="ai-tool-btn"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg><span>Upload image</span></button>
       <input type="file" id="aiImageInput" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
     </div>
     <div id="aiImagePreview" hidden style="margin:10px 0">
@@ -1004,7 +1033,7 @@ footer{color:#C1E8FF!important}
       </div>
       <p class="ck-apk-status" id="ck-apk-status" role="status" aria-live="polite">Checking the latest Android build…</p>
     </div>
-    <div class="ck-phone-art" aria-hidden="true"><div class="ck-phone-screen"><span class="ck-phone-dot"></span><b>CampusKit</b><small>YOUR STUDENT SPACE</small><div class="ck-phone-widget"><strong>Today</strong><span>Study • Create • Focus</span></div><div class="ck-phone-grid"><i>✓</i><i>⌁</i><i>✎</i><i>◷</i></div><div class="ck-phone-bar"></div><div class="ck-phone-bar short"></div></div></div>
+    <div class="ck-phone-art" aria-hidden="true"><div class="ck-phone-screen"><span class="ck-phone-dot"></span><b>CampusKit</b><small>YOUR STUDENT SPACE</small><div class="ck-phone-widget"><strong>Today</strong><span>Study • Create • Focus</span></div><div class="ck-phone-grid"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16M4 16h16M8 4v16M16 4v16"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16zM13 6l4 4"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i></div><div class="ck-phone-bar"></div><div class="ck-phone-bar short"></div></div></div>
   </div>
   <div class="ck-download-details">
     <article><span>01</span><h3>Download</h3><p>Get the latest APK from the official CampusKit GitHub release.</p></article>
@@ -1014,7 +1043,7 @@ footer{color:#C1E8FF!important}
   <p class="ck-apk-footnote">Android installation note: only install APKs published from this official repository. The current Android package is a web-connected companion; an internet connection is required for online features. APK size depends on the actual app build and is never padded artificially.</p>
 </section>
 
-<footer>Made for Students ❤️ | CampusKit</footer>
+<footer><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.7c0 5-8.8 11-8.8 11s-8.8-6-8.8-11a4.2 4.2 0 0 1 7.6-2.5 4.2 4.2 0 0 1 7.6 2.5Z"/></svg> Made for Students | CampusKit</footer>
 <canvas id="neural-bg" aria-hidden="true"></canvas>
 
 <script>
@@ -1130,7 +1159,7 @@ function displayAssignments() {
     item.appendChild(meta);
 
     const toggleButton = createButton(
-      assignment.completed ? "✓ Completed" : "Mark Complete",
+      assignment.completed ? "Completed" : "Mark Complete",
       "complete-btn" + (assignment.completed ? " is-complete" : ""),
       () => {
         savedAssignments[index].completed = !savedAssignments[index].completed;
@@ -1266,7 +1295,7 @@ function displayNotes() {
     const card = document.createElement("article");
     card.className = "note-item";
     const heading = document.createElement("h4");
-    heading.textContent = `${note.bookmarked ? "★ " : ""}${note.title || "Untitled note"}`;
+    heading.textContent = `${note.title || "Untitled note"}`;
     const meta = document.createElement("span");
     meta.className = "item-meta";
     meta.textContent = `${note.subject} · Updated ${formatDate((note.updatedAt || "").slice(0, 10))}`;
@@ -1295,13 +1324,13 @@ function displayNotes() {
       attachment.href = note.attachment.url;
       attachment.target = "_blank";
       attachment.rel = "noopener noreferrer";
-      attachment.textContent = `📎 ${note.attachment.name || "Open attachment"}${note.attachment.provider === "google-drive" ? " (Google Drive)" : ""}`;
+      attachment.textContent = `Attachment: ${note.attachment.name || "Open attachment"}${note.attachment.provider === "google-drive" ? " (Google Drive)" : ""}`;
       card.appendChild(attachment);
     }
 
     const actions = document.createElement("div");
     actions.className = "note-actions";
-    actions.appendChild(createButton(note.bookmarked ? "★ Bookmarked" : "☆ Bookmark", "bookmark-btn", () => {
+    actions.appendChild(createButton(note.bookmarked ? "Bookmarked" : "Bookmark", "bookmark-btn", () => {
       const index = savedNotes.findIndex(item => item.id === note.id);
       if (index < 0) return;
       savedNotes[index] = { ...savedNotes[index], bookmarked: !savedNotes[index].bookmarked, updatedAt: new Date().toISOString() };
@@ -1414,7 +1443,7 @@ notesSort.addEventListener("change", displayNotes);
 notesBookmarksOnlyBtn.addEventListener("click", () => {
   bookmarksOnly = !bookmarksOnly;
   notesBookmarksOnlyBtn.setAttribute("aria-pressed", String(bookmarksOnly));
-  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "★ Show all notes" : "☆ Bookmarks only";
+  notesBookmarksOnlyBtn.textContent = bookmarksOnly ? "Show all notes" : "Bookmarks only";
   displayNotes();
 });
 
@@ -1473,7 +1502,7 @@ function updateWelcome() {
   const now = new Date();
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  document.getElementById("dashboardTitle").textContent = greeting + ", Student! 👋";
+  document.getElementById("dashboardTitle").textContent = greeting + ", Student!";
   document.getElementById("todayDate").textContent = now.toLocaleDateString(undefined, {
     weekday: "long", day: "numeric", month: "long", year: "numeric"
   });
@@ -1689,7 +1718,7 @@ window.CampusKitCloud = {
       }
       if (window.CampusKitCloud) window.CampusKitCloud.applyCloudData(cloudData);
       cloudReady = true;
-      showStatus("Cloud sync on ✓");
+      showStatus("Cloud sync is active.");
     } catch (error) {
       console.error("CampusKit cloud sync error:", error);
       showStatus("Cloud sync failed: " + (error.code || error.message));
@@ -1704,7 +1733,7 @@ window.CampusKitCloud = {
       doc(db, "users", userId, "campusData", docId),
       { items: value, updatedAt: new Date().toISOString() }
     )).then(() => {
-      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync on ✓");
+      if (currentUser && currentUser.uid === userId) showStatus("Cloud sync is active.");
     }).catch(error => {
       console.error("CampusKit save error:", error);
       if (currentUser && currentUser.uid === userId) showStatus("Cloud save failed: " + (error.code || error.message));
@@ -1777,7 +1806,7 @@ window.CampusKitCloud = {
       setDriveStatus("Waiting for Google Drive authorization…");
       try {
         await requestDriveToken("consent");
-        setDriveStatus("Google Drive connected ✓. Files stay private in your Drive.");
+        setDriveStatus("Google Drive connected. Files stay private in your Drive.");
       } catch (error) {
         setDriveStatus(error.message || "Could not connect Google Drive.", true);
         throw error;
@@ -1811,7 +1840,7 @@ window.CampusKitCloud = {
       if (!response.ok) throw await driveApiError(response);
       const saved = await response.json();
       if (!saved.id) throw new Error("Google Drive did not return a file ID.");
-      setDriveStatus("File uploaded to your Google Drive ✓");
+      setDriveStatus("File uploaded to your Google Drive.");
       return {
         name: saved.name || file.name, driveFileId: saved.id,
         url: saved.webViewLink || `https://drive.google.com/file/d/${saved.id}/view`,
@@ -1921,7 +1950,7 @@ window.CampusKitCloud = {
     musicStatus.textContent = "Adding track…";
     try {
       await addDoc(collection(db, "publicMusic"), { title, url: parsed.url, type: parsed.type, addedBy: auth.currentUser.displayName || "CampusKit student", createdAt: new Date().toISOString() });
-      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students ✓";
+      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students.";
     } catch (error) {
       console.error("Could not add shared music:", error);
       musicStatus.textContent = "Could not add: " + (error.code || error.message || "unknown error") + ". Check Firestore rules for publicMusic and confirm you are signed in.";
@@ -2064,7 +2093,7 @@ window.CampusKitCloud = {
     recognition.continuous = false;
     recognition.onstart = () => {
       listening = true;
-      voiceButton.textContent = "⏹ Stop speaking";
+      voiceButton.innerHTML = '<svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Stop speaking</span>';
       voiceButton.setAttribute("aria-pressed", "true");
       status.textContent = "Listening… speak now.";
     };
@@ -2078,7 +2107,7 @@ window.CampusKitCloud = {
     };
     recognition.onend = () => {
       listening = false;
-      voiceButton.textContent = "🎙️ Speak";
+      voiceButton.innerHTML = '<svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span>Speak</span>';
       voiceButton.setAttribute("aria-pressed", "false");
       questionInput.focus();
     };
@@ -2113,7 +2142,7 @@ window.CampusKitCloud = {
     event.preventDefault();
     const question = questionInput.value.trim();
     if (!question) { status.textContent = "Please type or speak a question first."; questionInput.focus(); return; }
-    addMessage("You", question + (selectedImage ? "\n📷 Image attached: " + selectedImage.name : ""));
+    addMessage("You", question + (selectedImage ? "\nImage attached: " + selectedImage.name : ""));
     questionInput.value = "";
     sendButton.disabled = true;
     status.textContent = "AI is thinking…";
