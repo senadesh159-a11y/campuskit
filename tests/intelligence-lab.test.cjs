@@ -28,7 +28,7 @@ test("Doubt DNA classifies concept, numerical, recall and process doubts", () =>
 test("Opponent Teacher produces a challenge set and word count", () => {
   const result = core.opponentChallenges("Newton's laws", "Force equals mass times acceleration.");
   assert.equal(result.topic, "Newton's laws");
-  assert.equal(result.wordCount, 6);
+  assert.equal(result.wordCount, 5);
   assert.ok(result.questions.length >= 6);
   assert.match(result.questions[3], /equation|units/i);
 });
