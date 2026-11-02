@@ -47,13 +47,15 @@ input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer}input[type=
 <section class="ck3d-wrap"><div class="ck3d-card">
 <div class="ck3d-head"><div><div class="ck3d-kicker">CAMPUSKIT • PHYSICS • IMMERSIVE 3D LAB</div><h2 class="ck3d-title">Prism Deviation — 3D View</h2><p class="ck3d-desc">Rotate the triangular glass prism and inspect the incident, refracted and emergent light path.</p></div></div>
 <div id="ck3d-viewer"><div class="ck3d-hint">🖱️ Drag = rotate · Scroll/pinch = zoom · Right-drag = pan</div></div>
-<div class="ck3d-toolbar"><button class="primary" id="ck3d-full">⛶ Full screen</button><button id="ck3d-reset">↺ Reset view</button><button id="ck3d-auto">Auto-rotate: OFF</button></div><div class="ck3d-status" id="ck3d-status">Interactive 3D model • High-resolution responsive rendering</div>
+<div class="ck3d-toolbar"><button class="primary" id="ck3d-full">⛶ Full screen</button><button id="ck3d-reset">↺ Reset view</button><button id="ck3d-auto">Auto-rotate: OFF</button></div><div class="ck3d-status" id="ck3d-status" role="status" aria-live="polite">Starting 3D optics laboratory…</div>
 </div></section>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-const host=document.getElementById('ck3d-viewer'),scene=new THREE.Scene();
-scene.background=new THREE.Color(0x0a1420);\nscene.fog=new THREE.Fog(0x0a1420,13,28);
+const host=document.getElementById('ck3d-viewer'),status=document.getElementById('ck3d-status'),scene=new THREE.Scene();
+if(!host||!status)throw new Error('Prism viewer container is missing.');
+scene.background=new THREE.Color(0x0a1420);
+scene.fog=new THREE.Fog(0x0a1420,13,28);
 const camera=new THREE.PerspectiveCamera(42,host.clientWidth/host.clientHeight,.1,100);
 camera.position.set(7.8,5.2,10.5);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
@@ -62,6 +64,7 @@ renderer.setSize(host.clientWidth,host.clientHeight);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 host.appendChild(renderer.domElement);
+status.textContent='3D renderer created • Building the optical bench, glass prism and light path…';
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true;controls.dampingFactor=.06;controls.enablePan=true;controls.enableZoom=true;controls.minDistance=3;controls.maxDistance=24;controls.target.set(0,-.25,0);
 scene.add(new THREE.HemisphereLight(0xd9efff,0x18243a,2));
@@ -144,6 +147,9 @@ function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;
 new ResizeObserver(resize).observe(host);window.addEventListener('resize',resize);
 function animate(t){requestAnimationFrame(animate);if(moving){const a=Math.sin(t*.0015)*.42;const L=2.15;const x=Math.sin(a)*L,y=2.35-Math.cos(a)*L;moving.bob.position.set(x,y,0);moving.string.position.set(x/2, (2.35+y)/2,0);moving.string.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(x,y-2.35,0).normalize())}controls.update();renderer.render(scene,camera)}
 animate();
+status.textContent='3D optics laboratory ready • Drag to orbit, scroll to zoom, right-drag to pan.';
+window.addEventListener('error',e=>{if(status)status.textContent='3D viewer error: '+(e.message||'unknown rendering error');});
+window.addEventListener('unhandledrejection',e=>{if(status)status.textContent='3D viewer could not load: '+String(e.reason||'module error');});
 </script>
 <div class="shell">
 <a class="back" href="../../../index.html">← CampusKit Laboratory</a>
