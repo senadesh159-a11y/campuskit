@@ -53,20 +53,20 @@ input[type=range]{width:100%;accent-color:var(--lime);cursor:pointer}input[type=
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 const host=document.getElementById('ck3d-viewer'),scene=new THREE.Scene();
-scene.background=new THREE.Color(0x07111f);
+scene.background=new THREE.Color(0x0a1420);\nscene.fog=new THREE.Fog(0x0a1420,13,28);
 const camera=new THREE.PerspectiveCamera(42,host.clientWidth/host.clientHeight,.1,100);
-camera.position.set(7,5.5,8);
+camera.position.set(7.8,5.2,10.5);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,3));
 renderer.setSize(host.clientWidth,host.clientHeight);
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 host.appendChild(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;controls.dampingFactor=.06;controls.enablePan=true;controls.enableZoom=true;controls.minDistance=2;controls.maxDistance=24;
+controls.enableDamping=true;controls.dampingFactor=.06;controls.enablePan=true;controls.enableZoom=true;controls.minDistance=3;controls.maxDistance=24;controls.target.set(0,-.25,0);
 scene.add(new THREE.HemisphereLight(0xd9efff,0x18243a,2));
-const key=new THREE.DirectionalLight(0xffffff,2.4);key.position.set(6,9,7);scene.add(key);
-const rim=new THREE.DirectionalLight(0x55bfff,1.2);rim.position.set(-7,3,-6);scene.add(rim);
+const key=new THREE.DirectionalLight(0xfff2dc,3.2);key.position.set(6,9,7);key.castShadow=true;key.shadow.mapSize.set(2048,2048);scene.add(key);
+const rim=new THREE.DirectionalLight(0x55bfff,2.0);rim.position.set(-7,3,-6);scene.add(rim);
 scene.add(new THREE.GridHelper(12,12,0x34516c,0x1c3047));
 const root=new THREE.Group();scene.add(root);
 const mat=(color,roughness=.45,metalness=.05,transparent=false,opacity=1)=>new THREE.MeshStandardMaterial({color,roughness,metalness,transparent,opacity});
@@ -83,12 +83,38 @@ if(type==='pendulum'){
  moving={string,bob};
  line([0,2.35,0].map((v,i)=>[i===0?0:i===1?v:0,i===1?v:0,i===2?0:0]),0x35c8ff);
 }else if(type==='prism'){
- const shape=new THREE.Shape();shape.moveTo(0,1.9);shape.lineTo(-1.8,-1.45);shape.lineTo(1.8,-1.45);shape.closePath();
- const geo=new THREE.ExtrudeGeometry(shape,{depth:1.1,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.06,bevelThickness:.06});
- const prism=new THREE.Mesh(geo,new THREE.MeshPhysicalMaterial({color:0x8bdcff,transparent:true,opacity:.34,roughness:.12,metalness:.1,transmission:.2,side:THREE.DoubleSide}));prism.position.z=-.55;root.add(prism);
- rod([-4,.1,.05],[-1.55,.1,.05],.035,0xffffff);rod([-.65,-.2,.08],[3.8,-1.15,.08],.035,0xffd45b);
- for(let i=0;i<5;i++)rod([-.65,-.2,.08],[3.8,-1.15+i*.12,.08],.012,[0xff5a5a,0xffa34d,0xffff70,0x63e58a,0x64baff][i]);
-}else if(type==='caliper'){
+ // Photographic-style optics bench, precision rail, collimator, glass prism and screen.
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(18,12),mat(0x101a24,.32,.32));floor.rotation.x=-Math.PI/2;floor.position.y=-1.9;root.add(floor);
+ const bench=box(0,-1.55,0,13,.28,5.2,0x263544);bench.material.roughness=.28;bench.material.metalness=.42;
+ box(0,-1.34,0,12.6,.08,4.8,0x526474);
+ for(const x of [-5.5,5.5]){box(x,-2.55,0,.22,2,.22,0x26313d);box(x,-2.55,1.9,.22,2,.22,0x26313d);box(x,-2.55,-1.9,.22,2,.22,0x26313d)}
+ // Optical rail and graduated scale
+ box(0,-1.22,.15,10.8,.09,.24,0x9caebc);
+ for(let i=0;i<=100;i++){const x=-5.2+i*.104;box(x,-1.16,.15,.012,i%10===0?.16:.07,.025,i%10===0?0xc6ff00:0xdce8ef)}
+ // Precision collimator: lamp housing, slit and lens
+ const housing=new THREE.Mesh(new THREE.CylinderGeometry(.32,.38,1.25,48),mat(0x34485a,.24,.8));housing.rotation.z=Math.PI/2;housing.position.set(-4.55,-.05,.1);root.add(housing);
+ const lens=new THREE.Mesh(new THREE.CircleGeometry(.29,48),new THREE.MeshPhysicalMaterial({color:0x9bdcff,metalness:.08,roughness:.04,transmission:.72,transparent:true,opacity:.8,side:THREE.DoubleSide}));lens.position.set(-3.9,-.05,.1);lens.rotation.y=Math.PI/2;root.add(lens);
+ const slit=box(-3.82,-.05,.1,.025,.22,.16,0xffffff);
+ const lamp=new THREE.PointLight(0xffe7b0,42,5);lamp.position.set(-4.2,.0,.1);root.add(lamp);
+ // Equilateral optical glass prism with bevelled edges and realistic transmission.
+ const shape=new THREE.Shape();shape.moveTo(0,1.35);shape.lineTo(-1.25,-.82);shape.lineTo(1.25,-.82);shape.closePath();
+ const geo=new THREE.ExtrudeGeometry(shape,{depth:1.5,bevelEnabled:true,bevelSegments:6,steps:1,bevelSize:.09,bevelThickness:.09,curveSegments:32});
+ const glass=new THREE.MeshPhysicalMaterial({color:0xd8f4ff,roughness:.035,metalness:0,transmission:.96,thickness:1.1,ior:1.52,transparent:true,opacity:.72,clearcoat:1,clearcoatRoughness:.04,side:THREE.DoubleSide});
+ const prism=new THREE.Mesh(geo,glass);prism.position.set(-.35,.03,-.75);prism.castShadow=true;prism.receiveShadow=true;root.add(prism);
+ const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo,18),new THREE.LineBasicMaterial({color:0xd8f5ff,transparent:true,opacity:.82}));edges.position.copy(prism.position);root.add(edges);
+ // White incident beam and dispersed spectrum emerging from the prism.
+ const beamMat=new THREE.MeshBasicMaterial({color:0xfff4d6});
+ function beam(a,b,r,material){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A);const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,d.length(),16),material);mesh.position.copy(A).add(B).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());root.add(mesh);return mesh}
+ beam([-3.78,.12,.08],[-1.12,.12,.08],.035,beamMat);
+ const spectrum=[0x7c35ff,0x365dff,0x20bfff,0x35d77b,0xffe34a,0xff9b32,0xff3d3d];
+ spectrum.forEach((color,i)=>{const y=-.55+i*.13;beam([.05,-.28,.12],[3.7,y,.12],.018,new THREE.MeshBasicMaterial({color}));});
+ // White projection screen with visible spectral bands.
+ const screen=box(3.95,-.05,-.05,.12,3.1,2.3,0xe8edf1);screen.material.roughness=.92;
+ spectrum.forEach((color,i)=>{const strip=box(3.875,-.57+i*.16,.08,.025,.13,1.1,color);strip.material.emissive=new THREE.Color(color);strip.material.emissiveIntensity=.24});
+ // Retort stand, angular scale and viewing details.
+ const stand=box(-.35,-.93,1.12,.16,.45,.16,0x9ba8b3);box(-.35,-1.15,1.12,1.15,.08,.55,0x9ba8b3);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(.86,.025,10,64),new THREE.MeshStandardMaterial({color:0xc6ff00,metalness:.5,roughness:.3}));ring.rotation.x=Math.PI/2;ring.position.set(-.35,.04,.05);root.add(ring);
+}}else if(type==='caliper'){
  box(0,0,0,6,.22,.42,0x9eb4c5);box(-2.55,.25,0,.18,.8,.42,0xc3d2dc);box(-2.0,.15,0,.18,.6,.42,0x8ca9bd);
  box(1.3,.18,0,.18,.65,.42,0xc3d2dc);box(1.8,.1,0,.18,.5,.42,0x8ca9bd);
  box(.1,.18,0,2.2,.07,.18,0xc6ff00);
@@ -114,7 +140,7 @@ document.getElementById('ck3d-reset').onclick=resetView;
 document.getElementById('ck3d-auto').onclick=e=>{controls.autoRotate=!controls.autoRotate;e.currentTarget.textContent=controls.autoRotate?'Auto-rotate: ON':'Auto-rotate: OFF'};
 document.getElementById('ck3d-full').onclick=async()=>{try{if(!document.fullscreenElement)await host.requestFullscreen();else await document.exitFullscreen()}catch(err){document.getElementById('ck3d-status').textContent='Fullscreen is not available in this browser.'}};
 scene.traverse(object=>{if(object.isDirectionalLight){object.castShadow=true;object.shadow.mapSize.set(1024,1024);object.shadow.camera.near=.5;object.shadow.camera.far=40;object.shadow.bias=-0.00015;}if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
-function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));renderer.setSize(w,h)}
+function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,3));renderer.setSize(w,h)}
 new ResizeObserver(resize).observe(host);window.addEventListener('resize',resize);
 function animate(t){requestAnimationFrame(animate);if(moving){const a=Math.sin(t*.0015)*.42;const L=2.15;const x=Math.sin(a)*L,y=2.35-Math.cos(a)*L;moving.bob.position.set(x,y,0);moving.string.position.set(x/2, (2.35+y)/2,0);moving.string.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(x,y-2.35,0).normalize())}controls.update();renderer.render(scene,camera)}
 animate();
