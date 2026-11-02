@@ -7,19 +7,19 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080d0b;color:#eaf2eb;font-family:Arial,sans-serif;overflow:hidden}
+body{margin:0;background:#05161A;color:#eaf2eb;font-family:Arial,sans-serif;overflow:hidden}
 #lab{position:fixed;inset:0}
 canvas{display:block}
 #topbar{
  position:fixed;top:0;left:0;right:0;height:65px;
  display:flex;align-items:center;justify-content:space-between;
  padding:0 24px;background:rgba(5,12,8,.82);
- border-bottom:1px solid #304333;backdrop-filter:blur(14px);
+ border-bottom:1px solid #294D61;backdrop-filter:blur(14px);
  z-index:5
 }
 .logo{font-size:18px;font-weight:800;letter-spacing:1px}
-.logo span{color:#b7f34a}
-#status{font-size:12px;color:#b7f34a}
+.logo span{color:#0F969C}
+#status{font-size:12px;color:#0F969C}
 #controls{
  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
  display:flex;gap:9px;flex-wrap:wrap;justify-content:center;
@@ -30,21 +30,21 @@ button{
  border:1px solid #405344;border-radius:9px;
  padding:11px 15px;cursor:pointer
 }
-button:hover{border-color:#b7f34a;color:#b7f34a}
+button:hover{border-color:#0F969C;color:#0F969C}
 #help{
  position:fixed;left:20px;bottom:25px;z-index:5;
  background:rgba(5,12,8,.8);padding:13px 16px;
- border:1px solid #304333;border-radius:10px;
+ border:1px solid #294D61;border-radius:10px;
  color:#aab9ac;font-size:12px;line-height:1.8
 }
 #loading{
  position:fixed;inset:0;display:grid;place-items:center;
- background:#080d0b;z-index:10;color:#b7f34a;
+ background:#05161A;z-index:10;color:#0F969C;
  font-size:14px;letter-spacing:2px
 }
 #crosshair{
  position:fixed;left:50%;top:50%;width:5px;height:5px;
- border-radius:50%;background:#b7f34a;opacity:.45;
+ border-radius:50%;background:#0F969C;opacity:.45;
  pointer-events:none
 }
 @media(max-width:600px){
@@ -70,9 +70,22 @@ button:hover{border-color:#b7f34a;color:#b7f34a}
 
 <header id="topbar">
  <div class="logo">CAMPUS<span>KIT</span> / LABORATORY</div>
- <div style="display:flex;align-items:center;gap:14px"><a href="immersive.html" style="color:#b7f34a;text-decoration:none;border:1px solid #607c49;padding:9px 13px;border-radius:9px;font-size:12px;font-weight:800">OPEN 43+ INTERACTIVE PRACTICALS ↗</a><div id="status">● 3D ENVIRONMENT ONLINE</div></div>
+ <div style="display:flex;align-items:center;gap:14px"><a href="immersive.html" style="color:#0F969C;text-decoration:none;border:1px solid #607c49;padding:9px 13px;border-radius:9px;font-size:12px;font-weight:800">OPEN 43+ INTERACTIVE PRACTICALS ↗</a><div id="status">● 3D ENVIRONMENT ONLINE</div></div>
 </header>
 
+<section id="experimentHub" aria-label="CampusKit practicals">
+ <div class="hubHead"><div><small>OCEAN BLUE • CAMPUSKIT LAB</small><h1>Interactive Practical Library</h1><p>Choose any practical to open its own 3D workspace, experiment controls, live calculations and observation log.</p></div><div class="hubCount">40 STEM + 3 ANTHROPOLOGY</div></div>
+ <div class="hubTools"><input id="labSearch" type="search" placeholder="Search practicals…"><div id="labFilters"><button class="selected" data-filter="All">All</button><button data-filter="Physics">Physics</button><button data-filter="Chemistry">Chemistry</button><button data-filter="Biology">Biology</button><button data-filter="Mathematics">Mathematics</button><button data-filter="Anthropology">Anthropology</button></div></div>
+ <div id="labCards" class="hubGrid"></div>
+ <p class="hubFoot">Tap a practical to enter its interactive workspace. Drag to rotate the model, pinch or scroll to zoom, change controls and record observations.</p>
+</section>
+<style>
+#experimentHub{position:fixed;z-index:6;top:82px;left:50%;transform:translateX(-50%);width:min(1160px,calc(100% - 28px));max-height:calc(100vh - 160px);overflow:auto;padding:20px;border:1px solid #24616a;border-radius:20px;background:linear-gradient(145deg,rgba(7,46,51,.97),rgba(5,22,26,.97));box-shadow:0 20px 65px #0009;backdrop-filter:blur(18px)}
+.hubHead{display:flex;justify-content:space-between;align-items:center;gap:16px}.hubHead small{color:#6DA5C0;font-weight:900;letter-spacing:.18em}.hubHead h1{font-size:clamp(22px,3vw,34px);margin:7px 0}.hubHead p,.hubFoot{color:#a8c4c7;font-size:13px;line-height:1.55;margin:0}.hubCount{border:1px solid #0F969C;color:#b9f4ef;border-radius:12px;padding:10px 13px;font-size:11px;font-weight:900;white-space:nowrap}
+.hubTools{display:grid;gap:10px;margin:18px 0 14px}#labSearch{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #294D61;background:#05161A;color:#eaf7f7;font-size:14px}#labFilters{display:flex;gap:7px;flex-wrap:wrap}#labFilters button{padding:8px 12px;border-radius:999px;background:#072E33;border-color:#294D61}#labFilters button.selected{background:#0F969C;color:#031719;border-color:#0F969C}
+.hubGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.hubCard{display:flex;flex-direction:column;gap:6px;min-height:104px;padding:12px;border:1px solid #20535b;border-radius:12px;background:linear-gradient(145deg,#0b3036,#06191e);text-decoration:none;color:#eaf7f7;transition:.18s}.hubCard:hover{transform:translateY(-2px);border-color:#6DA5C0;background:#0c3b42}.hubCard small{font-size:9px;color:#80d6d2;text-transform:uppercase;letter-spacing:.1em}.hubCard strong{font-size:13px;line-height:1.3}.hubCard span{margin-top:auto;color:#8de4de;font-size:10px;font-weight:800}.hubFoot{margin-top:14px}
+@media(max-width:800px){#experimentHub{top:74px;max-height:calc(100vh - 138px);padding:14px}.hubGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.hubHead{align-items:flex-start;flex-direction:column}.hubCount{padding:7px 10px}}@media(max-width:390px){.hubGrid{grid-template-columns:1fr 1fr;gap:7px}.hubCard{padding:10px;min-height:100px}}
+</style>
 <div id="crosshair"></div>
 
 <div id="help">
@@ -97,8 +110,8 @@ import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 const container=document.getElementById("lab");
 
 const scene=new THREE.Scene();
-scene.background=new THREE.Color("#101914");
-scene.fog=new THREE.Fog("#101914",18,65);
+scene.background=new THREE.Color("#072E33");
+scene.fog=new THREE.Fog("#072E33",18,65);
 
 const camera=new THREE.PerspectiveCamera(
  55,window.innerWidth/window.innerHeight,.1,150
@@ -126,9 +139,9 @@ controls.maxDistance=35;
 controls.maxPolarAngle=Math.PI*.49; controls.enablePan=true; controls.screenSpacePanning=true; controls.mouseButtons.LEFT=THREE.MOUSE.ROTATE; controls.mouseButtons.MIDDLE=THREE.MOUSE.DOLLY; controls.mouseButtons.RIGHT=THREE.MOUSE.PAN;
 controls.target.set(0,2,0);
 
-scene.add(new THREE.HemisphereLight("#dcecff","#263526",2));
+scene.add(new THREE.HemisphereLight("#dcecff","#294D61",2));
 
-const mainLight=new THREE.DirectionalLight("#fff2d7",3);
+const mainLight=new THREE.DirectionalLight("#d8f5f5",3);
 mainLight.position.set(8,15,8);
 mainLight.castShadow=true;
 mainLight.shadow.mapSize.set(2048,2048);
@@ -140,13 +153,13 @@ function material(color,roughness=.7,metalness=0){
  });
 }
 
-const floorMat=material("#39443d",.82);
-const wallMat=material("#87918a");
-const darkMat=material("#202b24");
-const metalMat=material("#aab7b0",.3,.8);
-const greenMat=material("#b7f34a",.35,.15);
+const floorMat=material("#294D61",.82);
+const wallMat=material("#072E33");
+const darkMat=material("#05161A");
+const metalMat=material("#6DA5C0",.3,.8);
+const greenMat=material("#0F969C",.35,.15);
 const glassMat=new THREE.MeshPhysicalMaterial({
- color:"#b8d9c8",transparent:true,opacity:.2,
+ color:"#6DA5C0",transparent:true,opacity:.2,
  roughness:.08,metalness:.1
 });
 
@@ -177,7 +190,7 @@ function cylinder(name,x,y,z,r1,r2,height,mat){
 box("Laboratory Floor",0,-.2,0,30,.4,30,floorMat);
 
 // FLOOR GRID
-const grid=new THREE.GridHelper(30,30,"#829487","#53645a");
+const grid=new THREE.GridHelper(30,30,"#6DA5C0","#0C7075");
 grid.position.y=.015;
 scene.add(grid);
 
@@ -228,9 +241,9 @@ for(let i=0;i<3;i++){
 // LIGHT PANELS
 for(let x=-9;x<=9;x+=6){
  const light=box("Ceiling Light",x,9.65,0,3,.08,1.2,
-  new THREE.MeshBasicMaterial({color:"#fff4d2"}),false
+  new THREE.MeshBasicMaterial({color:"#d8f5f5"}),false
  );
- const glow=new THREE.PointLight("#fff0ce",25,12);
+ const glow=new THREE.PointLight("#0F969C",25,12);
  glow.position.set(x,9,0);
  scene.add(glow);
 }
@@ -238,7 +251,7 @@ for(let x=-9;x<=9;x+=6){
 // DIGITAL DISPLAY
 box("Display Frame",0,5,-14.35,6,3.5,.35,darkMat);
 box("Display Screen",0,5,-14.13,5.7,3.15,.08,
- new THREE.MeshBasicMaterial({color:"#13251b"}));
+ new THREE.MeshBasicMaterial({color:"#05161A"}));
 
 for(let i=0;i<5;i++){
  box("Screen Indicator",-2.1+i*1.05,3.8,-14.06,.55,.06,.04,greenMat,false);
@@ -254,7 +267,7 @@ function equipment(x,z){
  box("Instrument Head",x,3.62,z,.75,.35,.5,darkMat);
 
  box("Instrument Display",x,3.64,z+.26,.4,.19,.025,
-  new THREE.MeshBasicMaterial({color:"#b7f34a"}),false);
+  new THREE.MeshBasicMaterial({color:"#0F969C"}),false);
 }
 
 equipment(-7,-5);
@@ -265,7 +278,7 @@ equipment(7,5);
 
 function labLabel(text,x,y,z){
  const c=document.createElement('canvas');c.width=512;c.height=100;const q=c.getContext('2d');
- q.fillStyle='#101b14';q.strokeStyle='#b7f34a';q.lineWidth=5;q.roundRect(5,5,502,90,16);q.fill();q.stroke();
+ q.fillStyle='#101b14';q.strokeStyle='#0F969C';q.lineWidth=5;q.roundRect(5,5,502,90,16);q.fill();q.stroke();
  q.font='bold 30px Arial';q.fillStyle='#f4f8ef';q.textAlign='center';q.fillText(text,256,62);
  const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx}));sp.position.set(x,y,z);sp.scale.set(3.5,.7,1);scene.add(sp);
@@ -310,16 +323,16 @@ function labStation(x,z,title){
  const ey=new THREE.Mesh(new THREE.CylinderGeometry(.16,.12,.34,24),metalMat);ey.rotation.z=-.7;ey.position.set(.43,1.85,0);g.add(ey);
  const stage=new THREE.Mesh(new THREE.BoxGeometry(1.35,.1,.8),metalMat);stage.position.set(.05,.7,0);g.add(stage);
  const slide=new THREE.Mesh(new THREE.BoxGeometry(.75,.025,.34),glassMat);slide.position.set(.05,.77,0);g.add(slide);
- labRod(g,[.2,1.1,0],[.25,.85,0],.07,'#aab7b0');
+ labRod(g,[.2,1.1,0],[.25,.85,0],.07,'#6DA5C0');
  const knob=new THREE.Mesh(new THREE.TorusGeometry(.22,.05,12,32),greenMat);knob.position.set(-.7,.95,.18);g.add(knob);
 }
 // Mathematics 3D axes/vector and a solid of revolution.
 {
  const g=labStation(7,5,'MATHEMATICS • 3D MODELLING');
- labRod(g,[-1.2,.35,0],[1.2,.35,0],.025,'#b7f34a');labRod(g,[-1.2,.35,0],[-1.2,1.6,0],.025,'#ffb34a');labRod(g,[-1.2,.35,0],[-1.2,.35,-1],.025,'#42cfff');
+ labRod(g,[-1.2,.35,0],[1.2,.35,0],.025,'#0F969C');labRod(g,[-1.2,.35,0],[-1.2,1.6,0],.025,'#ffb34a');labRod(g,[-1.2,.35,0],[-1.2,.35,-1],.025,'#42cfff');
  labRod(g,[-1.2,.35,0],[.7,1.35,-.7],.055,'#62d6ff');
  const pts=[];for(let i=0;i<=32;i++){const y=-.65+i*.04;pts.push(new THREE.Vector2(.25+.42*Math.sin(i/32*Math.PI),y))}
- const solid=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshPhysicalMaterial({color:'#b7f34a',transparent:true,opacity:.75,metalness:.2,roughness:.25}));solid.position.set(.8,.9,.15);g.add(solid);
+ const solid=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshPhysicalMaterial({color:'#0F969C',transparent:true,opacity:.75,metalness:.2,roughness:.25}));solid.position.set(.8,.9,.15);g.add(solid);
 }
 // Anthropology teaching skeleton / skull model.
 {
@@ -353,7 +366,7 @@ particleGeometry.setAttribute(
 const particles=new THREE.Points(
  particleGeometry,
  new THREE.PointsMaterial({
-  color:"#c7f5ae",size:.025,transparent:true,opacity:.35
+  color:"#6DA5C0",size:.025,transparent:true,opacity:.35
  })
 );
 scene.add(particles);
@@ -401,6 +414,15 @@ document.getElementById("quality").onclick=()=>{
   highQuality?"Standard Mode":"High Detail";
 };
 
+const practicals=[
+['Physics','Simple Pendulum'],['Physics','Projectile Motion'],['Physics','Wave Interference'],['Physics','Electromagnetic Field'],['Physics','Gravitational Orbits'],['Physics','Doppler Effect'],['Physics','Refraction & Reflection'],['Physics','Spring-Mass System'],['Physics',"Ohm's Law Circuit"],['Physics','Double-Slit Experiment'],
+['Chemistry','Atomic Structure'],['Chemistry','Chemical Bonding'],['Chemistry','Electrolysis'],['Chemistry','Acid-Base Titration'],['Chemistry','Gas Laws (PV=nRT)'],['Chemistry','Acid-Base Reactions'],['Chemistry','Crystal Lattice Structures'],['Chemistry','Molecular Diffusion'],['Chemistry','Exothermic & Endothermic'],['Chemistry','Periodic Table Trends'],
+['Biology','Animal Cell Structure'],['Biology','DNA Replication'],['Biology','Protein Synthesis'],['Biology','Photosynthesis'],['Biology','Cellular Respiration'],['Biology','Mitosis & Meiosis'],['Biology','Natural Selection'],['Biology','Neuron & Synapse'],['Biology','Ecosystem Food Web'],['Biology','Immune System Response'],
+['Mathematics','Fourier Transform Visualizer'],['Mathematics','Fibonacci & Golden Spiral'],['Mathematics','3D Geometry Explorer'],['Mathematics','Calculus Visualizer'],['Mathematics','Mandelbrot Fractal'],['Mathematics','Probability Distributions'],['Mathematics','Linear Algebra Viz'],['Mathematics','Trigonometry Explorer'],['Mathematics','Complex Number Plane'],['Mathematics','Topology & Surfaces'],
+['Anthropology','Human Skull Craniometry'],['Anthropology','Human Skeletal System'],['Anthropology','Human Evolution']];
+let selectedSubject='All';
+function drawPracticals(){const query=document.getElementById('labSearch').value.toLowerCase();const visible=practicals.filter(p=>(selectedSubject==='All'||p[0]===selectedSubject)&&p[1].toLowerCase().includes(query));document.getElementById('labCards').innerHTML=visible.map(p=>'<a class="hubCard" href="immersive.html#'+encodeURIComponent(p[1])+'"><small>'+p[0]+' PRACTICAL</small><strong>'+p[1]+'</strong><span>OPEN 3D WORKSPACE ↗</span></a>').join('')||'<p class="hubFoot">No practical matches your search.</p>';}
+document.getElementById('labSearch').addEventListener('input',drawPracticals);document.getElementById('labFilters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;selectedSubject=b.dataset.filter;document.querySelectorAll('#labFilters button').forEach(x=>x.classList.toggle('selected',x===b));drawPracticals()});drawPracticals();
 // DOUBLE CLICK TO FOCUS
 renderer.domElement.addEventListener("dblclick",()=>{
  controls.target.set(0,2,0);
