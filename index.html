@@ -612,6 +612,20 @@ input,textarea,select{accent-color:var(--ck-lime,#c6ff00)}
  .card,.lab-card,.lab-department,.lab-experiment-card,.ck-download-button{transition:none!important}
 }
 
+
+/* Unified icon language: precision line icons, lime glass tiles, consistent across every section. */
+.ck-icon-heading{display:flex;align-items:center;gap:11px}
+.ck-section-icon{width:38px;height:38px;flex:0 0 38px;display:inline-grid;place-items:center;border:1px solid rgba(198,255,0,.28);border-radius:12px;background:linear-gradient(145deg,rgba(198,255,0,.14),rgba(110,150,20,.06));color:#d5ff56;box-shadow:inset 0 1px rgba(255,255,255,.08),0 6px 20px rgba(0,0,0,.18);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.ck-section-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.card:hover .ck-section-icon,.lab-card:hover .ck-section-icon,.ck-intel-tool:hover .ck-section-icon{transform:translateY(-2px);border-color:rgba(198,255,0,.65);box-shadow:0 0 20px rgba(198,255,0,.13)}
+.ai-input-actions .ai-tool-btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:10px 15px;border:1px solid rgba(198,255,0,.28);border-radius:13px;background:linear-gradient(145deg,rgba(198,255,0,.13),rgba(20,32,10,.72));color:#eaffbd;box-shadow:inset 0 1px rgba(255,255,255,.07),0 7px 22px rgba(0,0,0,.2);font-weight:700;letter-spacing:.1px;transition:transform .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease}
+.ai-input-actions .ai-tool-btn .ck-icon{width:19px;height:19px;color:#c6ff00}
+.ai-input-actions .ai-tool-btn:hover{transform:translateY(-2px);border-color:#c6ff00;background:linear-gradient(145deg,rgba(198,255,0,.23),rgba(20,32,10,.88));box-shadow:0 8px 24px rgba(198,255,0,.12)}
+.ai-input-actions .ai-tool-btn[aria-pressed="true"]{border-color:#c6ff00;background:rgba(198,255,0,.2);color:#f4ffd9;box-shadow:0 0 0 2px rgba(198,255,0,.1),0 0 22px rgba(198,255,0,.16)}
+.ai-input-actions .ai-tool-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+@media(max-width:480px){.ck-section-icon{width:34px;height:34px;flex-basis:34px}.ck-section-icon svg{width:19px;height:19px}.ai-input-actions .ai-tool-btn{flex:1 1 calc(50% - 10px);padding:10px 11px}}
+@media(prefers-reduced-motion:reduce){.ck-section-icon,.ai-input-actions .ai-tool-btn{transition:none!important}}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -762,7 +776,7 @@ footer{color:#C1E8FF!important}
 
   <div class="tools" id="study-tools">
     <section class="card" aria-labelledby="timetableTitle">
-      <h3 id="timetableTitle">📅 Class Timetable</h3>
+      <h3 id="timetableTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/></svg></span>Class Timetable</h3>
       <p>Organize your classes and practicals.</p>
       <form id="timetableForm">
         <input type="text" id="subject" placeholder="Subject name" required maxlength="100">
@@ -774,7 +788,7 @@ footer{color:#C1E8FF!important}
     </section>
 
     <section class="card" aria-labelledby="assignmentTitle">
-      <h3 id="assignmentTitle">📝 Assignment Tracker</h3>
+      <h3 id="assignmentTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4H5a2 2 0 0 0-2 2v14h18V6a2 2 0 0 0-2-2h-3"/><rect x="8" y="2" width="8" height="5" rx="2"/><path d="m8 13 2 2 5-5M8 18h8"/></svg></span>Assignment Tracker</h3>
       <p>Add deadlines and mark work as complete.</p>
       <form id="assignmentForm">
         <input id="assignmentName" type="text" placeholder="Assignment name" required maxlength="150">
@@ -786,7 +800,7 @@ footer{color:#C1E8FF!important}
     </section>
 
     <section class="card" aria-labelledby="notesTitle" id="notes-library">
-      <h3 id="notesTitle">📚 Notes Library</h3>
+      <h3 id="notesTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 11h8"/></svg></span>Notes Library</h3>
       <p>Organize notes by subject, search them, bookmark important topics, and attach PDFs.</p>
       <form id="notesForm">
         <div class="notes-form-grid">
@@ -845,22 +859,22 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="intelligence-lab" aria-labelledby="ck-intel-title">
  <div class="ck-intel-head"><span class="eyebrow">CAMPUSKIT • LEARNING INTELLIGENCE</span><h2 id="ck-intel-title">Student Intelligence Lab</h2><p>Five experimental learning tools: track unfinished concepts, investigate readings, challenge explanations, map doubt patterns and learn backwards from answers.</p></div>
  <div class="ck-intel-grid">
-  <article class="ck-intel-tool"><h3>🧩 Concept Debt Tracker</h3><p>Track concepts you have postponed or only partly understood.</p><form id="ck-debt-form"><input id="ck-debt-topic" maxlength="100" placeholder="Concept / chapter" required><select id="ck-debt-level"><option value="High">High confusion</option><option value="Medium" selected>Partly understood</option><option value="Low">Needs revision</option></select><textarea id="ck-debt-note" maxlength="500" placeholder="What is unclear? (optional)"></textarea><button>Add concept debt</button></form><div id="ck-debt-list" aria-live="polite"></div></article>
-  <article class="ck-intel-tool"><h3>🧪 Lab Mistake Detective</h3><p>Enter at least three readings. Compare the median, spread and possible outliers before checking your lab notebook and procedure.</p><form id="ck-lab-form"><input id="ck-lab-values" placeholder="Readings e.g. 10.2, 10.1, 14.8, 10.3" required><input id="ck-lab-unit" maxlength="20" placeholder="Unit (e.g. cm, s, g)"><button>Inspect readings</button></form><div id="ck-lab-result" class="ck-intel-result" aria-live="polite">Your reading analysis will appear here.</div></article>
-  <article class="ck-intel-tool"><h3>🥊 Opponent Teacher</h3><p>Become your own strict examiner. Get counter-questions that expose assumptions, missing evidence and weak explanations.</p><form id="ck-opponent-form"><input id="ck-opponent-topic" maxlength="120" placeholder="Topic / question" required><textarea id="ck-opponent-answer" maxlength="3000" placeholder="Explain the concept in your own words..." required></textarea><button>Challenge my explanation</button></form><div id="ck-opponent-result" class="ck-intel-result" aria-live="polite"></div></article>
-  <article class="ck-intel-tool"><h3>🧬 Doubt DNA</h3><p>Save doubts, see your strongest confusion pattern and remove doubts once resolved.</p><form id="ck-doubt-form"><textarea id="ck-doubt-text" maxlength="500" placeholder="Write a doubt or question..." required></textarea><button>Save and classify doubt</button></form><div id="ck-doubt-summary" class="ck-intel-result" aria-live="polite"></div><div id="ck-doubt-list"></div></article>
-  <article class="ck-intel-tool"><h3>🔁 Reverse Learning</h3><p>Begin with the final answer, then reconstruct the question, assumptions, method and verification.</p><form id="ck-reverse-form"><input id="ck-reverse-answer" maxlength="500" placeholder="Enter a result / answer" required><select id="ck-reverse-kind"><option value="science">Science / numerical result</option><option value="definition">Definition / concept</option><option value="history">Historical fact / event</option></select><button>Generate reverse prompts</button></form><div id="ck-reverse-result" class="ck-intel-result" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.2 4.5L19 9l-4.8 1.5L12 15l-2.2-4.5L5 9l4.8-1.5zM19 15l1.2 2.3L23 18l-2.8.7L19 21l-1.2-2.3L15 18l2.8-.7z"/></svg></span>Concept Debt Tracker</h3><p>Track concepts you have postponed or only partly understood.</p><form id="ck-debt-form"><input id="ck-debt-topic" maxlength="100" placeholder="Concept / chapter" required><select id="ck-debt-level"><option value="High">High confusion</option><option value="Medium" selected>Partly understood</option><option value="Low">Needs revision</option></select><textarea id="ck-debt-note" maxlength="500" placeholder="What is unclear? (optional)"></textarea><button>Add concept debt</button></form><div id="ck-debt-list" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/><path d="m10 17 2 2 4-4"/></svg></span>Lab Mistake Detective</h3><p>Enter at least three readings. Compare the median, spread and possible outliers before checking your lab notebook and procedure.</p><form id="ck-lab-form"><input id="ck-lab-values" placeholder="Readings e.g. 10.2, 10.1, 14.8, 10.3" required><input id="ck-lab-unit" maxlength="20" placeholder="Unit (e.g. cm, s, g)"><button>Inspect readings</button></form><div id="ck-lab-result" class="ck-intel-result" aria-live="polite">Your reading analysis will appear here.</div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4h10a4 4 0 0 1 4 4v5a4 4 0 0 1-4 4h-4l-4 4v-4H7a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z"/><path d="M8 10h8M8 13h5"/></svg></span>Opponent Teacher</h3><p>Become your own strict examiner. Get counter-questions that expose assumptions, missing evidence and weak explanations.</p><form id="ck-opponent-form"><input id="ck-opponent-topic" maxlength="120" placeholder="Topic / question" required><textarea id="ck-opponent-answer" maxlength="3000" placeholder="Explain the concept in your own words..." required></textarea><button>Challenge my explanation</button></form><div id="ck-opponent-result" class="ck-intel-result" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3c10 4 10 14 0 18M17 3C7 7 7 17 17 21M8 6h8M6 10h12M6 14h12M8 18h8"/></svg></span>Doubt DNA</h3><p>Save doubts, see your strongest confusion pattern and remove doubts once resolved.</p><form id="ck-doubt-form"><textarea id="ck-doubt-text" maxlength="500" placeholder="Write a doubt or question..." required></textarea><button>Save and classify doubt</button></form><div id="ck-doubt-summary" class="ck-intel-result" aria-live="polite"></div><div id="ck-doubt-list"></div></article>
+  <article class="ck-intel-tool"><h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h13a4 4 0 0 1 0 8H7M8 3 4 7l4 4M16 17l4 0-4 4"/></svg></span>Reverse Learning</h3><p>Begin with the final answer, then reconstruct the question, assumptions, method and verification.</p><form id="ck-reverse-form"><input id="ck-reverse-answer" maxlength="500" placeholder="Enter a result / answer" required><select id="ck-reverse-kind"><option value="science">Science / numerical result</option><option value="definition">Definition / concept</option><option value="history">Historical fact / event</option></select><button>Generate reverse prompts</button></form><div id="ck-reverse-result" class="ck-intel-result" aria-live="polite"></div></article>
  </div>
  <p class="ck-intel-foot">Privacy: tools use browser local storage on this device. They do not upload your study data. Lab outlier checks are statistical hints, not validation of experimental correctness.</p>
 </section>
 </main>
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
-  <h2 id="relaxTitle">🎵 Student Relaxation Corner</h2>
+  <h2 id="relaxTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Student Relaxation Corner</h2>
   <p>Take a short break with calm music. Add a YouTube or Spotify track link to the shared campus playlist.</p>
   <div class="music-grid">
     <div class="card">
-      <h3>▶️ Now playing</h3>
+      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></span>Now playing</h3>
       <p id="musicPlayerHint">Choose a track from the playlist to play it here.</p>
       <iframe id="musicPlayer" class="music-embed" title="Relaxation music player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="about:blank"></iframe>
       <p class="item-meta">Use relaxing music at a comfortable volume. Music is not a treatment for persistent headaches.</p>
@@ -921,12 +935,12 @@ footer{color:#C1E8FF!important}
 <section class="card app-view" id="laboratory-section">
 
   <div class="lab-heading">
-    <h2>🔬 Laboratory</h2>
+    <h2 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/></svg></span>Laboratory</h2>
     <p>Your digital practical laboratory — Learn, Experiment, Record and Practice.</p>
   </div>
 
   <div class="lab-card">
-    <h3>📊 Laboratory Progress</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Laboratory Progress</h3>
     <p id="labProgressText">0 practical records saved</p>
     <div class="lab-progress">
       <div class="lab-progress-fill" id="labProgressFill"></div>
@@ -951,12 +965,12 @@ footer{color:#C1E8FF!important}
   </section>
 
   <div class="lab-card">
-    <h3>📚 My Practical Records</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 11h8"/></svg></span>My Practical Records</h3>
     <div id="labRecordsList"></div>
   </div>
 
   <div class="lab-card" style="margin-top:18px">
-    <h3>🎯 Viva Preparation</h3>
+    <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m15 9 6-6"/></svg></span>Viva Preparation</h3>
     <p>Practice important questions from your selected department.</p>
     <div id="labVivaArea"></div>
   </div>
@@ -966,7 +980,7 @@ footer{color:#C1E8FF!important}
 
 <!-- CampusKit AI Study Assistant -->
 <section class="card app-view" id="ai-assistant" aria-labelledby="aiTitle">
-  <h3 id="aiTitle">🤖 CampusKit AI Study Assistant</h3>
+  <h3 id="aiTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M9 13h.01M15 13h.01M9 17h6"/></svg></span>CampusKit AI Study Assistant</h3>
   <p>Ask questions about Physics, Chemistry, practicals and assignments.</p>
 
   <div id="aiChat" aria-live="polite">
@@ -976,9 +990,9 @@ footer{color:#C1E8FF!important}
   <form id="aiForm">
     <textarea id="aiQuestion" placeholder="Ask your study question here..." maxlength="4000" required></textarea>
     <div class="ai-input-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0">
-      <button type="button" id="aiVoice" aria-pressed="false">🎙️ Speak</button>
-      <button type="button" id="aiCamera">📷 Camera</button>
-      <button type="button" id="aiUpload">🖼️ Upload image</button>
+      <button type="button" id="aiVoice" class="ai-tool-btn" aria-pressed="false"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span>Speak</span></button>
+      <button type="button" id="aiCamera" class="ai-tool-btn" aria-label="Capture with camera"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></svg><span>Camera</span></button>
+      <button type="button" id="aiUpload" class="ai-tool-btn"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg><span>Upload image</span></button>
       <input type="file" id="aiImageInput" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
     </div>
     <div id="aiImagePreview" hidden style="margin:10px 0">
@@ -2064,7 +2078,7 @@ window.CampusKitCloud = {
     recognition.continuous = false;
     recognition.onstart = () => {
       listening = true;
-      voiceButton.textContent = "⏹ Stop speaking";
+      voiceButton.innerHTML = '<svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span>Stop speaking</span>';
       voiceButton.setAttribute("aria-pressed", "true");
       status.textContent = "Listening… speak now.";
     };
@@ -2078,7 +2092,7 @@ window.CampusKitCloud = {
     };
     recognition.onend = () => {
       listening = false;
-      voiceButton.textContent = "🎙️ Speak";
+      voiceButton.innerHTML = '<svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8"/></svg><span>Speak</span>';
       voiceButton.setAttribute("aria-pressed", "false");
       questionInput.focus();
     };
