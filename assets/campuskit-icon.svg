@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
 <title id="title">CampusKit C mark</title>
 <defs>
- <linearGradient id="lime" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9ff38"/><stop offset=".55" stop-color="#9cff00"/><stop offset="1" stop-color="#39d353"/></linearGradient>
+ <linearGradient id="lime" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6DA5C0"/><stop offset=".55" stop-color="#0F969C"/><stop offset="1" stop-color="#0C7075"/></linearGradient>
  <linearGradient id="white" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#cbd5ce"/></linearGradient>
  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<rect x="12" y="12" width="488" height="488" rx="112" fill="#080a08"/>
-<rect x="14" y="14" width="484" height="484" rx="110" fill="none" stroke="#c6ff00" stroke-opacity=".22" stroke-width="4"/>
+<rect x="12" y="12" width="488" height="488" rx="112" fill="#05161A"/>
+<rect x="14" y="14" width="484" height="484" rx="110" fill="none" stroke="#0F969C" stroke-opacity=".22" stroke-width="4"/>
 <path d="M360 105C315 62 235 54 166 91 85 134 58 235 98 319c34 72 111 111 189 99" fill="none" stroke="url(#lime)" stroke-width="36" stroke-linecap="round" filter="url(#glow)"/>
-<path d="M360 105c-45-43-125-51-194-14" fill="none" stroke="#efffc0" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
+<path d="M360 105c-45-43-125-51-194-14" fill="none" stroke="#D8F0F1" stroke-opacity=".55" stroke-width="5" stroke-linecap="round"/>
 <path d="M145 304c39-26 82-28 119-4l-5 67c-39-24-78-22-114 4z" fill="url(#white)"/>
 <path d="M264 300c38-24 81-22 118 4v67c-37-26-76-28-118-4z" fill="#f7faf7"/>
 <path d="M264 300v67" stroke="#8d9b91" stroke-width="5"/>
@@ -17,5 +17,5 @@
 <path d="M366 266v47" stroke="#e9f1eb" stroke-width="5" stroke-linecap="round"/>
 <path d="M366 313c-13 0-19 10-19 20 0 12 8 20 19 20s19-8 19-20c0-10-6-20-19-20z" fill="url(#lime)"/>
 <path d="M366 313v-47" stroke="#e9f1eb" stroke-width="5"/>
-<g fill="#c6ff00"><rect x="112" y="390" width="16" height="16" rx="3"/><rect x="137" y="414" width="11" height="11" rx="2"/><rect x="101" y="425" width="9" height="9" rx="2"/></g>
+<g fill="#0F969C"><rect x="112" y="390" width="16" height="16" rx="3"/><rect x="137" y="414" width="11" height="11" rx="2"/><rect x="101" y="425" width="9" height="9" rx="2"/></g>
 </svg>
