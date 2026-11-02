@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#08091f">
-<meta name="theme-color" content="#07110b">
+<meta name="theme-color" content="#05161A">
+<meta name="theme-color" content="#05161A">
 <link rel="icon" type="image/svg+xml" href="./assets/campuskit-icon.svg">
 <link rel="apple-touch-icon" href="./assets/campuskit-icon.svg">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -625,6 +625,126 @@ input,textarea,select{accent-color:var(--ck-lime,#c6ff00)}
 .ai-input-actions .ai-tool-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 @media(max-width:480px){.ck-section-icon{width:34px;height:34px;flex-basis:34px}.ck-section-icon svg{width:19px;height:19px}.ai-input-actions .ai-tool-btn{flex:1 1 calc(50% - 10px);padding:10px 11px}}
 @media(prefers-reduced-motion:reduce){.ck-section-icon,.ai-input-actions .ai-tool-btn{transition:none!important}}
+
+
+/* ===== CAMPUSKIT OCEAN BLUE THEME (user-selected palette) ===== */
+:root{
+  --ck-bg:#05161A;
+  --ck-deep:#072E33;
+  --ck-primary:#0C7075;
+  --ck-teal:#0F969C;
+  --ck-sky:#6DA5C0;
+  --ck-slate:#294D61;
+  --ck-text:#EAF4F5;
+  --ck-muted:#A9C3C9;
+  --ck-line:rgba(109,165,192,.28);
+  --panel:rgba(7,46,51,.78);
+  --border:rgba(109,165,192,.28);
+  --lavender:#9DD7DE;
+  --muted:#A9C3C9;
+}
+html{background:var(--ck-bg)!important;color-scheme:dark}
+body{
+  background-color:var(--ck-bg)!important;
+  background-image:
+    radial-gradient(ellipse at 18% 12%,rgba(15,150,156,.25),transparent 42%),
+    radial-gradient(ellipse at 88% 28%,rgba(109,165,192,.16),transparent 42%),
+    radial-gradient(ellipse at 50% 100%,rgba(12,112,117,.22),transparent 48%)!important;
+  color:var(--ck-text)!important;
+}
+body::before{opacity:.22!important}
+body:after{background-image:linear-gradient(rgba(109,165,192,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(109,165,192,.055) 1px,transparent 1px)!important}
+header{
+  background:linear-gradient(120deg,rgba(7,46,51,.96),rgba(12,112,117,.78))!important;
+  border-color:var(--ck-line)!important;
+}
+header h1,.side-brand{color:#F2FAFA!important}
+header p,p,.item-meta{color:var(--ck-muted)!important}
+h2,.card h2,.card h3,.lab-card h3,.note-item h4{color:#9DD7DE!important}
+.eyebrow{color:#6DA5C0!important}
+.side-nav{
+  background:rgba(5,22,26,.96)!important;
+  border-color:var(--ck-line)!important;
+}
+.side-brand{
+  background:none!important;
+  -webkit-text-fill-color:#EAF4F5!important;
+}
+.side-nav a{color:#B9D1D5!important}
+.side-nav a:hover,.side-nav a.active{
+  color:#fff!important;
+  border-color:rgba(15,150,156,.42)!important;
+  background:linear-gradient(110deg,rgba(15,150,156,.24),rgba(109,165,192,.12))!important;
+}
+.card,.lab-card,.lab-department,.lab-experiment-card{
+  color:var(--ck-text)!important;
+  border-color:var(--ck-line)!important;
+  background:linear-gradient(145deg,rgba(7,46,51,.88),rgba(5,22,26,.91))!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.045)!important;
+}
+.card:hover,.lab-card:hover,.lab-experiment-card:hover{
+  border-color:rgba(15,150,156,.65)!important;
+  box-shadow:0 22px 65px rgba(0,0,0,.3),0 0 25px rgba(15,150,156,.10)!important;
+}
+.hero{background:linear-gradient(125deg,rgba(12,112,117,.32),rgba(41,77,97,.30)),rgba(7,46,51,.82)!important}
+.stat-box{
+  background:linear-gradient(145deg,rgba(15,150,156,.20),rgba(41,77,97,.20))!important;
+  border-color:var(--ck-line)!important;
+}
+.stat-box strong{color:#8EDDE0!important;text-shadow:0 0 18px rgba(15,150,156,.25)!important}
+.stat-box span,.progress-label{color:#D4E7E9!important}
+.progress-track{background:rgba(41,77,97,.55)!important;border-color:var(--ck-line)!important}
+#progressFill,.lab-progress-fill{background:linear-gradient(90deg,#0C7075,#0F969C,#6DA5C0)!important;box-shadow:0 0 16px rgba(15,150,156,.35)!important}
+input,textarea,.notes-toolbar input,.notes-toolbar select,.notes-form-grid select,
+.lab-card input,.lab-card textarea,.lab-card select{
+  background:rgba(5,22,26,.88)!important;
+  color:#EAF4F5!important;
+  border-color:rgba(109,165,192,.38)!important;
+}
+input::placeholder,textarea::placeholder{color:#87AAB3!important}
+input:focus,textarea:focus{outline-color:#0F969C!important;border-color:#6DA5C0!important;box-shadow:0 0 0 4px rgba(15,150,156,.13)!important}
+button,.lab-card button,.lab-action{
+  background:linear-gradient(115deg,#0C7075,#0F969C)!important;
+  color:#F4FFFF!important;
+  border:1px solid rgba(109,165,192,.35)!important;
+  box-shadow:0 7px 22px rgba(12,112,117,.22)!important;
+}
+button:hover,.lab-card button:hover,.lab-action:hover{filter:brightness(1.12)!important}
+.delete-btn,.lab-record button{background:linear-gradient(115deg,#7F3540,#A44752)!important;color:#fff!important}
+.complete-btn{background:linear-gradient(115deg,#0C7075,#294D61)!important}
+.complete-btn.is-complete{background:rgba(109,165,192,.20)!important}
+li,.note-item,.music-item,.lab-record,.lab-viva-item{
+  background:rgba(7,46,51,.58)!important;
+  border-color:var(--ck-line)!important;
+  color:#EAF4F5!important;
+}
+.note-tag{background:rgba(15,150,156,.17)!important;border-color:var(--ck-line)!important;color:#BCECEF!important}
+.note-attachment,.notes-status,.notes-count{color:#A9C3C9!important}
+.bookmark-btn{background:linear-gradient(115deg,#294D61,#0C7075)!important}
+.lab-department:hover,.lab-department.selected{
+  border-color:#0F969C!important;
+  background:linear-gradient(145deg,rgba(15,150,156,.22),rgba(41,77,97,.28))!important;
+}
+.lab-department .lab-icon{filter:drop-shadow(0 0 12px rgba(15,150,156,.4))!important}
+.lab-experiment-card{border-color:rgba(109,165,192,.32)!important}
+.lab-experiment-card h3,.lab-experiment-card a{color:#79D0D2!important}
+.lab-result{background:rgba(15,150,156,.14)!important;color:#A7E7E8!important}
+.lab-answer{color:#A7E7E8!important}
+.empty-state,footer{color:#A9C3C9!important}
+#campuskit-login-screen{background:rgba(5,22,26,.76)!important}
+.login-orb{border-color:rgba(109,165,192,.24)!important;box-shadow:0 0 70px rgba(15,150,156,.13),inset 0 0 70px rgba(109,165,192,.08)!important}
+.login-orb:before,.login-orb:after{border-color:rgba(15,150,156,.25)!important}
+.login-card{
+  background:linear-gradient(145deg,rgba(7,46,51,.96),rgba(5,22,26,.96))!important;
+  border-color:rgba(109,165,192,.35)!important;
+  box-shadow:0 25px 90px rgba(0,0,0,.5)!important;
+}
+.login-card .login-subtitle{color:#A9C3C9!important}
+.login-logo{background:linear-gradient(135deg,#0C7075,#294D61)!important;box-shadow:0 10px 35px rgba(15,150,156,.2)!important}
+#ck-status{color:#BCECEF!important}
+#ck-sidebar-logout{background:rgba(109,165,192,.08)!important;border-color:var(--ck-line)!important;color:#D4E7E9!important}
+.music-embed{background:#05161A!important}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
