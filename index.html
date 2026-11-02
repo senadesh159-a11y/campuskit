@@ -514,6 +514,11 @@ li,.note-item,.music-item{background:#072e33a8;border-color:var(--ck-line)}
 body.focus-running{overflow:hidden}
 @media(max-width:760px){.focus-duration-row{justify-content:center}.focus-duration-row label{text-align:center}}
 
+
+/* Unified CampusKit logo across the dashboard */
+.ck-brand-mark img{display:block;width:34px;height:34px;object-fit:cover;border-radius:9px}
+.ck-header-logo{width:38px;height:38px;vertical-align:middle;border-radius:10px;object-fit:cover}
+.ck-core img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -535,7 +540,7 @@ body.focus-running{overflow:hidden}
   </div>
 </div>
 <nav class="side-nav" aria-label="Main navigation">
-  <div class="side-brand"><span class="ck-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.2 12 4l9 5.2-9 5.2L3 9.2Z"/><path d="M6.5 11.4v5.1c3.5 2.5 7.5 2.5 11 0v-5.1M21 9.2v6"/></svg></span><span>CampusKit</span></div>
+  <div class="side-brand"><span class="ck-brand-mark"><img src="./assets/campuskit-icon.svg" alt=""></span><span>CampusKit</span></div>
   <a href="#dashboard" class="active"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg><span>Dashboard</span></a>
   <a href="#study-tools"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg><span>Study Tools</span></a>
   <a href="#notes-library"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Notes Library</span></a>
@@ -552,7 +557,7 @@ body.focus-running{overflow:hidden}
   <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
 </nav>
 <header>
-  <h1>🎓 CampusKit</h1>
+  <h1><img class="ck-header-logo" src="./assets/campuskit-icon.svg" alt=""> CampusKit</h1>
   <p>Your College Life, Organized!</p>
 </header>
 
@@ -561,7 +566,7 @@ body.focus-running{overflow:hidden}
 <div class="ck-hero-copy"><div class="ck-hero-pill"><span class="ck-live-dot"></span> YOUR DIGITAL CAMPUS • ALL IN ONE PLACE</div>
 <h1>Study beyond<br><span>the ordinary.</span></h1><p>A smarter student universe for your assignments, notes, study tools and immersive virtual laboratories.</p>
 <div class="ck-hero-actions"><a class="ck-hero-primary" href="#study-tools" data-ck-view="study-tools">Explore workspace ↗</a><a class="ck-hero-secondary" href="#laboratory" data-ck-view="laboratory">Enter 3D laboratory</a></div></div>
-<div class="ck-hero-stage" aria-hidden="true"><div class="ck-orbit"></div><div class="ck-core">🎓</div>
+<div class="ck-hero-stage" aria-hidden="true"><div class="ck-orbit"></div><div class="ck-core"><img src="./assets/campuskit-icon.svg" alt=""></div>
 <div class="ck-float-card one"><small>Study progress</small><strong>One step at a time</strong><div class="ck-mini-bar" style="width:82%"></div></div>
 <div class="ck-float-card two"><small>Virtual laboratory</small><strong>Explore • Experiment</strong><div class="ck-mini-bar" style="width:68%"></div></div>
 <div class="ck-float-card three"><small>Student workspace</small><strong>Notes • Tasks • Classes</strong><div class="ck-mini-bar" style="width:92%"></div></div></div><div class="ck-scroll-hint">A new way to learn · scroll to explore</div></section>
