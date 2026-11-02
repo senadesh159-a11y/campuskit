@@ -123,7 +123,7 @@ controls.enableDamping=true;
 controls.dampingFactor=.06;
 controls.minDistance=3;
 controls.maxDistance=35;
-controls.maxPolarAngle=Math.PI*.49;
+controls.maxPolarAngle=Math.PI*.49; controls.enablePan=true; controls.screenSpacePanning=true; controls.mouseButtons.LEFT=THREE.MOUSE.ROTATE; controls.mouseButtons.MIDDLE=THREE.MOUSE.DOLLY; controls.mouseButtons.RIGHT=THREE.MOUSE.PAN;
 controls.target.set(0,2,0);
 
 scene.add(new THREE.HemisphereLight("#dcecff","#263526",2));
@@ -262,6 +262,76 @@ equipment(7,-5);
 equipment(-7,5);
 equipment(7,5);
 
+
+function labLabel(text,x,y,z){
+ const c=document.createElement('canvas');c.width=512;c.height=100;const q=c.getContext('2d');
+ q.fillStyle='#101b14';q.strokeStyle='#b7f34a';q.lineWidth=5;q.roundRect(5,5,502,90,16);q.fill();q.stroke();
+ q.font='bold 30px Arial';q.fillStyle='#f4f8ef';q.textAlign='center';q.fillText(text,256,62);
+ const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx}));sp.position.set(x,y,z);sp.scale.set(3.5,.7,1);scene.add(sp);
+}
+function labRod(g,a,b,r,col){
+ const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),v=B.clone().sub(A);
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,v.length(),18),material(col,.35,.55));
+ m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.normalize());m.castShadow=true;g.add(m);return m;
+}
+function labStation(x,z,title){
+ const g=new THREE.Group();g.position.set(x,2.22,z);scene.add(g);
+ const p=new THREE.Mesh(new THREE.BoxGeometry(3.7,.12,1.55),material('#202a24',.3,.45));p.position.y=.12;p.castShadow=true;g.add(p);
+ labLabel(title,x,4.7,z-1);return g;
+}
+// Physics optics bench: rail, scale, glass prism and beam source.
+{
+ const g=labStation(-7,-5,'PHYSICS • OPTICS / MECHANICS');
+ const rail=new THREE.Mesh(new THREE.BoxGeometry(3.1,.08,.18),metalMat);rail.position.set(0,.3,0);g.add(rail);
+ for(let i=0;i<25;i++){const t=new THREE.Mesh(new THREE.BoxGeometry(.018,.05,.2),greenMat);t.position.set(-1.5+i*.125,.36,0);g.add(t)}
+ const sh=new THREE.Shape();sh.moveTo(0,.95);sh.lineTo(-.72,-.55);sh.lineTo(.72,-.55);sh.closePath();
+ const pr=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:.5,bevelEnabled:true,bevelSegments:3,bevelSize:.04,bevelThickness:.04}),new THREE.MeshPhysicalMaterial({color:'#a8eaff',transparent:true,opacity:.48,roughness:.08,transmission:.4,ior:1.52,clearcoat:1}));
+ pr.position.set(-.15,.85,-.25);g.add(pr);
+ const src=new THREE.Mesh(new THREE.CylinderGeometry(.16,.2,.5,24),metalMat);src.rotation.z=Math.PI/2;src.position.set(-1.35,.85,0);g.add(src);
+ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.15,12),new THREE.MeshBasicMaterial({color:'#fff1c8'}));beam.rotation.z=Math.PI/2;beam.position.set(-.85,.88,0);g.add(beam);
+}
+// Chemistry titration bench: burette, stopcock and indicator flask.
+{
+ const g=labStation(7,-5,'CHEMISTRY • TITRATION / VISCOSITY');
+ const glass=new THREE.MeshPhysicalMaterial({color:'#a9e8ff',transparent:true,opacity:.3,roughness:.08,transmission:.4,side:THREE.DoubleSide});
+ const bu=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,1.8,24,1,true),glass);bu.position.set(-.7,1.15,0);g.add(bu);
+ for(let i=0;i<12;i++){const t=new THREE.Mesh(new THREE.BoxGeometry(i%3===0?.14:.07,.014,.025),material('#f2fbff'));t.position.set(-.6,1.9-i*.13,.02);g.add(t)}
+ labRod(g,[-.7,.25,0],[-.7,.02,0],.025,'#c9d8e2');
+ const tap=new THREE.Mesh(new THREE.BoxGeometry(.28,.06,.06),greenMat);tap.position.set(-.7,.14,0);g.add(tap);
+ const flask=new THREE.Mesh(new THREE.ConeGeometry(.5,.95,32,1,true),glass);flask.position.set(.55,.45,0);flask.rotation.z=Math.PI;g.add(flask);
+ const liquid=new THREE.Mesh(new THREE.CylinderGeometry(.28,.2,.18,24),new THREE.MeshStandardMaterial({color:'#b87aff',transparent:true,opacity:.72}));liquid.position.set(.55,.37,0);g.add(liquid);
+}
+// Biology microscope with eyepiece, stage, objective and focus knob.
+{
+ const g=labStation(-7,5,'BIOLOGY • MICROSCOPY / LIFE SCIENCE');
+ const dark=material('#20272a',.28,.65);
+ labRod(g,[-.55,.35,0],[-.15,1.5,0],.13,'#20272a');labRod(g,[-.15,1.5,0],[.35,1.72,0],.11,'#20272a');
+ const ey=new THREE.Mesh(new THREE.CylinderGeometry(.16,.12,.34,24),metalMat);ey.rotation.z=-.7;ey.position.set(.43,1.85,0);g.add(ey);
+ const stage=new THREE.Mesh(new THREE.BoxGeometry(1.35,.1,.8),metalMat);stage.position.set(.05,.7,0);g.add(stage);
+ const slide=new THREE.Mesh(new THREE.BoxGeometry(.75,.025,.34),glassMat);slide.position.set(.05,.77,0);g.add(slide);
+ labRod(g,[.2,1.1,0],[.25,.85,0],.07,'#aab7b0');
+ const knob=new THREE.Mesh(new THREE.TorusGeometry(.22,.05,12,32),greenMat);knob.position.set(-.7,.95,.18);g.add(knob);
+}
+// Mathematics 3D axes/vector and a solid of revolution.
+{
+ const g=labStation(7,5,'MATHEMATICS • 3D MODELLING');
+ labRod(g,[-1.2,.35,0],[1.2,.35,0],.025,'#b7f34a');labRod(g,[-1.2,.35,0],[-1.2,1.6,0],.025,'#ffb34a');labRod(g,[-1.2,.35,0],[-1.2,.35,-1],.025,'#42cfff');
+ labRod(g,[-1.2,.35,0],[.7,1.35,-.7],.055,'#62d6ff');
+ const pts=[];for(let i=0;i<=32;i++){const y=-.65+i*.04;pts.push(new THREE.Vector2(.25+.42*Math.sin(i/32*Math.PI),y))}
+ const solid=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshPhysicalMaterial({color:'#b7f34a',transparent:true,opacity:.75,metalness:.2,roughness:.25}));solid.position.set(.8,.9,.15);g.add(solid);
+}
+// Anthropology teaching skeleton / skull model.
+{
+ const g=labStation(0,5,'ANTHROPOLOGY • HUMAN ANATOMY');const bone=material('#e8dfc9',.75);
+ labRod(g,[0,.4,0],[0,1.55,0],.09,'#e8dfc9');
+ for(let y=.65;y<1.35;y+=.23){const rib=new THREE.Mesh(new THREE.TorusGeometry(.34,.04,10,32),bone);rib.position.set(0,y,0);rib.rotation.x=Math.PI/2;g.add(rib)}
+ labRod(g,[0,1.3,0],[-.48,.9,0],.055,'#e8dfc9');labRod(g,[0,1.3,0],[.48,.9,0],.055,'#e8dfc9');
+ labRod(g,[-.48,.9,0],[-.58,.35,0],.05,'#e8dfc9');labRod(g,[.48,.9,0],[.58,.35,0],.05,'#e8dfc9');
+ labRod(g,[0,.4,0],[-.28,-.35,0],.07,'#e8dfc9');labRod(g,[0,.4,0],[.28,-.35,0],.07,'#e8dfc9');
+ const skull=new THREE.Mesh(new THREE.SphereGeometry(.25,24,18),bone);skull.position.set(0,1.8,0);g.add(skull);
+}
+
 // SAFETY SIGNS
 box("Safety Sign",12,6,-14.7,2.5,1.5,.1,greenMat,false);
 
@@ -360,7 +430,7 @@ function animate(){
 
 animate();
 
-document.getElementById("loading").style.display="none";
+document.getElementById("loading").style.display="none"; document.getElementById('status').textContent='● IMMERSIVE LAB READY • 5 SUBJECT ZONES';
 </script>
 </body>
 </html>
