@@ -87,7 +87,7 @@ button:hover{border-color:#b7f34a;color:#b7f34a}
  <button id="top">Top View</button>
  <button id="front">Front View</button>
  <button id="fullscreen">Fullscreen</button>
- <button id="quality">4K Mode</button>
+ <button id="quality">High Detail</button>
 </div>
 
 <script type="module">
@@ -398,7 +398,7 @@ document.getElementById("quality").onclick=()=>{
  renderer.setSize(window.innerWidth,window.innerHeight);
 
  document.getElementById("quality").textContent=
-  highQuality?"Standard Mode":"4K Mode";
+  highQuality?"Standard Mode":"High Detail";
 };
 
 // DOUBLE CLICK TO FOCUS
