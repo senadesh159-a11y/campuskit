@@ -9,7 +9,7 @@
 @media(max-width:900px){.layout{grid-template-columns:1fr}.stage{height:55vh;min-height:340px}}@media(max-width:520px){.wrap{padding:13px}.card{padding:11px}.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:span 2}.two{grid-template-columns:1fr}.stage{min-height:310px}}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<link rel="stylesheet" href="../../../lab-interactive.css">
+<link rel="stylesheet" href="../../lab-interactive.css">
 </head>
 <body><main class="wrap">
 <div class="top"><div class="brand">CAMPUS<span>KIT</span> / VIRTUAL LAB</div><a href="../../index.html">← Back to Laboratory</a></div>
@@ -60,5 +60,5 @@ scene.traverse(object=>{if(object.isDirectionalLight){object.castShadow=true;obj
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
 camera.aspect=w/h;camera.updateProjectionMatrix()}new ResizeObserver(resize).observe(host);resize();update();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;if(running){const p=get();let x=p.x+dir*p.speed*dt*.06;if(x>0.06||x<-.06){dir*=-1;x=Math.max(-.06,Math.min(.06,x))}$("position").value=(x*100).toFixed(1);update()}orbit.update();renderer.render(scene,camera)}requestAnimationFrame(animate);
-</script><script src="../../../lab-interactive.js" defer></script>
+</script><script src="../../lab-interactive.js" defer></script>
 </body></html>
