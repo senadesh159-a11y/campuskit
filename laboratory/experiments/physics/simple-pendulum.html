@@ -58,6 +58,7 @@ camera.position.set(7,5.5,8);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));
 renderer.setSize(host.clientWidth,host.clientHeight);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 host.appendChild(renderer.domElement);
 const controls=new OrbitControls(camera,renderer.domElement);
@@ -111,6 +112,7 @@ function resetView(){camera.position.set(7,5.5,8);controls.target.set(0,0,0);con
 document.getElementById('ck3d-reset').onclick=resetView;
 document.getElementById('ck3d-auto').onclick=e=>{controls.autoRotate=!controls.autoRotate;e.currentTarget.textContent=controls.autoRotate?'Auto-rotate: ON':'Auto-rotate: OFF'};
 document.getElementById('ck3d-full').onclick=async()=>{try{if(!document.fullscreenElement)await host.requestFullscreen();else await document.exitFullscreen()}catch(err){document.getElementById('ck3d-status').textContent='Fullscreen is not available in this browser.'}};
+scene.traverse(object=>{if(object.isDirectionalLight){object.castShadow=true;object.shadow.mapSize.set(1024,1024);object.shadow.camera.near=.5;object.shadow.camera.far=40;object.shadow.bias=-0.00015;}if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
 function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5));renderer.setSize(w,h)}
 new ResizeObserver(resize).observe(host);window.addEventListener('resize',resize);
 function animate(t){requestAnimationFrame(animate);if(moving){const a=Math.sin(t*.0015)*.42;const L=2.15;const x=Math.sin(a)*L,y=2.35-Math.cos(a)*L;moving.bob.position.set(x,y,0);moving.string.position.set(x/2, (2.35+y)/2,0);moving.string.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(x,y-2.35,0).normalize())}controls.update();renderer.render(scene,camera)}
