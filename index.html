@@ -123,7 +123,8 @@ body.authenticated #campuskit-login-screen{display:none!important}
 .login-orb:after{inset:25%;transform:rotate(-35deg) scaleX(.68);border-color:rgba(196,181,253,.28)}
 @keyframes loginOrbit{to{transform:rotate(360deg)}}
 .login-card{position:relative;z-index:1;width:min(100%,430px);padding:34px 28px;text-align:center;border:1px solid rgba(196,181,253,.28);border-radius:26px;background:linear-gradient(145deg,rgba(23,21,54,.9),rgba(11,19,48,.84));box-shadow:0 25px 90px rgba(0,0,0,.42);backdrop-filter:blur(22px)}
-.login-logo{width:68px;height:68px;margin:0 auto 14px;display:grid;place-items:center;border-radius:22px;font-size:32px;background:linear-gradient(135deg,#8b5cf6,#2563eb);box-shadow:0 10px 35px rgba(99,102,241,.35)}
+.login-logo{width:68px;height:68px;margin:0 auto 14px;overflow:hidden;display:grid;place-items:center;border-radius:22px;font-size:32px;background:linear-gradient(135deg,#8b5cf6,#2563eb);box-shadow:0 10px 35px rgba(32,245,139,.18)}
+.login-logo img{display:block;width:68px;height:68px;object-fit:cover}
 .login-card h1{font-size:clamp(28px,7vw,36px);margin:0;color:#fff;letter-spacing:-.7px}
 .login-card .login-subtitle{margin:8px 0 24px;color:#c8c5e5;font-size:14px}
 #ck-google-login{width:100%;margin:0;padding:13px 16px;border:1px solid rgba(255,255,255,.8);border-radius:12px;background:#fff;color:#222;font-size:15px;font-weight:700;box-shadow:none}
@@ -520,7 +521,7 @@ body.focus-running{overflow:hidden}
 <div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="login-orb" aria-hidden="true"></div>
   <div class="login-card">
-    <div class="login-logo" aria-hidden="true">🎓</div>
+    <div class="login-logo" aria-hidden="true"><img src="./assets/campuskit-icon.svg" alt="" width="68" height="68"></div>
     <h1 id="loginTitle">CampusKit</h1>
     <p class="login-subtitle">Your college life, organized in one place.</p>
     <button id="ck-google-login" type="button">Continue with Google</button>
