@@ -657,6 +657,21 @@ li,.note-item,.music-item,.lab-record,.lab-viva-item{background:rgba(5,38,89,.58
 footer{color:#C1E8FF!important}
 </style>
 
+
+<style id="ck-intelligence-lab-style">
+#intelligence-lab{max-width:1200px;margin:20px auto}
+.ck-intel-head{margin-bottom:20px}.ck-intel-head h2{font-size:clamp(25px,4vw,34px);margin:5px 0}
+.ck-intel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.ck-intel-tool{min-width:0;padding:18px;border:1px solid rgba(193,232,255,.22);border-radius:16px;background:linear-gradient(145deg,rgba(5,38,89,.9),rgba(2,16,36,.86))}
+.ck-intel-tool h3{margin:0 0 6px;color:#C1E8FF}.ck-intel-tool p{font-size:13px;color:#C4DDF0}
+.ck-intel-tool input,.ck-intel-tool textarea,.ck-intel-tool select{width:100%;padding:11px;margin:7px 0;border:1px solid rgba(125,160,202,.45);border-radius:9px;background:#021024;color:#f4fbff;font:inherit}
+.ck-intel-tool textarea{min-height:76px}.ck-intel-tool button{margin:5px 0}
+.ck-intel-result{margin-top:12px;padding:12px;border-radius:10px;background:rgba(84,131,179,.16);color:#EAF7FF;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.ck-intel-entry{margin:8px 0;padding:10px;border:1px solid rgba(193,232,255,.16);border-radius:9px;background:rgba(2,16,36,.55);overflow-wrap:anywhere}
+.ck-intel-entry small{display:block;color:#C1E8FF}.ck-intel-entry button{padding:6px 9px;font-size:12px}
+.ck-intel-foot{font-size:12px;color:#AFCBE0;margin-top:18px}
+@media(max-width:760px){#intelligence-lab{margin:12px!important}.ck-intel-tool{padding:14px}}
+</style>
 </head>
 <body>
 <div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -690,6 +705,7 @@ footer{color:#C1E8FF!important}
 </a>
 
   <a href="#apk-download"><span aria-hidden="true">⬇</span><span>Download App</span></a>
+  <a href="#intelligence-lab"><span aria-hidden="true">✦</span><span>Intelligence Lab</span></a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
   <button id="ck-sidebar-logout" type="button">↪ Sign out</button>
 </nav>
@@ -824,6 +840,18 @@ footer{color:#C1E8FF!important}
     </section>
   </div>
   </div>
+
+<section class="card app-view" id="intelligence-lab" aria-labelledby="ck-intel-title">
+ <div class="ck-intel-head"><span class="eyebrow">CAMPUSKIT • LEARNING INTELLIGENCE</span><h2 id="ck-intel-title">Student Intelligence Lab</h2><p>Five practical tools to find learning gaps, inspect lab readings and strengthen understanding. Your entries stay in this browser.</p></div>
+ <div class="ck-intel-grid">
+  <article class="ck-intel-tool"><h3>🧩 Concept Debt Tracker</h3><p>Track concepts you have postponed or only partly understood.</p><form id="ck-debt-form"><input id="ck-debt-topic" maxlength="100" placeholder="Concept / chapter" required><select id="ck-debt-level"><option value="High">High confusion</option><option value="Medium" selected>Partly understood</option><option value="Low">Needs revision</option></select><textarea id="ck-debt-note" maxlength="500" placeholder="What is unclear? (optional)"></textarea><button>Add concept debt</button></form><div id="ck-debt-list" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3>🧪 Lab Mistake Detective</h3><p>Enter at least three numerical readings. This flags statistical outliers; it cannot prove a lab mistake.</p><form id="ck-lab-form"><input id="ck-lab-values" placeholder="Readings e.g. 10.2, 10.1, 14.8, 10.3" required><input id="ck-lab-unit" maxlength="20" placeholder="Unit (e.g. cm, s, g)"><button>Inspect readings</button></form><div id="ck-lab-result" class="ck-intel-result" aria-live="polite">Your reading analysis will appear here.</div></article>
+  <article class="ck-intel-tool"><h3>🥊 Opponent Teacher</h3><p>Write an explanation. Challenge it with a structured self-check, not an AI-generated verdict.</p><form id="ck-opponent-form"><input id="ck-opponent-topic" maxlength="120" placeholder="Topic / question" required><textarea id="ck-opponent-answer" maxlength="3000" placeholder="Explain the concept in your own words..." required></textarea><button>Challenge my explanation</button></form><div id="ck-opponent-result" class="ck-intel-result" aria-live="polite"></div></article>
+  <article class="ck-intel-tool"><h3>🧬 Doubt DNA</h3><p>Collect doubts and see which kind of confusion appears most often.</p><form id="ck-doubt-form"><textarea id="ck-doubt-text" maxlength="500" placeholder="Write a doubt or question..." required></textarea><button>Save and classify doubt</button></form><div id="ck-doubt-summary" class="ck-intel-result" aria-live="polite"></div><div id="ck-doubt-list"></div></article>
+  <article class="ck-intel-tool"><h3>🔁 Reverse Learning</h3><p>Start from an answer and work backwards to reconstruct the question and reasoning.</p><form id="ck-reverse-form"><input id="ck-reverse-answer" maxlength="500" placeholder="Enter a result / answer" required><select id="ck-reverse-kind"><option value="science">Science / numerical result</option><option value="definition">Definition / concept</option><option value="history">Historical fact / event</option></select><button>Generate reverse prompts</button></form><div id="ck-reverse-result" class="ck-intel-result" aria-live="polite"></div></article>
+ </div>
+ <p class="ck-intel-foot">Privacy: tools use browser local storage on this device. They do not upload your study data. Lab outlier checks are statistical hints, not validation of experimental correctness.</p>
+</section>
 </main>
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
@@ -2054,7 +2082,7 @@ const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
   'apk-download'
 ];
   function setView(name) {
-    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], };
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
@@ -2071,7 +2099,7 @@ const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
   }
   links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
   const initial = location.hash.slice(1);
-  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download'].includes(initial) ? initial : 'dashboard');
+  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download','intelligence-lab'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
 <script>
@@ -2330,6 +2358,26 @@ loadLabExperiments("Physics");
   note.classList.add('is-warning');note.textContent='Release information is temporarily unavailable. Only install an APK attached to the official repository release.';
   console.warn('CampusKit APK release check:',error);
  }
+})();
+</script>
+
+<script id="ck-intelligence-lab">
+(()=>{'use strict';
+const $=id=>document.getElementById(id),KEY='campuskitIntelligenceV1';
+const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(_){return {}}};
+const state=read();state.debts=Array.isArray(state.debts)?state.debts:[];state.doubts=Array.isArray(state.doubts)?state.doubts:[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));return true}catch(e){alert('Could not save in this browser. Check available storage.');return false}};
+const safe=(tag,text)=>{const el=document.createElement(tag);el.textContent=text;return el};
+function renderDebts(){const box=$('ck-debt-list');box.replaceChildren();if(!state.debts.length){box.append(safe('p','No tracked concepts yet.'));return}
+state.debts.forEach((d,i)=>{const row=document.createElement('div');row.className='ck-intel-entry';row.append(safe('strong',d.topic),safe('small',d.level+' confusion · '+new Date(d.created).toLocaleDateString()));if(d.note)row.append(safe('p',d.note));const done=document.createElement('button');done.type='button';done.textContent='Mark understood';done.addEventListener('click',()=>{state.debts.splice(i,1);save();renderDebts()});row.append(done);box.append(row)})}
+$('ck-debt-form').addEventListener('submit',e=>{e.preventDefault();state.debts.unshift({topic:$('ck-debt-topic').value.trim(),level:$('ck-debt-level').value,note:$('ck-debt-note').value.trim(),created:Date.now()});if(save()){e.target.reset();renderDebts()}});
+$('ck-lab-form').addEventListener('submit',e=>{e.preventDefault();const raw=$('ck-lab-values').value.trim(),nums=raw.split(/[,;\s]+/).filter(Boolean).map(Number),out=$('ck-lab-result'),unit=$('ck-lab-unit').value.trim();if(nums.length<3||nums.some(n=>!Number.isFinite(n))){out.textContent='Enter at least 3 valid numbers separated by commas or spaces.';return}const sorted=[...nums].sort((a,b)=>a-b),median=sorted.length%2?sorted[(sorted.length-1)/2]:(sorted[sorted.length/2-1]+sorted[sorted.length/2])/2;const deviations=nums.map(n=>Math.abs(n-median)).sort((a,b)=>a-b),mad=deviations.length%2?deviations[(deviations.length-1)/2]:(deviations[deviations.length/2-1]+deviations[deviations.length/2])/2;const flagged=mad===0?nums.map((n,i)=>({n,i})).filter(x=>x.n!==median):nums.map((n,i)=>({n,i})).filter(x=>Math.abs(.6745*(x.n-median)/mad)>3.5);out.textContent='Readings: '+nums.length+'\nMedian: '+median+' '+unit+'\nPotential outliers: '+(flagged.length?flagged.map(x=>'#'+(x.i+1)+' = '+x.n+' '+unit).join(', '):'None detected by this robust screen.')+'\nCheck original observations, instrument, units and procedure before changing or removing any reading.'});
+$('ck-opponent-form').addEventListener('submit',e=>{e.preventDefault();const topic=$('ck-opponent-topic').value.trim(),answer=$('ck-opponent-answer').value.trim(),words=answer.split(/\s+/).filter(Boolean),checks=['Can you define the key term precisely?','What assumption are you making, and when could it fail?','Can you give a concrete example?','What evidence or equation supports your claim?','What would change if one condition were reversed?'];const box=$('ck-opponent-result');box.replaceChildren(safe('strong','Your explanation challenge: '+topic));box.append(safe('p','Length check: '+words.length+' words. This is a reflection checklist, not an automatic correctness score.'));checks.forEach(q=>box.append(safe('p','• '+q)));box.append(safe('p','Revise your explanation after answering each challenge.'))});
+function classify(t){const s=t.toLowerCase();if(/why|reason|because|derive|proof|prove|concept|meaning/.test(s))return 'Concept / reasoning';if(/formula|calculate|solve|value|unit|equation|numerical/.test(s))return 'Formula / numerical';if(/when|year|date|who|where|event|history/.test(s))return 'Fact / recall';if(/how|step|process|method|procedure|experiment/.test(s))return 'Process / method';return 'General / unclear'}
+function renderDoubts(){const list=$('ck-doubt-list'),summary=$('ck-doubt-summary');list.replaceChildren();const counts={};state.doubts.forEach(d=>counts[d.type]=(counts[d.type]||0)+1);summary.textContent=state.doubts.length?'Your doubt pattern: '+Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>k+': '+v).join(' · '):'No doubts saved yet.';state.doubts.slice(0,12).forEach(d=>{const row=document.createElement('div');row.className='ck-intel-entry';row.append(safe('strong',d.type),safe('p',d.text),safe('small',new Date(d.created).toLocaleString()));list.append(row)})}
+$('ck-doubt-form').addEventListener('submit',e=>{e.preventDefault();state.doubts.unshift({text:$('ck-doubt-text').value.trim(),type:classify($('ck-doubt-text').value),created:Date.now()});state.doubts=state.doubts.slice(0,100);if(save()){e.target.reset();renderDoubts()}});
+$('ck-reverse-form').addEventListener('submit',e=>{e.preventDefault();const answer=$('ck-reverse-answer').value.trim(),kind=$('ck-reverse-kind').value,box=$('ck-reverse-result');const prompts=kind==='science'?['What question or physical situation could produce this result?','Which law, formula or assumptions connect the given data to it?','What units should the answer have?','What happens if one input value is doubled?']:kind==='definition'?['What question would this definition answer?','What are its necessary characteristics?','Give one example and one non-example.','How would you explain it without using the key term?']:['What question would make this fact the answer?','What happened immediately before and after it?','Which source could verify it?','What context makes this fact meaningful?'];box.replaceChildren(safe('strong','Start from your answer: '+answer));prompts.forEach((p,i)=>box.append(safe('p',(i+1)+'. '+p)));box.append(safe('small','These are guided prompts; verify factual answers with your course material.'))});
+renderDebts();renderDoubts();
 })();
 </script>
 </body>
