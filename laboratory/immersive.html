@@ -117,7 +117,7 @@ function init2D(kind){
  clock2=0;let last=performance.now();const tick=n=>{if(!canvas)return;raf2=requestAnimationFrame(tick);if(!paused)clock2+=(n-last)/1000;last=n;draw2D()};raf2=requestAnimationFrame(tick);
 }
 function draw2D(){
- if(!ctx||!canvas)return;let w=canvas.width,h=canvas.height,d=Math.min(devicePixelRatio||1,2);ctx.clearRect(0,0,w,h);ctx.fillStyle='#020609';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+dx2*d,h/2+dy2*d);ctx.scale(d*zoom2,d*zoom2);
+ if(!ctx||!canvas)return;let w=canvas.width,h=canvas.height,d=Math.min(devicePixelRatio||1,2);ctx.clearRect(0,0,w,h);ctx.fillStyle='#020609';ctx.fillRect(0,0,w,h);ctx.save();ctx.translate(w/2+dx2*d,h/2+dy2*d);ctx.scale(d*zoom2*(Number(vals?.scale)||1),d*zoom2*(Number(vals?.scale)||1));
  const C={a:'#ffb86b',b:'#20c5bd',c:'#75b9e6',w:'#eaf7f7',p:'#eaa6dc',g:'#78d6a0'};
  const L=(x,y,X,Y,c=C.w,z=2)=>{ctx.beginPath();ctx.moveTo(x,-y);ctx.lineTo(X,-Y);ctx.strokeStyle=c;ctx.lineWidth=z;ctx.stroke()};
  const R=(x,y,X,Y,c=C.b,fill=true)=>{ctx.beginPath();ctx.rect(x,-y,X-x,y-Y);ctx.fillStyle=c;if(fill)ctx.fill();ctx.strokeStyle=c;if(!fill)ctx.stroke()};
@@ -126,8 +126,8 @@ function draw2D(){
  const P=(pts,c=C.b,z=2)=>{ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],-p[1]):ctx.moveTo(p[0],-p[1]));ctx.strokeStyle=c;ctx.lineWidth=z;ctx.stroke()};
  const A=(x,y,X,Y,c=C.g)=>{L(x,y,X,Y,c,2);let q=Math.atan2(Y-y,X-x);L(X,Y,X-10*Math.cos(q-.5),Y-10*Math.sin(q-.5),c,2);L(X,Y,X-10*Math.cos(q+.5),Y-10*Math.sin(q+.5),c,2)};
  const wave=(y,amp,f,phase,c)=>P(Array.from({length:180},(_,i)=>[-230+i*460/179,y+amp*Math.sin(i/179*Math.PI*2*f+phase)]),c,2.5);
- if(grid2){for(let x=-320;x<=320;x+=40)L(x,-210,x,210,'#10252c',.7);for(let y=-200;y<=200;y+=40)L(-320,y,320,y,'#10252c',.7)}
- const v=vals||{},t=clock2,name=active?.[1]||'',ang=(v.angle||45)*Math.PI/180;
+ if(grid2 && (Number(vals?.detail??100)>=20)){let step=Number(vals?.detail??100)<50?80:40;for(let x=-320;x<=320;x+=step)L(x,-210,x,210,'#10252c',.7);for(let y=-200;y<=200;y+=step)L(-320,y,320,y,'#10252c',.7)}
+ const v=vals||{},t=clock2*(Number(v.speed)||1),name=active?.[1]||'',ang=(v.angle||45)*Math.PI/180;
  if(name==='Simple Pendulum'){let q=(v.angle||18)*Math.PI/180*Math.sin(t*Math.sqrt((v.gravity||9.81)/(v.length||1))),len=110*(v.length||1),x=Math.sin(q)*len,y=140-Math.cos(q)*len;L(-150,145,150,145,C.c,5);L(0,145,x,y,C.w,3);O(x,y,13,C.a);P(Array.from({length:70},(_,i)=>{let z=-.8+i/69*1.6;return [Math.sin(z)*len,145-Math.cos(z)*len]}),C.c);T('Length '+(v.length||1)+' m',x+16,y,C.g)}
  else if(name==='Projectile Motion'){let u=v.speed||20,g=v.gravity||9.81;P(Array.from({length:140},(_,i)=>{let tt=i/139*2*u*Math.sin(ang)/g;return [-230+u*Math.cos(ang)*tt*5,-130+(v.height||0)*5+u*Math.sin(ang)*tt*5-g*tt*tt*2.5]}),C.b,3);let tt=(t%3)/3*2*u*Math.sin(ang)/g;O(-230+u*Math.cos(ang)*tt*5,-130+(v.height||0)*5+u*Math.sin(ang)*tt*5-g*tt*tt*2.5,8,C.a);L(-250,-130,250,-130,C.w);T('Launch angle '+(v.angle||45)+'°',-220,160)}
  else if(['Wave Interference','Doppler Effect','Double-Slit Experiment','Fourier Transform Visualizer'].includes(name)){if(name==='Double-Slit Experiment'){R(-220,-120,-205,120,C.c);R(-220,35,-205,50,'#020609');R(-220,-55,-205,-40,'#020609');for(let i=0;i<8;i++)P([[-205,-50+i*15],[20,-50+i*24],[180,-50+i*30]],C.b);R(180,-140,192,140,C.w);for(let i=0;i<13;i++)O(202,-120+i*20,4,i%2?C.a:C.w)}else{wave(70,(v.amplitude||1)*45,v.frequency||2,t,C.b);wave(-30,(v.amplitude||1)*45,v.frequency||2,t+(v.phase||90)*Math.PI/180,C.a);wave(-130,35,v.frequency||2,t,C.c);T('Wave A / Wave B / Resultant',-220,150)}}
