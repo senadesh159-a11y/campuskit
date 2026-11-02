@@ -15,7 +15,7 @@
 .viewer .ck-view-tools button:hover{filter:brightness(1.15)}
 @media(max-width:600px){.viewer{height:58vh!important;min-height:300px!important}.viewer .ck-view-tools{max-width:95%}.viewer .ck-view-tools button{font-size:11px;padding:7px 9px}}
 </style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<link rel="stylesheet" href="../../../lab-interactive.css">
+<link rel="stylesheet" href="../../lab-interactive.css">
 </head><body>
 <header><a href="/campuskit/">← CampusKit</a><h1>🧮 3D Vector Operations</h1>
 <section class="lab-reference-panel" aria-label="Practical apparatus and labelled model guide"><div class="lab-panel-head"><div><span class="lab-eyebrow">MATHEMATICS • VECTOR ALGEBRA</span><h2>Explore the vector components</h2><p>Use the coordinate axes to interpret vector addition and products geometrically.</p></div><span class="lab-panel-mark">LAB<br>GUIDE</span></div><div class="lab-reference-grid"><article class="lab-ref-card"><h3>Components / features</h3><ol class="lab-apparatus"><li><span class="lab-index">01</span><span>Vector A — components (a₁, a₂, a₃)</span></li><li><span class="lab-index">02</span><span>Vector B — components (b₁, b₂, b₃)</span></li><li><span class="lab-index">03</span><span>Resultant A + B — diagonal of the parallelogram</span></li><li><span class="lab-index">04</span><span>Dot product — scalar measuring alignment</span></li><li><span class="lab-index">05</span><span>Cross product — perpendicular vector</span></li></ol></article><article class="lab-ref-card"><h3>Label key</h3><div class="lab-parts"><div class="lab-part"><b>X, Y, Z axes</b><span>Three mutually perpendicular coordinate directions</span></div><div class="lab-part"><b>Vector A and B</b><span>Directed line segments with magnitude and direction</span></div><div class="lab-part"><b>A + B</b><span>Parallelogram or head-to-tail resultant</span></div><div class="lab-part"><b>A · B</b><span>Scalar: |A||B|cosθ</span></div><div class="lab-part"><b>A × B</b><span>Vector perpendicular to both A and B</span></div></div></article></div><div class="lab-formula"><span>KEY RELATION</span><strong>A·B = a₁b₁ + a₂b₂ + a₃b₃  •  |A×B| = |A||B|sinθ</strong></div><section class="lab-interactive-console" data-lab-key="vectors"></section>
@@ -60,5 +60,5 @@ scene.traverse(object=>{if(object.isDirectionalLight){object.castShadow=true;obj
 function animate(){requestAnimationFrame(animate);if(running)group.rotation.y+=.003;orbit.update();renderer.render(scene,camera)}animate();
 new ResizeObserver(()=>{camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)}).observe(host);
 
-</script><script src="../../../lab-interactive.js" defer></script>
+</script><script src="../../lab-interactive.js" defer></script>
 </body></html>
