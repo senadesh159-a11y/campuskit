@@ -490,6 +490,25 @@ li,.note-item,.music-item{background:#072e33a8;border-color:var(--ck-line)}
 .ck-lab-immersive iframe{display:block;width:100%;height:1600px;border:0;background:#05161a}
 .ck-lab-note{margin:0;padding:10px 16px;background:#072e33;color:#9bbfc2;font-size:11px}
 @media(max-width:700px){.ck-lab-immersive-head{align-items:flex-start;flex-direction:column}.ck-lab-immersive iframe{height:1900px}}
+
+/* Focus Mode */
+.focus-head{margin-bottom:18px}.focus-kicker{font-size:11px;letter-spacing:.18em;font-weight:900;color:#78d8cf}
+.focus-panel{max-width:620px;margin:18px auto;padding:clamp(20px,5vw,38px);border:1px solid #4d9694;border-radius:24px;background:linear-gradient(145deg,#0b3437,#061c22);text-align:center;box-shadow:0 24px 70px #0006}
+.focus-panel label{display:block;text-align:left;color:#c6e5e5;font-weight:700}
+.focus-duration-row{display:flex;align-items:center;gap:12px}.focus-duration-row input{max-width:150px;font-size:22px;text-align:center}.focus-duration-row span{color:#b7d3d9}
+.focus-presets{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:10px 0 20px}.focus-presets button{background:#164b50;border:1px solid #4d9694;box-shadow:none}
+.focus-clock,.focus-lock-clock{font-size:clamp(58px,13vw,92px);font-weight:900;letter-spacing:-.06em;line-height:1.15;color:#c5ff75;text-shadow:0 0 35px #9ce65b44;font-variant-numeric:tabular-nums;margin:18px 0}
+.focus-start{background:linear-gradient(110deg,#c5ff75,#7fda83)!important;color:#10210b!important;border:0!important;padding:13px 24px!important}
+.focus-end{background:#4a292b!important;border:1px solid #a85b60!important;color:#ffe5e5!important}
+.focus-limit{max-width:760px;margin:18px auto;padding:14px 16px;border:1px solid #a9793b66;border-radius:12px;background:#5a3d1b30;color:#e7d2ae;font-size:13px}
+.focus-lock-screen{position:fixed;inset:0;z-index:200000;background:radial-gradient(ellipse at 50% 25%,#15565a,#041316 68%);display:grid;place-items:center;padding:20px}
+.focus-lock-screen[hidden]{display:none!important}
+.focus-lock-card{width:min(100%,560px);text-align:center;padding:clamp(25px,6vw,52px);border:1px solid #65b9b1;border-radius:28px;background:#062327ed;box-shadow:0 30px 100px #000b}
+.focus-lock-mark{font-size:52px;color:#c5ff75}.focus-lock-card h2{font-size:clamp(28px,6vw,42px);color:#efffff;margin:12px 0}
+.focus-lock-card p{color:#b6d6d7}.focus-lock-card button{margin:8px}
+body.focus-running{overflow:hidden}
+@media(max-width:760px){.focus-duration-row{justify-content:center}.focus-duration-row label{text-align:center}}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -682,6 +701,46 @@ li,.note-item,.music-item{background:#072e33a8;border-color:var(--ck-line)}
   </div>
 </section>
   
+
+<section class="card app-view" id="focus-mode" aria-labelledby="focusModeTitle">
+  <div class="focus-head">
+    <span class="focus-kicker">CAMPUSKIT • DEEP WORK</span>
+    <h2 id="focusModeTitle">⏳ Focus Mode</h2>
+    <p>Set a study session and keep CampusKit as your focused workspace.</p>
+  </div>
+  <div class="focus-panel">
+    <label for="focusDuration">Session duration</label>
+    <div class="focus-duration-row">
+      <input id="focusDuration" type="number" min="1" max="240" value="25" inputmode="numeric">
+      <span>minutes</span>
+    </div>
+    <div class="focus-presets">
+      <button type="button" data-focus-min="25">25 min</button>
+      <button type="button" data-focus-min="45">45 min</button>
+      <button type="button" data-focus-min="60">60 min</button>
+      <button type="button" data-focus-min="90">90 min</button>
+    </div>
+    <div class="focus-clock" id="focusClock" aria-live="off">25:00</div>
+    <p id="focusStatus" role="status" aria-live="polite">Ready when you are. Choose a duration and start.</p>
+    <button type="button" id="startFocusBtn" class="focus-start">Start Focus Session</button>
+    <button type="button" id="endFocusBtn" class="focus-end" hidden>End session early</button>
+  </div>
+  <p class="focus-limit"><strong>Important:</strong> A website cannot block Android apps, other browser tabs, notifications, or system controls. During a session CampusKit can show a full-screen focus screen while this page is open, but it cannot lock your phone or prevent you from leaving the website.</p>
+</section>
+
+<div id="focusLockScreen" class="focus-lock-screen" hidden role="dialog" aria-modal="true" aria-labelledby="focusLockTitle">
+  <div class="focus-lock-card">
+    <div class="focus-lock-mark">◎</div>
+    <span class="focus-kicker">CAMPUSKIT • FOCUS SESSION</span>
+    <h2 id="focusLockTitle">Stay with your goal.</h2>
+    <p>Your focus session is running.</p>
+    <div class="focus-lock-clock" id="focusLockClock">25:00</div>
+    <p id="focusLockMessage">One task. One session. Full attention.</p>
+    <button type="button" id="focusFinishBtn" class="focus-start" hidden>Session complete · Continue</button>
+    <button type="button" id="focusExitBtn" class="focus-end">End session early</button>
+  </div>
+</div>
+
 <section class="card app-view" id="laboratory-section">
 
   <div class="lab-heading">
@@ -1825,7 +1884,7 @@ const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
   'laboratory-section'
 ];
   function setView(name) {
-    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], };
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
@@ -1842,7 +1901,7 @@ const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
   }
   links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
   const initial = location.hash.slice(1);
-  setView(['study-tools','notes-library','ai-assistant','relaxation-section'].includes(initial) ? initial : 'dashboard');
+  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
 <script>
@@ -1979,5 +2038,89 @@ loadLabExperiments("Physics");
  const stage=document.querySelector('.ck-hero-stage');if(stage&&!reduce&&fine){stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;stage.style.transform='rotateY('+x*10+'deg) rotateX('+(-y*8)+'deg)'});stage.addEventListener('pointerleave',()=>stage.style.transform='')}
 })();
 </script>
+
+<script id="campuskit-focus-mode">
+(() => {
+  const $ = id => document.getElementById(id);
+  const duration = $('focusDuration'), clock = $('focusClock'), status = $('focusStatus');
+  const start = $('startFocusBtn'), end = $('endFocusBtn'), screen = $('focusLockScreen');
+  const lockClock = $('focusLockClock'), finish = $('focusFinishBtn'), exit = $('focusExitBtn');
+  if (!duration || !clock || !screen) return;
+  const KEY = 'campuskitFocusSessionV1';
+  let interval = null, session = null;
+  const format = ms => {
+    const sec = Math.max(0, Math.ceil(ms / 1000));
+    return String(Math.floor(sec / 60)).padStart(2,'0') + ':' + String(sec % 60).padStart(2,'0');
+  };
+  function showSession() {
+    if (!session) return;
+    const remaining = session.endsAt - Date.now();
+    const label = format(remaining);
+    clock.textContent = label; lockClock.textContent = label;
+    if (remaining <= 0) completeSession();
+  }
+  function enterFocus() {
+    document.body.classList.add('focus-running');
+    screen.hidden = false; start.hidden = true; end.hidden = false;
+    finish.hidden = true; exit.hidden = false;
+    showSession();
+    clearInterval(interval); interval = setInterval(showSession, 250);
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+  }
+  function leaveFocus(message) {
+    clearInterval(interval); interval = null; session = null;
+    localStorage.removeItem(KEY);
+    screen.hidden = true; document.body.classList.remove('focus-running');
+    start.hidden = false; end.hidden = true;
+    status.textContent = message; clock.textContent = '25:00';
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  }
+  function completeSession() {
+    clearInterval(interval); interval = null;
+    localStorage.removeItem(KEY); session = null;
+    lockClock.textContent = '00:00';
+    $('focusLockTitle').textContent = 'Session complete!';
+    $('focusLockMessage').textContent = 'Great work. Take a short break before your next session.';
+    finish.hidden = false; exit.hidden = true;
+    status.textContent = 'Your focus session is complete.';
+  }
+  function restore() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved && Number.isFinite(saved.endsAt) && saved.endsAt > Date.now()) {
+        session = saved; $('focusLockTitle').textContent = 'Stay with your goal.';
+        $('focusLockMessage').textContent = 'One task. One session. Full attention.';
+        enterFocus(); status.textContent = 'Focus session is running.';
+      } else if (saved) {
+        localStorage.removeItem(KEY);
+      }
+    } catch (_) { localStorage.removeItem(KEY); }
+  }
+  document.querySelectorAll('[data-focus-min]').forEach(btn => btn.addEventListener('click', () => {
+    if (!session) duration.value = btn.dataset.focusMin;
+  }));
+  start.addEventListener('click', () => {
+    const mins = Number(duration.value);
+    if (!Number.isInteger(mins) || mins < 1 || mins > 240) {
+      status.textContent = 'Enter a duration between 1 and 240 minutes.'; return;
+    }
+    session = { startedAt: Date.now(), endsAt: Date.now() + mins * 60000 };
+    localStorage.setItem(KEY, JSON.stringify(session));
+    $('focusLockTitle').textContent = 'Stay with your goal.';
+    $('focusLockMessage').textContent = 'One task. One session. Full attention.';
+    status.textContent = 'Focus session started. Keep this CampusKit page open.';
+    enterFocus();
+  });
+  const confirmEnd = () => {
+    if (confirm('End your focus session early?')) leaveFocus('Focus session ended early. Start another whenever you are ready.');
+  };
+  end.addEventListener('click', confirmEnd); exit.addEventListener('click', confirmEnd);
+  finish.addEventListener('click', () => leaveFocus('Session completed. Well done!'));
+  restore();
+})();
+</script>
+
 </body>
 </html>
