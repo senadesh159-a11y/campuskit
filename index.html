@@ -479,6 +479,17 @@ li,.note-item,.music-item{background:#072e33a8;border-color:var(--ck-line)}
 @keyframes ckPanelIn{from{opacity:0;transform:translateY(-10px) scale(.97)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+
+/* Main dashboard: embed the complete CampusKit practical library directly in Laboratory */
+.ck-lab-immersive{margin:22px 0 26px;border:1px solid #24616a;border-radius:20px;overflow:hidden;background:#05161a;box-shadow:0 22px 60px #0005}
+.ck-lab-immersive-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 20px;background:linear-gradient(120deg,#072e33,#0c4148)}
+.ck-lab-immersive-head span{font-size:10px;letter-spacing:.18em;font-weight:900;color:#6da5c0}
+.ck-lab-immersive-head h3{margin:5px 0;color:#eaf7f7;font-size:20px}
+.ck-lab-immersive-head p{margin:0;color:#a8c4c7;font-size:13px}
+.ck-lab-immersive-head a{flex:0 0 auto;padding:10px 14px;border:1px solid #4d8b91;border-radius:10px;color:#dff7f5;text-decoration:none;font-weight:800;font-size:12px}
+.ck-lab-immersive iframe{display:block;width:100%;height:1600px;border:0;background:#05161a}
+.ck-lab-note{margin:0;padding:10px 16px;background:#072e33;color:#9bbfc2;font-size:11px}
+@media(max-width:700px){.ck-lab-immersive-head{align-items:flex-start;flex-direction:column}.ck-lab-immersive iframe{height:1900px}}
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -686,70 +697,22 @@ li,.note-item,.music-item{background:#072e33a8;border-color:var(--ck-line)}
     </div>
   </div>
 
-  <div class="lab-departments">
-
-    <button class="lab-department selected" data-lab="Physics">
-      <span class="lab-icon">⚛️</span>
-      <strong>Physics Lab</strong>
-      <small>Experiments & calculations</small>
-    </button>
-
-    <button class="lab-department" data-lab="Mathematics">
-      <span class="lab-icon">📐</span>
-      <strong>Mathematics Lab</strong>
-      <small>Equations & geometry</small>
-    </button>
-
-    <button class="lab-department" data-lab="Chemistry">
-      <span class="lab-icon">🧪</span>
-      <strong>Chemistry Lab</strong>
-      <small>Reactions & solutions</small>
-    </button>
-
-    <button class="lab-department" data-lab="Biology">
-      <span class="lab-icon">🧬</span>
-      <strong>Biology Lab</strong>
-      <small>Microscope & biology</small>
-    </button>
-
-    <button class="lab-department" data-lab="Anthropology">
-      <span class="lab-icon">🦴</span>
-      <strong>Anthropology Lab</strong>
-      <small>Human measurements</small>
-    </button>
-
-  </div>
-
-  <div class="lab-card">
-    <h3 id="labDepartmentTitle">⚛️ Physics Laboratory</h3>
-    <p id="labDepartmentDescription">Explore physics experiments and calculations.</p>
-    <div id="labExperimentsList">
-    <p>Loading Physics practicals...</p>
-</div>
-  </div>
-
-  <div class="lab-panel">
-
-    <div class="lab-card">
-      <h3>🧮 Interactive Practical Tool</h3>
-      <div id="labToolArea"></div>
-      <div class="lab-result" id="labToolResult" aria-live="polite">
-        Select a department to begin.
-      </div>
+  <section class="ck-lab-immersive" aria-label="Interactive practical library">
+    <div class="ck-lab-immersive-head">
+      <div><span> CAMPUSKIT • INTERACTIVE SCIENCE </span><h3>Explore all practicals</h3><p>Choose a subject, open any experiment, adjust its variables, inspect the 3D model and record observations.</p></div>
+      <a href="laboratory/immersive.html" target="_blank" rel="noopener">Open full laboratory ↗</a>
     </div>
-
-    <div class="lab-card">
-      <h3>📒 Practical Notebook</h3>
-      <form id="labRecordForm">
-        <input id="labExperiment" placeholder="Experiment name" required>
-        <input id="labObservation" placeholder="Observation / readings" required>
-        <textarea id="labConclusion" rows="3" placeholder="Result / conclusion"></textarea>
-        <button type="submit">＋ Save Practical Record</button>
-      </form>
-      <div id="labRecordStatus" aria-live="polite"></div>
-    </div>
-
-  </div>
+    <iframe
+      id="campuskitImmersiveLab"
+      src="laboratory/immersive.html"
+      title="CampusKit interactive 3D practical laboratory"
+      loading="eager"
+      allow="fullscreen"
+      allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin">
+    </iframe>
+    <p class="ck-lab-note">All practicals open inside CampusKit. No external experiment website is used.</p>
+  </section>
 
   <div class="lab-card">
     <h3>📚 My Practical Records</h3>
