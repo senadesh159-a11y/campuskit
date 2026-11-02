@@ -974,14 +974,21 @@ footer{color:#C1E8FF!important}
   </div>
 
   <form id="aiForm">
-    <textarea
-      id="aiQuestion"
-      placeholder="Ask your study question here..."
-      maxlength="4000"
-      required
-    ></textarea>
+    <textarea id="aiQuestion" placeholder="Ask your study question here..." maxlength="4000" required></textarea>
+    <div class="ai-input-actions" style="display:flex;flex-wrap:wrap;gap:10px;margin:12px 0">
+      <button type="button" id="aiVoice" aria-pressed="false">🎙️ Speak</button>
+      <button type="button" id="aiCamera">📷 Camera</button>
+      <button type="button" id="aiUpload">🖼️ Upload image</button>
+      <input type="file" id="aiImageInput" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>
+    </div>
+    <div id="aiImagePreview" hidden style="margin:10px 0">
+      <img id="aiImageThumb" alt="Selected image preview" style="display:block;max-width:220px;max-height:180px;object-fit:contain;border-radius:12px">
+      <button type="button" id="aiRemoveImage" style="margin-top:8px">Remove image</button>
+      <small id="aiImageName"></small>
+    </div>
     <button type="submit" id="aiSend">Ask AI</button>
-    <p id="aiStatus" role="status"></p>
+    <p id="aiStatus" role="status" aria-live="polite"></p>
+    <p class="ai-privacy-note" style="font-size:.85em;opacity:.75">Voice uses your browser's speech recognition. Images are sent to CampusKit AI only when you press Ask AI.</p>
   </form>
 </section>
 
@@ -1984,59 +1991,148 @@ window.CampusKitCloud = {
   const sendButton = document.getElementById("aiSend");
   const chat = document.getElementById("aiChat");
   const status = document.getElementById("aiStatus");
-
-const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
+  const voiceButton = document.getElementById("aiVoice");
+  const cameraButton = document.getElementById("aiCamera");
+  const uploadButton = document.getElementById("aiUpload");
+  const imageInput = document.getElementById("aiImageInput");
+  const imagePreview = document.getElementById("aiImagePreview");
+  const imageThumb = document.getElementById("aiImageThumb");
+  const imageName = document.getElementById("aiImageName");
+  const removeImageButton = document.getElementById("aiRemoveImage");
+  const WORKER_URL = "https://campuskit-six.vercel.app/api/ask";
+  const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+  let selectedImage = null;
+  let previewUrl = null;
+  let recognition = null;
+  let listening = false;
 
   function addMessage(label, message) {
     const wrapper = document.createElement("div");
-    wrapper.style.cssText =
-      "margin:12px 0;padding:12px;border-radius:10px;" +
-      "background:rgba(105,85,170,.18);overflow-wrap:anywhere;";
-
+    wrapper.style.cssText = "margin:12px 0;padding:12px;border-radius:10px;background:rgba(105,85,170,.18);overflow-wrap:anywhere;";
     const heading = document.createElement("strong");
     heading.textContent = label;
-
     const content = document.createElement("p");
     content.style.whiteSpace = "pre-wrap";
     content.textContent = message;
-
     wrapper.append(heading, content);
     chat.appendChild(wrapper);
     return wrapper;
   }
 
+  function clearSelectedImage() {
+    selectedImage = null;
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+    imageThumb.removeAttribute("src");
+    imageName.textContent = "";
+    imagePreview.hidden = true;
+    imageInput.value = "";
+  }
+
+  function chooseImage() { imageInput.click(); }
+  cameraButton.addEventListener("click", chooseImage);
+  uploadButton.addEventListener("click", chooseImage);
+  removeImageButton.addEventListener("click", clearSelectedImage);
+
+  imageInput.addEventListener("change", () => {
+    const file = imageInput.files && imageInput.files[0];
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      status.textContent = "Please choose a JPG, PNG or WebP image.";
+      imageInput.value = "";
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      status.textContent = "Image is too large. Please choose an image under 3 MB.";
+      imageInput.value = "";
+      return;
+    }
+    clearSelectedImage();
+    selectedImage = file;
+    previewUrl = URL.createObjectURL(file);
+    imageThumb.src = previewUrl;
+    imageName.textContent = file.name + " · " + (file.size / 1024).toFixed(0) + " KB";
+    imagePreview.hidden = false;
+    status.textContent = "Image ready. Add a question, then press Ask AI.";
+  });
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = navigator.language || "en-IN";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      listening = true;
+      voiceButton.textContent = "⏹ Stop speaking";
+      voiceButton.setAttribute("aria-pressed", "true");
+      status.textContent = "Listening… speak now.";
+    };
+    recognition.onresult = event => {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) transcript += event.results[i][0].transcript;
+      if (transcript) questionInput.value = (questionInput.value.trim() ? questionInput.value.trim() + " " : "") + transcript;
+    };
+    recognition.onerror = event => {
+      status.textContent = event.error === "not-allowed" ? "Microphone permission was denied. Allow it in browser settings." : "Voice input stopped: " + event.error;
+    };
+    recognition.onend = () => {
+      listening = false;
+      voiceButton.textContent = "🎙️ Speak";
+      voiceButton.setAttribute("aria-pressed", "false");
+      questionInput.focus();
+    };
+    voiceButton.addEventListener("click", () => {
+      if (listening) recognition.stop();
+      else {
+        try { recognition.start(); }
+        catch (error) { status.textContent = "Voice input is already starting. Please try again."; }
+      }
+    });
+  } else {
+    voiceButton.disabled = true;
+    voiceButton.title = "Speech recognition is not supported in this browser. Try Chrome.";
+    voiceButton.addEventListener("click", () => { status.textContent = "Voice input is not supported in this browser. Try the latest Chrome."; });
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = String(reader.result || "");
+        const comma = result.indexOf(",");
+        if (comma < 0) return reject(new Error("Could not read the selected image."));
+        resolve(result.slice(comma + 1));
+      };
+      reader.onerror = () => reject(new Error("Could not read the selected image."));
+      reader.readAsDataURL(file);
+    });
+  }
+
   form.addEventListener("submit", async event => {
     event.preventDefault();
-
     const question = questionInput.value.trim();
-    if (!question) return;
-
-    addMessage("You", question);
+    if (!question) { status.textContent = "Please type or speak a question first."; questionInput.focus(); return; }
+    addMessage("You", question + (selectedImage ? "\n📷 Image attached: " + selectedImage.name : ""));
     questionInput.value = "";
     sendButton.disabled = true;
-    status.textContent = "AI is thinking...";
+    status.textContent = "AI is thinking…";
 
     try {
       const idToken = await window.CampusKitAuth?.getIdToken();
       if (!idToken) throw new Error("Please sign in with Google before using CampusKit AI.");
-
+      const body = { question };
+      if (selectedImage) body.image = { mimeType: selectedImage.type, data: await fileToBase64(selectedImage) };
       const response = await fetch(WORKER_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ question })
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
+        body: JSON.stringify(body)
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "AI request failed.");
-      }
-
+      if (!response.ok) throw new Error(data.error || "AI request failed.");
       addMessage("CampusKit AI", data.answer || "No answer received.");
       status.textContent = "Answer received.";
+      clearSelectedImage();
     } catch (error) {
       addMessage("CampusKit AI", error.message || "Sorry, the AI could not respond. Please try again.");
       status.textContent = "Request failed.";

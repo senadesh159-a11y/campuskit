@@ -53,10 +53,29 @@ module.exports = async function handler(req, res) {
     // Validate question
     const question = req.body?.question;
 
-    if (typeof question !== "string" || !question.trim()) {
+    if (typeof question !== "string" || !question.trim() || question.length > 4000) {
       return res.status(400).json({
-        error: "Please enter a question."
+        error: "Please enter a question of up to 4,000 characters."
       });
+    }
+
+    // Optional image input from the AI Assistant camera/upload controls.
+    // Accept only common raster formats and cap decoded bytes to 3 MB.
+    const image = req.body?.image;
+    let imagePart = null;
+    if (image !== undefined && image !== null) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!image || !allowedTypes.includes(image.mimeType) ||
+          typeof image.data !== "string" ||
+          !/^[A-Za-z0-9+/]+={0,2}$/.test(image.data)) {
+        return res.status(400).json({ error: "Please attach a valid JPG, PNG or WebP image." });
+      }
+      const estimatedBytes = Math.floor(image.data.length * 3 / 4) -
+        (image.data.endsWith("==") ? 2 : image.data.endsWith("=") ? 1 : 0);
+      if (estimatedBytes <= 0 || estimatedBytes > 3 * 1024 * 1024) {
+        return res.status(413).json({ error: "Image is too large. Please use an image under 3 MB." });
+      }
+      imagePart = { inlineData: { mimeType: image.mimeType, data: image.data } };
     }
 
     if (!process.env.GEMINI_API_KEY) {
@@ -88,7 +107,8 @@ Student question: ${question.trim()}`;
           model: modelName
         });
 
-        const result = await model.generateContent(prompt);
+        const content = imagePart ? [{ text: prompt }, imagePart] : prompt;
+        const result = await model.generateContent(content);
 
         return res.status(200).json({
           answer: result.response.text(),
