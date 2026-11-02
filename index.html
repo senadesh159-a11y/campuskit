@@ -1385,6 +1385,8 @@ window.CampusKitCloud = {
     getAuth,
     GoogleAuthProvider,
     signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
@@ -1699,12 +1701,28 @@ window.CampusKitCloud = {
     }
   });
 
+  // Mobile browsers use full-page redirect; desktop keeps popup sign-in.
+  const isMobileBrowser = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  function explainAuthError(error) {
+    const code = error?.code || "";
+    if (code === "auth/unauthorized-domain") {
+      const host = window.location.hostname;
+      return "This website address is not authorized for Google sign-in (" + host + "). Add this exact host in Firebase Console → Authentication → Settings → Authorized domains.";
+    }
+    if (code === "auth/operation-not-allowed") return "Google sign-in is disabled. Enable Google under Firebase Console → Authentication → Sign-in method.";
+    return "Sign-in failed: " + (code || error?.message || "Unknown error");
+  }
+  getRedirectResult(auth).catch(error => {
+    console.error("Google redirect sign-in error:", error);
+    showStatus(explainAuthError(error));
+  });
   loginBtn.addEventListener("click", async () => {
     showStatus("Opening Google sign-in...");
     try {
-      await signInWithPopup(auth, provider);
+      if (isMobileBrowser) await signInWithRedirect(auth, provider);
+      else await signInWithPopup(auth, provider);
     } catch (error) {
-      showStatus("Sign-in failed: " + (error.code || error.message));
+      showStatus(explainAuthError(error));
       console.error("Google sign-in error:", error);
     }
   });
