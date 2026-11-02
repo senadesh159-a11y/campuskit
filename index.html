@@ -1447,7 +1447,7 @@ window.CampusKitCloud = {
 
   const app = initializeApp(firebaseConfig);
   // Persist the Firebase session across reloads and mobile browser navigation.
-  const auth = initializeAuth(app, { persistence: browserLocalPersistence });
+  const auth = initializeAuth(app, { persistence: [browserLocalPersistence] });
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
   window.CampusKitAuth = {
