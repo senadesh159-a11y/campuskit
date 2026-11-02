@@ -17,7 +17,7 @@ a{color:inherit;text-decoration:none}.top{height:64px;display:flex;align-items:c
 <section id="catalogView">
 <div class="intro"><div><div class="eyebrow">LEARN BY EXPERIMENTING</div><h1>Immersive Virtual Laboratory</h1><p>Explore interactive 3D models, change experimental variables, observe calculated results and record readings. Built as an original CampusKit learning environment.</p></div><input id="search" class="search" placeholder="Search an experiment…"></div>
 <div class="filters" id="filters"><button class="active" data-filter="All">All subjects</button><button data-filter="Physics">Physics</button><button data-filter="Chemistry">Chemistry</button><button data-filter="Biology">Biology</button><button data-filter="Mathematics">Mathematics</button><button data-filter="Anthropology">Anthropology</button></div>
-<div class="catalog" id="catalog"></div>
+<div id="catalog"></div>
 <p class="foot">Models are educational visualisations. They illustrate scientific relationships and are not substitutes for supervised laboratory work or calibrated instruments.</p>
 </section>
 <section class="viewer" id="viewer">
@@ -45,8 +45,9 @@ const experiments=[
 ['Anthropology','Human Skull Craniometry','Physical anthropology','skull'],['Anthropology','Human Skeletal System','Human osteology','skeleton'],['Anthropology','Human Evolution','Human origins','evolution']
 ];
 const $=s=>document.querySelector(s);let filter='All';
+const classXI=new Set(['Simple Pendulum',"Ohm's Law Circuit",'Atomic Structure','Acid-Base Titration','Animal Cell Structure','Trigonometry Explorer']);
 function card(e){return '<a class="exp" href="#'+encodeURIComponent(e[1])+'" data-sub="'+e[0]+'" data-name="'+e[1].toLowerCase()+'"><span class="tag">'+e[0]+' · '+e[2]+'</span><strong>'+e[1]+'</strong><small>Interactive 3D learning model</small><span class="launch">OPEN EXPERIMENT ↗</span></a>'}
-function drawCatalog(){const q=$('#search').value.toLowerCase();$('#catalog').innerHTML=experiments.filter(e=>(filter==='All'||e[0]===filter)&&e[1].toLowerCase().includes(q)).map(card).join('')||'<div class="empty">No matching experiments.</div>'}
+function drawCatalog(){const q=$('#search').value.toLowerCase();const matches=experiments.filter(e=>(filter==='All'||e[0]===filter)&&e[1].toLowerCase().includes(q));const xi=matches.filter(e=>classXI.has(e[1]));const xii=matches.filter(e=>!classXI.has(e[1]));const section=(name,items)=>items.length?'<section><h2>'+name+'</h2><div class="catalog">'+items.map(card).join('')+'</div></section>':'';$('#catalog').innerHTML=section('Class XI',xi)+section('Class XII',xii)||'<div class="empty">No matching experiments.</div>'}
 $('#filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;filter=b.dataset.filter;$('#filters').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));drawCatalog()});$('#search').addEventListener('input',drawCatalog);drawCatalog();
 let renderer,scene,camera,orbit,root,raf,clock,paused=false,active=null,vals={},logCount=0,anim=[],angleUnit='deg';
 const pack=(rows,eq)=>[...rows,eq];
