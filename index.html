@@ -822,6 +822,163 @@ footer .ck-icon{color:#C1E8FF;stroke:#C1E8FF}
 @media(max-width:760px){#intelligence-lab{margin:12px!important}.ck-intel-tool{padding:14px}}
 </style>
 <link rel="stylesheet" href="./assets/intelligence-lab.css">
+
+<!-- CampusKit Premium Ocean Glass UI — presentation-only layer; app logic untouched -->
+<style id="campuskit-premium-ui">
+:root{
+ --ck-bg:#030B12;--ck-bg-2:#061722;--ck-panel:rgba(8,30,43,.72);
+ --ck-panel-strong:rgba(7,25,37,.94);--ck-line:rgba(100,190,207,.19);
+ --ck-line-strong:rgba(66,190,205,.38);--ck-text:#EAF7FA;--ck-muted:#9CB8C2;
+ --ck-blue:#0C7075;--ck-cyan:#20C4C9;--ck-soft:#6DA5C0;
+ --ck-shadow:0 22px 65px rgba(0,0,0,.32);
+}
+html{background:var(--ck-bg);scroll-padding-top:90px}
+body{
+ padding-left:220px!important;color:var(--ck-text)!important;
+ font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+ background:
+ radial-gradient(ellipse at 75% 0%,rgba(12,112,117,.22),transparent 38%),
+ radial-gradient(ellipse at 8% 35%,rgba(41,77,97,.23),transparent 42%),
+ linear-gradient(145deg,#030B12 0%,#061722 48%,#041018 100%)!important;
+ background-attachment:fixed!important;line-height:1.65;
+}
+body:before{opacity:.22;background-image:radial-gradient(1px 1px at 20% 30%,rgba(170,240,245,.8) 50%,transparent 100%),radial-gradient(2px 2px at 70% 60%,rgba(32,196,201,.55) 50%,transparent 100%);z-index:0}
+::selection{background:rgba(32,196,201,.28);color:#fff}
+a{transition:color .22s ease,background .22s ease,border-color .22s ease,transform .22s ease}
+.side-nav{
+ width:220px!important;padding:22px 15px!important;gap:8px!important;
+ background:rgba(3,15,23,.88)!important;border-right:1px solid var(--ck-line)!important;
+ box-shadow:14px 0 50px rgba(0,0,0,.2);backdrop-filter:blur(24px)!important;
+ -webkit-backdrop-filter:blur(24px)!important;
+}
+.side-brand{display:flex;align-items:center;gap:11px;padding:8px 10px 24px!important;
+ color:#F1FEFF!important;font-size:20px!important;font-weight:800;letter-spacing:-.5px}
+.ck-brand-mark{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;
+ background:linear-gradient(145deg,#0C7075,#123A50);border:1px solid rgba(100,220,225,.28);
+ box-shadow:0 8px 24px rgba(12,112,117,.28);overflow:hidden}
+.ck-brand-mark img{width:27px;height:27px;object-fit:contain}
+.side-nav a{
+ min-height:44px;padding:11px 13px!important;border:1px solid transparent;
+ border-radius:13px!important;color:#9DB8C3!important;font-size:13px!important;font-weight:650;
+}
+.side-nav a .ck-icon{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;flex:none}
+.side-nav a:hover{color:#E9FFFF!important;background:rgba(19,111,122,.15)!important;border-color:var(--ck-line)!important;transform:translateX(2px)}
+.side-nav a.active{color:#DFFFFF!important;background:linear-gradient(100deg,rgba(12,112,117,.34),rgba(32,196,201,.08))!important;border-color:rgba(32,196,201,.23)!important;box-shadow:inset 3px 0 #20C4C9}
+.side-nav .side-hint{color:#71919D!important;font-size:11px!important}
+#ck-sidebar-logout{border:1px solid var(--ck-line)!important;background:rgba(255,255,255,.035)!important;color:#A9C6CE!important;border-radius:12px}
+#ck-sidebar-logout:hover{background:rgba(190,70,85,.12)!important;color:#FFDCE0!important}
+header{background:linear-gradient(120deg,rgba(7,38,51,.94),rgba(5,22,32,.94))!important;border-bottom:1px solid var(--ck-line)!important}
+header h1,h1,h2,h3,h4{font-family:Inter,ui-sans-serif,system-ui,sans-serif!important;letter-spacing:-.035em}
+header h1{font-weight:850}
+main{max-width:1320px!important;padding:0 28px!important;margin:30px auto!important}
+.card,.stat-box,.note-item,.lab-card,.ck-intel-tool,.focus-panel,.ck-download-details{
+ background:linear-gradient(145deg,rgba(10,37,51,.78),rgba(5,22,33,.76))!important;
+ border:1px solid var(--ck-line)!important;border-radius:20px!important;
+ box-shadow:var(--ck-shadow);backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;
+}
+.card{padding:clamp(18px,2.3vw,28px)!important;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease!important}
+.card:hover{border-color:var(--ck-line-strong)!important;box-shadow:0 26px 75px rgba(0,0,0,.38),0 0 0 1px rgba(32,196,201,.04)!important}
+.card h2,.card h3,.card h4,.ck-icon-heading{color:#D8F8FA!important}
+p,.quote{color:#A9C2CB!important}
+.eyebrow,.ck-kicker,.ck-hero-pill{color:#67D6D8!important;letter-spacing:.13em}
+.cinematic-hero{
+ min-height:390px!important;margin:22px 0 28px!important;padding:clamp(26px,5vw,58px)!important;
+ border:1px solid rgba(68,186,198,.22)!important;border-radius:26px!important;overflow:hidden;
+ background:radial-gradient(ellipse at 78% 40%,rgba(12,112,117,.32),transparent 38%),linear-gradient(125deg,rgba(6,31,44,.98),rgba(3,13,23,.96))!important;
+ box-shadow:0 30px 90px rgba(0,0,0,.34)!important;
+}
+.cinematic-hero h1{font-size:clamp(38px,5vw,64px)!important;line-height:1.04!important;color:#F1FCFF!important;font-weight:850!important}
+.cinematic-hero h1 span{background:linear-gradient(90deg,#49D6D5,#9BC9E0);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.cinematic-hero p{max-width:540px;color:#A9C4CD!important;font-size:16px}
+.ck-hero-pill{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border-radius:99px;background:rgba(32,196,201,.08);border:1px solid rgba(32,196,201,.2);font-size:10px}
+.ck-live-dot{box-shadow:0 0 14px #20C4C9}
+.ck-hero-primary,.ck-hero-secondary{border-radius:12px!important;padding:12px 17px!important;font-weight:750!important}
+.ck-hero-primary{background:linear-gradient(120deg,#0C7075,#119AA0)!important;box-shadow:0 10px 30px rgba(12,112,117,.25)}
+.ck-hero-secondary{background:rgba(255,255,255,.045)!important;border:1px solid var(--ck-line)!important;color:#D6F1F3!important}
+.ck-hero-stage{filter:saturate(.82)}
+.ck-core{background:radial-gradient(circle,#1D9FA6,#082D3D 70%)!important;box-shadow:0 0 75px rgba(32,196,201,.3)!important}
+.ck-float-card{background:rgba(4,22,33,.82)!important;border:1px solid rgba(98,200,207,.22)!important;border-radius:15px!important;backdrop-filter:blur(15px)}
+.ck-float-card small{color:#83AEB9!important}.ck-float-card strong{color:#E4FAFB!important}
+.dashboard-stats{gap:14px!important}
+.stat-box{padding:20px 12px!important;min-height:112px}
+.stat-box strong{color:#69DDE0!important;text-shadow:0 0 22px rgba(32,196,201,.2)!important;font-size:clamp(25px,3vw,34px)!important}
+.stat-box span{color:#A9C5CE!important;font-weight:600}
+.progress-track{background:rgba(150,205,215,.12)!important;border-radius:99px!important;overflow:hidden}
+#progressFill,.ck-lab-progress-fill{background:linear-gradient(90deg,#0C7075,#35D2D2)!important;box-shadow:0 0 16px rgba(32,196,201,.3)}
+button,.ck-hero-primary,.ck-download-button{
+ border-radius:11px!important;font-weight:700!important;
+ background:linear-gradient(125deg,#0C7075,#108F98)!important;
+ border:1px solid rgba(89,220,222,.22)!important;color:#F3FFFF!important;
+ box-shadow:0 7px 22px rgba(8,112,117,.2)!important;
+ transition:transform .2s ease,filter .2s ease,box-shadow .2s ease!important;
+}
+button:hover,.ck-download-button:hover{transform:translateY(-2px)!important;filter:brightness(1.12);box-shadow:0 12px 28px rgba(8,145,151,.28)!important}
+button.delete-btn{background:linear-gradient(120deg,#923D51,#B94C5D)!important}
+button.complete-btn{background:linear-gradient(120deg,#087F76,#0C9D91)!important}
+input,textarea,select,.ck-intel-tool input,.ck-intel-tool textarea,.ck-intel-tool select{
+ background:rgba(2,14,22,.72)!important;color:#EAFBFC!important;
+ border:1px solid rgba(106,174,188,.25)!important;border-radius:11px!important;
+ padding:11px 13px!important;outline:none;transition:border-color .2s,box-shadow .2s;
+}
+input::placeholder,textarea::placeholder{color:#6F909B!important}
+input:focus,textarea:focus,select:focus{border-color:#20C4C9!important;box-shadow:0 0 0 3px rgba(32,196,201,.1)!important;outline:none!important}
+li,.ck-intel-entry{background:rgba(5,27,39,.68)!important;border:1px solid var(--ck-line)!important;border-radius:13px!important;color:#D9EEF1!important}
+.item-meta,.ck-intel-foot{color:#85A6B1!important}
+.note-item h4{color:#D8F8FA!important}
+#todayDate{color:#A9C4CD!important}
+#ck-notification-button{background:rgba(32,196,201,.09)!important;border:1px solid var(--ck-line)!important}
+#ck-notification-panel{background:rgba(4,22,33,.97)!important;border:1px solid var(--ck-line)!important;border-radius:14px!important}
+#campuskit-login-screen{background:radial-gradient(ellipse at 50% 35%,rgba(12,112,117,.23),transparent 45%),rgba(2,9,15,.92)!important}
+.login-orb{border-color:rgba(32,196,201,.24)!important;box-shadow:0 0 90px rgba(12,112,117,.16),inset 0 0 75px rgba(32,196,201,.08)!important}
+.login-card{background:linear-gradient(145deg,rgba(7,32,45,.97),rgba(3,15,24,.98))!important;border:1px solid rgba(94,192,202,.27)!important;border-radius:24px!important;box-shadow:0 30px 100px rgba(0,0,0,.55)!important}
+.login-logo{background:linear-gradient(135deg,#0C7075,#294D61)!important}
+#ck-status{color:#9BE5E6!important}
+.ck-lab-immersive{border:1px solid var(--ck-line)!important;border-radius:20px!important;background:linear-gradient(145deg,rgba(7,32,45,.85),rgba(3,16,26,.9))!important}
+#intelligence-lab{border-color:var(--ck-line)!important;background:rgba(5,24,35,.7)!important;border-radius:20px!important}
+.ck-intel-tool{padding:18px!important}
+.ck-intel-result{background:rgba(12,112,117,.13)!important;border:1px solid var(--ck-line)!important}
+.ck-download-hero{background:radial-gradient(ellipse at 75% 25%,rgba(12,112,117,.28),transparent 40%),linear-gradient(135deg,#061D2A,#030E18)!important;border:1px solid var(--ck-line)!important;border-radius:24px!important}
+footer{color:#7696A2!important}
+@keyframes ckFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card,.ck-download-hero{animation:ckFadeUp .55s ease both}
+@media(max-width:900px){
+ body{padding-left:0!important;padding-top:76px!important}
+ .side-nav{right:0!important;top:0!important;bottom:auto!important;width:100%!important;height:68px!important;
+  padding:7px 10px!important;flex-direction:row!important;align-items:center!important;gap:5px!important;
+  overflow-x:auto!important;overflow-y:hidden!important;border-right:0!important;border-bottom:1px solid var(--ck-line)!important}
+ .side-brand{font-size:14px!important;padding:0 8px!important;flex:none}
+ .ck-brand-mark{width:32px;height:32px;border-radius:10px}
+ .side-nav a{flex:none!important;min-height:42px!important;padding:9px 11px!important;font-size:11px!important}
+ .side-nav a:hover{transform:none}
+ .side-nav .side-hint{display:none!important}
+ main{padding:0 16px!important;margin:20px auto!important}
+ .cinematic-hero{margin-top:14px!important;min-height:330px!important}
+}
+@media(max-width:560px){
+ body{padding-top:66px!important}
+ .side-nav{height:60px!important}
+ .side-brand{font-size:0!important;gap:0;padding:0 5px!important}
+ .ck-brand-mark{width:30px;height:30px}
+ .side-nav a{padding:9px 10px!important;font-size:10px!important;gap:6px!important}
+ .side-nav a .ck-icon{width:16px;height:16px}
+ main{padding:0 11px!important;margin:14px auto!important}
+ .card{padding:17px!important;border-radius:17px!important;margin-bottom:14px!important}
+ .cinematic-hero{padding:25px 20px!important;min-height:350px!important;border-radius:20px!important}
+ .cinematic-hero h1{font-size:39px!important}
+ .ck-hero-stage{opacity:.38;position:absolute;right:-65px;top:80px;transform:scale(.72);pointer-events:none}
+ .ck-hero-copy{position:relative;z-index:2}
+ .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dashboard-stats .stat-box:last-child:nth-child(odd){grid-column:1/-1}
+ .hero-top{gap:12px}
+ #todayDate{font-size:11px}
+ .ck-hero-actions{flex-wrap:wrap}
+ .ck-hero-actions a{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+}
+</style>
+
 </head>
 <body>
 <div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
