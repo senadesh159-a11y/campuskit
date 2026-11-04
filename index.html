@@ -1190,6 +1190,12 @@ footer{color:#7696A2!important}
     <p id="ck-payment-status" role="status" aria-live="polite"></p>
   </form>
 </div>
+<div class="ck-premium-card" id="ck-my-payments" style="margin-top:18px">
+  <h3>My Payment Requests</h3>
+  <p>Track your submitted UPI payments and approval status. Sign in with the same Google account used when submitting the payment.</p>
+  <div id="ck-my-payment-list" aria-live="polite">Sign in and refresh to view your requests.</div>
+  <button type="button" id="ck-my-payment-refresh">Refresh my requests</button>
+</div>
 <div class="ck-premium-card" id="ck-admin-payments" hidden style="margin-top:18px">
   <h3>Admin · Pending payment requests</h3>
   <p>Check that the money has actually arrived in your UPI account before approving.</p>
@@ -2821,9 +2827,9 @@ loadLabExperiments("Physics");
   const list=document.getElementById('ck-admin-payment-list');
   const adminPanel=document.getElementById('ck-admin-payments');
   async function token(){const value=await window.CampusKitAuth?.getIdToken();if(!value)throw new Error('Please sign in with Google first.');return value;}
-  async function api(method,body){
+  async function api(method,body,suffix=''){
     const idToken=await token();
-    const response=await fetch('https://campuskit-six.vercel.app/api/payments',{
+    const response=await fetch('https://campuskit-six.vercel.app/api/payments'+suffix,{
       method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
       ...(body?{body:JSON.stringify(body)}:{})
     });
@@ -2839,9 +2845,48 @@ loadLabExperiments("Physics");
       const result=await api('POST',{featureId:document.getElementById('ck-payment-feature').value,utr:document.getElementById('ck-payment-utr').value.trim()});
       status.textContent=result.message+' Amount: ₹'+result.amount+'. Keep your receipt until approval.';
       form.reset();
+      await loadMyRequests();
     }catch(error){status.textContent=error.message;}
     finally{button.disabled=false;}
   });
+  const myList=document.getElementById('ck-my-payment-list');
+  const featureNames={
+    'ai-premium':'AI Assistant Premium',
+    'debate-tracker':'Debate Tracker',
+    'lab-mistake-detection':'Lab Mistake Detection',
+    'opponent-teacher':'Opponent Teacher',
+    'doubt-dna':'Doubt DNA',
+    'reverse-learning':'Reverse Learning'
+  };
+  function readableDate(value){
+    if(!value)return '—';
+    const date=new Date(value);
+    return Number.isNaN(date.getTime())?'—':date.toLocaleString();
+  }
+  async function loadMyRequests(){
+    if(!myList)return;
+    myList.textContent='Loading your payment requests…';
+    try{
+      const data=await api('GET',null,'?mine=1');
+      myList.replaceChildren();
+      if(!data.requests.length){myList.textContent='No payment requests found for this Google account.';return;}
+      data.requests.forEach(item=>{
+        const card=document.createElement('div');
+        card.style.cssText='padding:12px;margin:10px 0;border:1px solid rgba(165,145,230,.3);border-radius:12px;background:rgba(9,12,34,.45)';
+        const title=document.createElement('strong');
+        title.textContent=(featureNames[item.featureId]||item.featureId)+' · ₹'+item.amount;
+        const details=document.createElement('p');
+        details.style.margin='6px 0';
+        details.textContent='UTR: '+item.utr+' | Submitted: '+readableDate(item.createdAt);
+        const state=document.createElement('p');
+        state.style.margin='4px 0';
+        state.style.fontWeight='bold';
+        state.textContent='Status: '+String(item.status||'pending').toUpperCase()+(item.reviewedAt?' · Reviewed: '+readableDate(item.reviewedAt):'');
+        card.append(title,details,state);
+        myList.append(card);
+      });
+    }catch(error){myList.textContent=error.message;}
+  }
   async function loadAdmin(){
     try{
       const data=await api('GET');
@@ -2867,9 +2912,12 @@ loadLabExperiments("Physics");
       if(!String(error.message).includes('Admin access is not configured'))console.warn('Admin payment panel:',error.message);
     }
   }
+  document.getElementById('ck-my-payment-refresh')?.addEventListener('click',loadMyRequests);
   document.getElementById('ck-admin-refresh')?.addEventListener('click',loadAdmin);
   document.querySelector('.side-nav a[href="#ck-premium-payment"]')?.addEventListener('click',()=>setTimeout(loadAdmin,250));
-  window.addEventListener('hashchange',()=>{if(location.hash==='#ck-premium-payment')loadAdmin();});
+  window.addEventListener('hashchange',()=>{if(location.hash==='#ck-premium-payment'){loadAdmin();loadMyRequests();}});
+  window.addEventListener('ck-auth-ready',loadMyRequests);
+  if(location.hash==='#ck-premium-payment')loadMyRequests();
 })();
 </script>
 
