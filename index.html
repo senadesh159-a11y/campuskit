@@ -2487,10 +2487,11 @@ window.CampusKitCloud = {
   'focus-mode',
   'laboratory-section',
   'apk-download',
-  'intelligence-lab'
+  'intelligence-lab',
+  'ck-premium-payment'
 ];
   function setView(name) {
-    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], };
+    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], 'ck-premium-payment':['ck-premium-payment'] };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
@@ -2507,7 +2508,7 @@ window.CampusKitCloud = {
   }
   links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
   const initial = location.hash.slice(1);
-  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download','intelligence-lab'].includes(initial) ? initial : 'dashboard');
+  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download','intelligence-lab','ck-premium-payment'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
 <script>
