@@ -21,10 +21,10 @@ function initFirebase() {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (!["GET", "POST", "PATCH"].includes(req.method)) return res.status(405).json({ error: "Method not allowed." });
+  if (!["GET", "POST", "PATCH", "DELETE"].includes(req.method)) return res.status(405).json({ error: "Method not allowed." });
 
   try {
     initFirebase();
@@ -79,6 +79,58 @@ module.exports = async function handler(req, res) {
 
     if (!process.env.CAMPUSKIT_ADMIN_EMAIL || (user.email || "").toLowerCase() !== process.env.CAMPUSKIT_ADMIN_EMAIL.toLowerCase()) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
+    }
+
+    const resource = String(req.query?.resource || "");
+    if (resource === "users") {
+      if (req.method === "GET") {
+        const result = await getAuth().listUsers(200);
+        const users = await Promise.all(result.users.map(async account => {
+          const entitlements = await db.collection("users").doc(account.uid).collection("entitlements").get();
+          return {
+            uid: account.uid, email: account.email || null, displayName: account.displayName || null,
+            disabled: account.disabled, createdAt: account.metadata.creationTime || null,
+            lastSignInAt: account.metadata.lastSignInTime || null,
+            entitlements: entitlements.docs.map(d => ({ featureId: d.id, status: d.data().status || "unknown" }))
+          };
+        }));
+        return res.status(200).json({ users, pageToken: result.pageToken || null });
+      }
+      if (req.method === "PATCH") {
+        const uid = String(req.body?.uid || "");
+        if (!uid || uid === user.uid) return res.status(400).json({ error: "A different user UID is required." });
+        const target = await getAuth().getUser(uid);
+        await getAuth().updateUser(uid, { disabled: req.body?.disabled === true });
+        return res.status(200).json({ ok: true, uid, disabled: req.body?.disabled === true, email: target.email || null });
+      }
+      return res.status(405).json({ error: "Method not allowed for users." });
+    }
+
+    if (resource === "music") {
+      const music = db.collection("publicMusic");
+      if (req.method === "GET") {
+        const snapshot = await music.orderBy("createdAt", "desc").limit(300).get();
+        return res.status(200).json({ tracks: snapshot.docs.map(d => ({ id: d.id, ...d.data() })) });
+      }
+      if (req.method === "POST") {
+        const title = String(req.body?.title || "").trim().slice(0, 120);
+        const rawUrl = String(req.body?.url || "").trim();
+        let parsed;
+        try { parsed = new URL(rawUrl); } catch (_) { parsed = null; }
+        if (!title || !parsed || parsed.protocol !== "https:" || !["youtube.com", "www.youtube.com", "youtu.be", "open.spotify.com"].includes(parsed.hostname)) {
+          return res.status(400).json({ error: "Enter a title and a supported HTTPS YouTube or Spotify link." });
+        }
+        const type = parsed.hostname.includes("spotify") ? "spotify" : "youtube";
+        const ref = await music.add({ title, url: parsed.toString(), type, addedBy: user.email || "CampusKit admin", createdAt: new Date().toISOString() });
+        return res.status(201).json({ ok: true, id: ref.id });
+      }
+      if (req.method === "DELETE") {
+        const id = String(req.query?.id || "");
+        if (!/^[A-Za-z0-9_-]{8,128}$/.test(id)) return res.status(400).json({ error: "Invalid music track ID." });
+        await music.doc(id).delete();
+        return res.status(200).json({ ok: true, id });
+      }
+      return res.status(405).json({ error: "Method not allowed for music." });
     }
 
     if (req.method === "GET") {
