@@ -82,10 +82,29 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "GET") {
-      const snapshot = await requests.where("status", "==", "pending").limit(100).get();
-      const pending = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate?.().toISOString() || null }));
-      pending.sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
-      return res.status(200).json({ requests: pending });
+      const requestedStatus = String(req.query?.status || "pending").toLowerCase();
+      if (!["pending", "approved", "rejected", "all"].includes(requestedStatus)) {
+        return res.status(400).json({ error: "Invalid payment status filter." });
+      }
+      const snapshot = requestedStatus === "all"
+        ? await requests.limit(300).get()
+        : await requests.where("status", "==", requestedStatus).limit(300).get();
+      const items = snapshot.docs.map(doc => {
+        const item = doc.data();
+        return {
+          id: doc.id,
+          uid: item.uid || null,
+          email: item.email || null,
+          featureId: item.featureId || null,
+          amount: item.amount || 0,
+          utr: item.utr || null,
+          status: item.status || "pending",
+          createdAt: item.createdAt?.toDate?.().toISOString() || null,
+          reviewedAt: item.reviewedAt?.toDate?.().toISOString() || null
+        };
+      });
+      items.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      return res.status(200).json({ requests: items });
     }
 
     const requestId = String(req.body?.requestId || "");
