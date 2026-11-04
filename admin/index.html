@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#071426">
+<title>CampusKit Admin · Payments</title>
+<style>
+:root{color-scheme:dark;--bg:#06111f;--panel:rgba(15,35,58,.82);--line:rgba(145,190,230,.16);--text:#edf6ff;--muted:#8ea8c2;--blue:#38a6ff;--green:#35d49a;--amber:#ffc15c;--red:#ff7182}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#12385c 0,transparent 42%),linear-gradient(145deg,#050c17,#081b2e 55%,#050d18);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+.wrap{max-width:1120px;margin:auto;padding:28px 18px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.brand{display:flex;gap:13px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#39b5ff,#1763bd);display:grid;place-items:center;font-weight:900;box-shadow:0 8px 28px #147ac044}.eyebrow{color:#79bfff;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800}.brand h1{font-size:21px;margin:2px 0 0}.top-actions{display:flex;gap:9px;align-items:center}.muted{color:var(--muted)}button{font:inherit;cursor:pointer;border:1px solid var(--line);border-radius:11px;padding:10px 14px;background:#102944;color:var(--text);font-weight:700}button:hover{border-color:#4a9cda}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(120deg,#168be0,#2865ca);border:0}.danger{color:#ff9aa6}.hidden{display:none!important}.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 70px #0004;backdrop-filter:blur(16px)}.login{max-width:480px;margin:8vh auto;text-align:center;padding:38px}.login h2{margin:0 0 8px}.login p{color:var(--muted)}.statusline{margin-top:14px;color:var(--muted);font-size:13px;min-height:20px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}.stat{padding:17px 18px;background:#0b2036;border:1px solid var(--line);border-radius:16px}.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:28px;margin-top:5px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 16px}.tab.active{background:#1a5e91;border-color:#3d9fe4}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.list{display:grid;gap:12px;margin-top:15px}.request{padding:18px;background:rgba(7,22,39,.72);border:1px solid var(--line);border-radius:16px}.reqhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.reqtitle{font-size:16px;font-weight:800}.amount{font-size:21px;font-weight:900}.meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 18px;margin:14px 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}.meta b{color:#d9eaff;font-weight:600}.pill{display:inline-flex;border-radius:99px;padding:4px 10px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.pending{background:#68471955;color:#ffd28b}.approved{background:#155c4655;color:#74e7ba}.rejected{background:#692b3a66;color:#ff9cab}.actions{display:flex;gap:9px;margin-top:14px}.empty{text-align:center;color:var(--muted);padding:42px 12px}.error{color:#ff9aa6}.foot{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+@media(max-width:650px){.wrap{padding:18px 12px 40px}.top{align-items:flex-start}.brand h1{font-size:18px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:23px}.panel{padding:15px}.meta{grid-template-columns:1fr}.reqhead{align-items:flex-start}.actions button{flex:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="logo">CK</div><div><div class="eyebrow">Private control panel</div><h1>CampusKit · Payment Admin</h1></div></div>
+    <div class="top-actions"><span id="userEmail" class="muted"></span><button id="signOut" class="hidden">Sign out</button></div>
+  </header>
+  <section id="loginPanel" class="panel login">
+    <div class="logo" style="margin:0 auto 18px">CK</div><h2>Admin sign in</h2>
+    <p>This is a separate, restricted dashboard for reviewing CampusKit payment requests.</p>
+    <button id="signIn" class="primary">Continue with Google</button>
+    <div id="loginStatus" class="statusline">Only the configured CampusKit admin account can access payment records.</div>
+  </section>
+  <main id="dashboard" class="hidden">
+    <div class="toolbar"><div><div class="eyebrow">Payment operations</div><h2 style="margin:3px 0">Payment requests</h2><div class="muted" style="font-size:13px">Verify each UTR in your UPI/bank records before approving.</div></div><button id="refresh" class="primary">↻ Refresh</button></div>
+    <div class="stats">
+      <div class="stat"><span>Pending</span><strong id="countPending">—</strong></div>
+      <div class="stat"><span>Approved</span><strong id="countApproved">—</strong></div>
+      <div class="stat"><span>Rejected</span><strong id="countRejected">—</strong></div>
+    </div>
+    <nav class="tabs" aria-label="Payment status filters">
+      <button class="tab active" data-status="pending">Pending</button>
+      <button class="tab" data-status="approved">Approved</button>
+      <button class="tab" data-status="rejected">Rejected</button>
+      <button class="tab" data-status="all">All requests</button>
+    </nav>
+    <section class="panel"><div class="toolbar"><strong id="listTitle">Pending requests</strong><span id="resultCount" class="muted"></span></div><div id="requestList" class="list"><div class="empty">Sign in to load payment requests.</div></div><div id="pageStatus" class="statusline" role="status"></div></section>
+  </main>
+  <div class="foot">CampusKit Admin · Keep this URL private. Payment approval must be based on verified transaction records.</div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+const firebaseConfig={apiKey:"AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",authDomain:"campuskit-11f47.firebaseapp.com",projectId:"campuskit-11f47",storageBucket:"campuskit-11f47.firebasestorage.app",messagingSenderId:"900160377191",appId:"1:900160377191:web:44a0220ce9fb85f4391fc2",measurementId:"G-CM5NHSY03B"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),provider=new GoogleAuthProvider();
+const $=id=>document.getElementById(id);let currentStatus="pending",currentUser=null,allCounts={pending:0,approved:0,rejected:0};
+const featureNames={"ai-premium":"AI Assistant Premium","debate-tracker":"Debate Tracker","lab-mistake-detection":"Lab Mistake Detection","opponent-teacher":"Opponent Teacher","doubt-dna":"Doubt DNA","reverse-learning":"Reverse Learning"};
+const apiBase="https://campuskit-six.vercel.app/api/payments";
+function setStatus(message,isError=false){$("pageStatus").textContent=message;$("pageStatus").className="statusline"+(isError?" error":"");}
+async function api(method="GET",body=null,suffix=""){if(!currentUser)throw new Error("Please sign in first.");const token=await currentUser.getIdToken(true);const response=await fetch(apiBase+suffix,{method,headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();if(!response.ok)throw new Error(data.error||"Request failed.");return data;}
+function fmt(value){if(!value)return "—";try{return new Date(value).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"});}catch{return value;}}
+function addMeta(parent,label,value){const div=document.createElement("div");const b=document.createElement("b");b.textContent=label+": ";div.append(b,document.createTextNode(value||"—"));parent.append(div);}
+function render(items){const root=$("requestList");root.replaceChildren();$("resultCount").textContent=items.length+" shown";if(!items.length){const empty=document.createElement("div");empty.className="empty";empty.textContent="No "+currentStatus+" payment requests found.";root.append(empty);return;}
+for(const item of items){const card=document.createElement("article");card.className="request";const head=document.createElement("div");head.className="reqhead";const left=document.createElement("div");const title=document.createElement("div");title.className="reqtitle";title.textContent=featureNames[item.featureId]||item.featureId||"Payment";const sub=document.createElement("div");sub.className="muted";sub.style.fontSize="12px";sub.textContent=item.email||"Student account";left.append(title,sub);const right=document.createElement("div");right.style.textAlign="right";const amount=document.createElement("div");amount.className="amount";amount.textContent="₹"+(item.amount??"—");const pill=document.createElement("span");pill.className="pill "+(item.status||"pending");pill.textContent=item.status||"pending";right.append(amount,pill);head.append(left,right);card.append(head);
+const meta=document.createElement("div");meta.className="meta";addMeta(meta,"UPI reference (UTR)",item.utr);addMeta(meta,"Submitted",fmt(item.createdAt));addMeta(meta,"Reviewed",fmt(item.reviewedAt));addMeta(meta,"Request ID",item.id);card.append(meta);
+if(item.status==="pending"){const actions=document.createElement("div");actions.className="actions";const approve=document.createElement("button");approve.className="primary";approve.textContent="Approve payment";approve.addEventListener("click",()=>decide(item.id,"approve",approve));const reject=document.createElement("button");reject.className="danger";reject.textContent="Reject";reject.addEventListener("click",()=>decide(item.id,"reject",reject));actions.append(approve,reject);card.append(actions);}root.append(card);}}
+async function load(status=currentStatus){currentStatus=status;$("listTitle").textContent=status==="all"?"All payment requests":status[0].toUpperCase()+status.slice(1)+" requests";document.querySelectorAll(".tab").forEach(btn=>btn.classList.toggle("active",btn.dataset.status===status));$("requestList").innerHTML='<div class="empty">Loading…</div>';setStatus("Loading payment records…");try{const [data]=await Promise.all([api("GET",null,"?status="+encodeURIComponent(status)),...[]]);render(data.requests||[]);setStatus("Payment records loaded.");}catch(error){$("requestList").innerHTML='<div class="empty error"></div>';$("requestList").firstChild.textContent=error.message;setStatus(error.message,true);}}
+async function loadCounts(){try{for(const status of ["pending","approved","rejected"]){const data=await api("GET",null,"?status="+status);allCounts[status]=(data.requests||[]).length;$("count"+status[0].toUpperCase()+status.slice(1)).textContent=allCounts[status];}}catch(error){setStatus(error.message,true);}}
+async function refresh(){await loadCounts();await load(currentStatus);}
+async function decide(requestId,decision,button){const label=decision==="approve"?"Approve this payment and unlock the feature?":"Reject this payment request?";if(!confirm(label))return;button.disabled=true;try{await api("PATCH",{requestId,decision});setStatus("Request "+(decision==="approve"?"approved. Feature entitlement activated.":"rejected."));await refresh();}catch(error){setStatus(error.message,true);button.disabled=false;}}
+$("signIn").addEventListener("click",async()=>{try{$("loginStatus").textContent="Opening Google sign-in…";await signInWithPopup(auth,provider);}catch(error){$("loginStatus").textContent=error.message;}});
+$("signOut").addEventListener("click",()=>signOut(auth));
+$("refresh").addEventListener("click",refresh);
+document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>load(btn.dataset.status)));
+onAuthStateChanged(auth,async user=>{currentUser=user;$("userEmail").textContent=user?.email||"";$("signOut").classList.toggle("hidden",!user);$("loginPanel").classList.toggle("hidden",!!user);$("dashboard").classList.toggle("hidden",!user);if(user)await refresh();});
+</script>
+</body>
+</html>
