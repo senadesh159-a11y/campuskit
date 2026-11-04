@@ -1163,7 +1163,33 @@ footer{color:#7696A2!important}
 </section>
 </main>
 
-<section class="card app-view" id="ck-premium-payment" aria-labelledby="ck-premium-title"><div class="ck-premium-grid"><div><p class="ck-hero-pill">CAMPUSKIT • PREMIUM ACCESS</p><h2 id="ck-premium-title">Unlock more with Premium</h2><p>Choose the feature you want, scan the UPI QR and complete your payment.</p><div class="ck-premium-card"><h3>AI Assistant Premium</h3><p><strong>₹59</strong> · After 15 free questions per day, choose Premium or wait for the daily reset.</p></div><h3 style="margin-top:22px">Intelligence Lab — individual access</h3><div class="ck-price-list"><div class="ck-price-item"><span>Debate Tracker</span><strong>₹15</strong></div><div class="ck-price-item"><span>Lab Mistake Detection</span><strong>₹20</strong></div><div class="ck-price-item"><span>Opponent Teacher</span><strong>₹10</strong></div><div class="ck-price-item"><span>Doubt DNA</span><strong>₹30</strong></div><div class="ck-price-item"><span>Reverse Learning</span><strong>₹5</strong></div></div><p class="ck-premium-note">Other laboratory project prices are not listed because final prices have not been confirmed.</p></div><div class="ck-premium-card"><h3 style="text-align:center">Pay using UPI QR</h3><div class="ck-qr-wrap"><img src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&format=png&color=080808&bgcolor=f6d68d&data=upi%3A%2F%2Fpay%3Fpa%3D6001120467%40fam" alt="UPI payment QR for 6001120467@fam"></div><p style="text-align:center;margin:12px 0 4px"><strong>UPI ID: 6001120467@fam</strong></p><a class="ck-upi-button" href="upi://pay?pa=6001120467%40fam&pn=CampusKit" target="_blank" rel="noopener">Open UPI app</a><p class="ck-premium-note">Pay the exact amount for your selected feature and keep your UPI transaction reference number and receipt. This QR display does not itself verify payment or unlock features.</p></div></div></section>
+<section class="card app-view" id="ck-premium-payment" aria-labelledby="ck-premium-title"><div class="ck-premium-grid"><div><p class="ck-hero-pill">CAMPUSKIT • PREMIUM ACCESS</p><h2 id="ck-premium-title">Unlock more with Premium</h2><p>Choose the feature you want, scan the UPI QR and complete your payment.</p><div class="ck-premium-card"><h3>AI Assistant Premium</h3><p><strong>₹59</strong> · After 15 free questions per day, choose Premium or wait for the daily reset.</p></div><h3 style="margin-top:22px">Intelligence Lab — individual access</h3><div class="ck-price-list"><div class="ck-price-item"><span>Debate Tracker</span><strong>₹15</strong></div><div class="ck-price-item"><span>Lab Mistake Detection</span><strong>₹20</strong></div><div class="ck-price-item"><span>Opponent Teacher</span><strong>₹10</strong></div><div class="ck-price-item"><span>Doubt DNA</span><strong>₹30</strong></div><div class="ck-price-item"><span>Reverse Learning</span><strong>₹5</strong></div></div><p class="ck-premium-note">Other laboratory project prices are not listed because final prices have not been confirmed.</p></div><div class="ck-premium-card"><h3 style="text-align:center">Pay using UPI QR</h3><div class="ck-qr-wrap"><img src="https://api.qrserver.com/v1/create-qr-code/?size=420x420&format=png&color=080808&bgcolor=f6d68d&data=upi%3A%2F%2Fpay%3Fpa%3D6001120467%40fam" alt="UPI payment QR for 6001120467@fam"></div><p style="text-align:center;margin:12px 0 4px"><strong>UPI ID: 6001120467@fam</strong></p><a class="ck-upi-button" href="upi://pay?pa=6001120467%40fam&pn=CampusKit" target="_blank" rel="noopener">Open UPI app</a><p class="ck-premium-note">Pay the exact amount for your selected feature and keep your UPI transaction reference number and receipt. This QR display does not itself verify payment or unlock features.</p></div></div>
+<div class="ck-premium-card" style="margin-top:22px">
+  <h3>Submit payment reference</h3>
+  <p>After paying by UPI, enter your UTR here. Admin will verify the credit before enabling access.</p>
+  <form id="ck-payment-form">
+    <label for="ck-payment-feature">Feature purchased</label>
+    <select id="ck-payment-feature" required>
+      <option value="ai-premium">AI Assistant Premium — ₹59</option>
+      <option value="debate-tracker">Debate Tracker — ₹15</option>
+      <option value="lab-mistake-detection">Lab Mistake Detection — ₹20</option>
+      <option value="opponent-teacher">Opponent Teacher — ₹10</option>
+      <option value="doubt-dna">Doubt DNA — ₹30</option>
+      <option value="reverse-learning">Reverse Learning — ₹5</option>
+    </select>
+    <label for="ck-payment-utr">UPI transaction reference / UTR</label>
+    <input id="ck-payment-utr" required minlength="8" maxlength="24" autocomplete="off" placeholder="Enter 8–24 character UTR">
+    <button type="submit" id="ck-payment-submit">Submit for verification</button>
+    <p id="ck-payment-status" role="status" aria-live="polite"></p>
+  </form>
+</div>
+<div class="ck-premium-card" id="ck-admin-payments" hidden style="margin-top:18px">
+  <h3>Admin · Pending payment requests</h3>
+  <p>Check that the money has actually arrived in your UPI account before approving.</p>
+  <div id="ck-admin-payment-list">Loading…</div>
+  <button type="button" id="ck-admin-refresh">Refresh requests</button>
+</div>
+</section>
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
   <h2 id="relaxTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Student Relaxation Corner</h2>
@@ -2771,5 +2797,66 @@ loadLabExperiments("Physics");
 </script>
 
 <script src="./assets/intelligence-lab.js" defer></script>
+
+<script id="ck-payment-workflow">
+(() => {
+  const form=document.getElementById('ck-payment-form');
+  if(!form)return;
+  const status=document.getElementById('ck-payment-status');
+  const list=document.getElementById('ck-admin-payment-list');
+  const adminPanel=document.getElementById('ck-admin-payments');
+  async function token(){const value=await window.CampusKitAuth?.getIdToken();if(!value)throw new Error('Please sign in with Google first.');return value;}
+  async function api(method,body){
+    const idToken=await token();
+    const response=await fetch('https://campuskit-six.vercel.app/api/payments',{
+      method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+      ...(body?{body:JSON.stringify(body)}:{})
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||'Payment request failed.');
+    return data;
+  }
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const button=document.getElementById('ck-payment-submit');
+    button.disabled=true;status.textContent='Submitting…';
+    try{
+      const result=await api('POST',{featureId:document.getElementById('ck-payment-feature').value,utr:document.getElementById('ck-payment-utr').value.trim()});
+      status.textContent=result.message+' Amount: ₹'+result.amount+'. Keep your receipt until approval.';
+      form.reset();
+    }catch(error){status.textContent=error.message;}
+    finally{button.disabled=false;}
+  });
+  async function loadAdmin(){
+    try{
+      const data=await api('GET');
+      adminPanel.hidden=false;
+      list.replaceChildren();
+      if(!data.requests.length){list.textContent='No pending requests.';return;}
+      data.requests.forEach(item=>{
+        const card=document.createElement('div');card.className='ck-intel-entry';
+        const title=document.createElement('strong');title.textContent=item.featureId+' · ₹'+item.amount;
+        const detail=document.createElement('p');detail.textContent='Student: '+(item.email||item.uid)+' | UTR: '+item.utr;
+        const approve=document.createElement('button');approve.type='button';approve.textContent='Approve';
+        const reject=document.createElement('button');reject.type='button';reject.textContent='Reject';reject.className='delete-btn';
+        const act=async decision=>{
+          approve.disabled=reject.disabled=true;
+          try{await api('PATCH',{requestId:item.id,decision});await loadAdmin();}
+          catch(error){detail.textContent=error.message;approve.disabled=reject.disabled=false;}
+        };
+        approve.addEventListener('click',()=>act('approve'));
+        reject.addEventListener('click',()=>act('reject'));
+        card.append(title,detail,approve,reject);list.append(card);
+      });
+    }catch(error){
+      if(!String(error.message).includes('Admin access is not configured'))console.warn('Admin payment panel:',error.message);
+    }
+  }
+  document.getElementById('ck-admin-refresh')?.addEventListener('click',loadAdmin);
+  document.querySelector('.side-nav a[href="#ck-premium-payment"]')?.addEventListener('click',()=>setTimeout(loadAdmin,250));
+  window.addEventListener('hashchange',()=>{if(location.hash==='#ck-premium-payment')loadAdmin();});
+})();
+</script>
+
 </body>
 </html>
