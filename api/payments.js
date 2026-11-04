@@ -51,6 +51,14 @@ module.exports = async function handler(req, res) {
       return res.status(201).json({ ok: true, requestId: id, status: "pending", amount: PRICES[featureId], message: "Request submitted. Access unlocks only after the admin verifies the payment." });
     }
 
+    if (req.method === "GET" && typeof req.query?.check === "string") {
+      const featureId = req.query.check;
+      if (!Object.prototype.hasOwnProperty.call(PRICES, featureId)) return res.status(400).json({ error: "Unknown feature." });
+      const entitlement = await db.collection("users").doc(user.uid).collection("entitlements").doc(featureId).get();
+      const data = entitlement.exists ? entitlement.data() : {};
+      return res.status(200).json({ active: data.status === "active", featureId });
+    }
+
     if (user.uid !== process.env.CAMPUSKIT_ADMIN_UID) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
     }
