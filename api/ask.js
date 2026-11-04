@@ -133,7 +133,8 @@ Student question: ${question.trim()}`;
     for (const modelName of models) {
       try {
         const model = genAI.getGenerativeModel({
-          model: modelName
+          model: modelName,
+          quota: { used: quotaState.used, remaining: quotaState.remaining, premium: quotaState.premium, limit: quotaState.premium ? null : 15, resetTimeZone: "Asia/Kolkata" }
         });
 
         const content = imagePart ? [{ text: prompt }, imagePart] : prompt;
