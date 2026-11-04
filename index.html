@@ -1200,23 +1200,18 @@ footer{color:#7696A2!important}
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
   <h2 id="relaxTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>Student Relaxation Corner</h2>
-  <p>Take a short break with calm music. Add a YouTube or Spotify track link to the shared campus playlist.</p>
+  <p>Take a quiet break with the CampusKit music library. Only tracks uploaded by the CampusKit admin appear here.</p>
   <div class="music-grid">
     <div class="card">
       <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></span>Now playing</h3>
-      <p id="musicPlayerHint">Choose a track from the playlist to play it here.</p>
-      <iframe id="musicPlayer" class="music-embed" title="Relaxation music player" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen src="about:blank"></iframe>
-      <p class="item-meta">Use relaxing music at a comfortable volume. Music is not a treatment for persistent headaches.</p>
+      <p id="musicPlayerHint">Choose a track from the campus library.</p>
+      <audio id="musicPlayer" class="music-embed" controls preload="metadata" style="width:100%"></audio>
+      <p id="musicStatus" class="item-meta" role="status" aria-live="polite">Choose a song to start listening.</p>
+      <p class="item-meta">Use relaxing music at a comfortable volume.</p>
     </div>
     <div class="card">
-      <h3>＋ Add a track</h3>
-      <form id="musicForm">
-        <label for="musicTitle">Song / playlist title</label><input id="musicTitle" required maxlength="120" placeholder="e.g. Calm study music">
-        <label for="musicUrl">YouTube or Spotify link</label><input id="musicUrl" type="url" required placeholder="https://youtu.be/...">
-        <button type="submit">Add to shared playlist</button>
-        <p id="musicStatus" role="status" aria-live="polite"></p>
-      </form>
-      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/><path d="M8 12h8M12 8v8"/></svg></span>Campus playlist</h3><ul id="musicList"><li>Loading shared playlist…</li></ul>
+      <h3 class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.5-8 11-8 11Z"/></svg></span>Campus music library</h3>
+      <ul id="musicList"><li>Loading approved tracks…</li></ul>
     </div>
   </div>
 </section>
@@ -1969,6 +1964,7 @@ window.CampusKitCloud = {
     onSnapshot,
     query,
     orderBy,
+    where,
     limit
   } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
@@ -2179,96 +2175,47 @@ window.CampusKitCloud = {
     finally { connectDriveBtn.disabled = false; }
   });
 
-  // Shared relaxation playlist: all students read the same Firestore collection.
-  const musicForm = document.getElementById("musicForm");
+  // Student relaxation playlist: read-only library of admin-published Drive audio.
   const musicList = document.getElementById("musicList");
   const musicStatus = document.getElementById("musicStatus");
   const musicPlayer = document.getElementById("musicPlayer");
   const musicPlayerHint = document.getElementById("musicPlayerHint");
-  function safeMusicUrl(raw) {
-    try {
-      const u = new URL(raw.trim());
-      if (u.protocol !== "https:") return null;
-      const host = u.hostname.toLowerCase();
-      const validId = id => /^[A-Za-z0-9_-]{6,40}$/.test(id || "");
-
-      // YouTube video, Shorts, embed, youtu.be, and playlist links.
-      if (host === "youtu.be") {
-        const id = u.pathname.split("/").filter(Boolean)[0] || "";
-        if (!validId(id)) return null;
-        return { type: "youtube-video", id, list: u.searchParams.get("list") || "", url: u.href };
-      }
-      if (["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
-        const list = u.searchParams.get("list") || "";
-        if (u.pathname === "/playlist" && validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
-        const parts = u.pathname.split("/").filter(Boolean);
-        let id = "";
-        if (u.pathname === "/watch") id = u.searchParams.get("v") || "";
-        else if (["embed", "shorts", "live"].includes(parts[0])) id = parts[1] || "";
-        if (validId(id)) return { type: "youtube-video", id, list, url: u.href };
-        if (validId(list)) return { type: "youtube-playlist", id: "", list, url: u.href };
-      }
-
-      // Spotify track, album, playlist, episode, or show URLs.
-      if (["open.spotify.com", "www.open.spotify.com"].includes(host)) {
-        const match = u.pathname.match(/^\/(track|album|playlist|episode|show)\/([A-Za-z0-9]+)\/?$/);
-        if (match) return { type: "spotify", kind: match[1], id: match[2], url: u.href };
-      }
-    } catch (_) {}
-    return null;
-  }
   function playMusic(item) {
-    const parsed = safeMusicUrl(item.url || "");
-    if (!parsed) {
-      musicStatus.textContent = "This link is not supported. Use a YouTube video/playlist or Spotify track/playlist link.";
-      return;
-    }
-    musicPlayerHint.textContent = item.title || "Relaxation track";
-    if (parsed.type === "youtube-playlist") {
-      musicPlayer.src = `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(parsed.list)}&autoplay=1`;
-    } else if (parsed.type === "youtube-video") {
-      const listPart = parsed.list ? `&list=${encodeURIComponent(parsed.list)}` : "";
-      musicPlayer.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(parsed.id)}?autoplay=1&rel=0${listPart}`;
-    } else {
-      musicPlayer.src = `https://open.spotify.com/embed/${parsed.kind}/${encodeURIComponent(parsed.id)}?utm_source=generator`;
-    }
-    musicPlayer.title = `Player: ${item.title || "Relaxation track"}`;
-    musicStatus.textContent = "Player loaded. If playback does not start automatically, press Play inside the player.";
+    if (!item?.downloadUrl) return;
+    musicPlayer.pause();
+    musicPlayer.src = item.downloadUrl;
+    musicPlayer.load();
+    musicPlayerHint.textContent = item.title || "CampusKit track";
+    musicPlayer.play().catch(() => {
+      musicStatus.textContent = "Track loaded. Press Play to start listening.";
+    });
+    musicPlayer.title = "Player: " + (item.title || "CampusKit track");
   }
   function renderMusic(items) {
     musicList.replaceChildren();
-    if (!items.length) { const li = document.createElement("li"); li.textContent = "No tracks yet. Sign in and add the first one."; musicList.append(li); return; }
+    if (!items.length) {
+      const li=document.createElement("li");
+      li.textContent="No music has been uploaded yet. Please check again later.";
+      musicList.append(li); return;
+    }
     items.forEach(item => {
-      const li = document.createElement("li"); li.className = "music-item";
-      const info = document.createElement("div");
-      const title = document.createElement("strong"); title.textContent = item.title || "Untitled track";
-      const link = document.createElement("a"); link.href = item.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.textContent = "Open track";
-      info.append(title, document.createElement("br"), link);
-      const play = document.createElement("button"); play.type = "button"; play.textContent = "Play"; play.addEventListener("click", () => playMusic(item));
-      li.append(info, play); musicList.append(li);
+      const li=document.createElement("li"); li.className="music-item";
+      const info=document.createElement("div");
+      const title=document.createElement("strong"); title.textContent=item.title || "Untitled track";
+      const meta=document.createElement("p"); meta.className="item-meta"; meta.textContent=item.artist || "CampusKit music library";
+      info.append(title,meta);
+      const play=document.createElement("button"); play.type="button"; play.textContent="Play";
+      play.addEventListener("click",()=>playMusic(item));
+      li.append(info,play); musicList.append(li);
     });
   }
-  onSnapshot(query(collection(db, "publicMusic"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
-    renderMusic(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+  onSnapshot(query(collection(db, "publicMusic"), where("status", "==", "published"), where("source", "==", "google-drive"), orderBy("createdAt", "desc"), limit(100)), snapshot => {
+    const approved=snapshot.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(item=>item.status==="published" && item.source==="google-drive" && typeof item.downloadUrl==="string");
+    renderMusic(approved);
   }, error => {
-    console.error("Shared music playlist error:", error);
-    musicList.textContent = "Playlist needs Firestore rules setup. See the instructions provided with this code.";
-  });
-  musicForm.addEventListener("submit", async event => {
-    event.preventDefault();
-    const title = document.getElementById("musicTitle").value.trim();
-    const rawUrl = document.getElementById("musicUrl").value.trim();
-    const parsed = safeMusicUrl(rawUrl);
-    if (!parsed) { musicStatus.textContent = "Unsupported link. Use an HTTPS YouTube video/playlist or Spotify track/album/playlist/episode link."; return; }
-    if (!auth.currentUser) { musicStatus.textContent = "Sign in with Google before adding a shared track."; return; }
-    musicStatus.textContent = "Adding track…";
-    try {
-      await addDoc(collection(db, "publicMusic"), { title, url: parsed.url, type: parsed.type, addedBy: auth.currentUser.displayName || "CampusKit student", createdAt: new Date().toISOString() });
-      musicForm.reset(); musicStatus.textContent = "Added to the shared playlist for students.";
-    } catch (error) {
-      console.error("Could not add shared music:", error);
-      musicStatus.textContent = "Could not add: " + (error.code || error.message || "unknown error") + ". Check Firestore rules for publicMusic and confirm you are signed in.";
-    }
+    console.error("CampusKit music library error:",error);
+    musicList.textContent="Music library is temporarily unavailable. Please try again later.";
   });
 
   // Use the same popup flow on mobile and desktop. Redirect sign-in can

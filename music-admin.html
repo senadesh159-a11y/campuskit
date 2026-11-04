@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08091f">
+<title>CampusKit Music Admin</title>
+<style>
+:root{color-scheme:dark;--bg:#08091f;--panel:rgba(20,19,49,.82);--border:rgba(173,150,255,.3);--text:#f2efff;--muted:#c9c3df;--accent:#8b5cf6;--soft:#d8c8ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:28px 16px;font:16px/1.6 Arial,sans-serif;color:var(--text);background:radial-gradient(ellipse at 15% 20%,rgba(139,92,246,.22),transparent 45%),radial-gradient(ellipse at 85% 30%,rgba(59,130,246,.2),transparent 45%),var(--bg)}
+main{width:min(760px,100%);margin:auto}.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:24px;margin:18px 0;backdrop-filter:blur(12px)}h1,h2{line-height:1.2}h1{font-size:clamp(1.7rem,5vw,2.4rem)}p,.muted{color:var(--muted)}label{display:block;margin:14px 0 6px;font-weight:700}input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#11112d;color:var(--text)}button,.button{border:0;border-radius:10px;padding:11px 16px;background:var(--accent);color:white;font-weight:700;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.status{min-height:1.5em;color:var(--soft)}.track{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.track small{display:block;color:var(--muted)}a{color:var(--soft)}.hidden{display:none!important}
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<main>
+<p><a href="./index.html">← Back to CampusKit</a></p>
+<h1>CampusKit Music Admin</h1>
+<p>Private upload dashboard. Only the authorized CampusKit administrator can manage the student music library.</p>
+<section class="panel" id="loginPanel">
+<h2>Admin sign-in</h2><p>Sign in with the authorized Google account.</p>
+<button id="loginBtn" type="button">Sign in with Google</button>
+<p id="authStatus" class="status" role="status" aria-live="polite">Checking sign-in…</p>
+</section>
+<section class="panel hidden" id="adminPanel">
+<h2>Upload a track</h2>
+<p id="adminIdentity" class="muted"></p>
+<label for="songTitle">Song title</label><input id="songTitle" maxlength="120" placeholder="e.g. Peaceful study ambience" required>
+<label for="songArtist">Artist (optional)</label><input id="songArtist" maxlength="120" placeholder="Artist name">
+<label for="audioFile">Audio file</label><input id="audioFile" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac" required>
+<p class="muted">Free Drive storage is used. Keep uploads reasonably sized; Google Drive sharing and streaming limits may apply.</p>
+<div class="actions"><button id="uploadBtn" type="button">Upload and publish</button><button id="logoutBtn" type="button">Sign out</button></div>
+<p id="uploadStatus" class="status" role="status" aria-live="polite"></p>
+</section>
+<section class="panel hidden" id="libraryPanel"><h2>Published tracks</h2><div id="adminTracks">Loading…</div></section>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import {getFirestore,collection,addDoc,onSnapshot,query,orderBy,where,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+const ADMIN_EMAIL="senadesh159@gmail.com";
+const DRIVE_CLIENT_ID="900160377191-o1gh5h2a0n03gue021b1ri9npg3gonst.apps.googleusercontent.com";
+const app=initializeApp({apiKey:"AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I",authDomain:"campuskit-11f47.firebaseapp.com",projectId:"campuskit-11f47",storageBucket:"campuskit-11f47.firebasestorage.app",messagingSenderId:"900160377191",appId:"1:900160377191:web:44a0220ce9fb85f4391fc2"});
+const auth=getAuth(app),db=getFirestore(app),provider=new GoogleAuthProvider();
+const $=id=>document.getElementById(id);
+let driveToken=null,tokenClient=null,tokenWait=null,stopTracks=null;
+function status(id,msg,isError=false){$(id).textContent=msg;$(id).style.color=isError?"#ff9cab":"#d8c8ff";}
+function showAdmin(user){
+ const allowed=!!user&&user.email===ADMIN_EMAIL&&user.emailVerified;
+ $("loginPanel").classList.toggle("hidden",allowed);
+ $("adminPanel").classList.toggle("hidden",!allowed);
+ $("libraryPanel").classList.toggle("hidden",!allowed);
+ if(allowed){$("adminIdentity").textContent="Signed in as "+user.email;if(!stopTracks)watchTracks();}
+ else if(user)status("authStatus","This Google account is not authorized. Use "+ADMIN_EMAIL+".",true);
+}
+onAuthStateChanged(auth,user=>showAdmin(user));
+$("loginBtn").addEventListener("click",async()=>{try{await signInWithPopup(auth,provider);}catch(e){status("authStatus",e.message,true);}});
+$("logoutBtn").addEventListener("click",()=>signOut(auth));
+function waitGIS(){return new Promise((resolve,reject)=>{let n=0;const tick=()=>{if(window.google?.accounts?.oauth2)return resolve();if(++n>100)return reject(new Error("Google Drive sign-in did not load. Reload and try again."));setTimeout(tick,150);};tick();});}
+async function getDriveToken(){await waitGIS();if(driveToken)return driveToken;return new Promise(async(resolve,reject)=>{tokenWait={resolve:v=>{driveToken=v;resolve(v);},reject};if(!tokenClient)tokenClient=google.accounts.oauth2.initTokenClient({client_id:DRIVE_CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.file",callback:r=>{if(r.error)tokenWait?.reject(new Error(r.error_description||r.error));else tokenWait?.resolve(r.access_token);tokenWait=null;},error_callback:e=>{tokenWait?.reject(new Error(e.message||"Drive authorization failed"));tokenWait=null;}});tokenClient.requestAccessToken({prompt:"consent"});});}
+async function driveRequest(url,options={}){const token=await getDriveToken();const response=await fetch(url,{...options,headers:{Authorization:"Bearer "+token,...(options.headers||{})}});if(!response.ok){let msg="";try{msg=(await response.json()).error?.message||"";}catch{}if(response.status===401)driveToken=null;throw new Error("Google Drive ("+response.status+"): "+(msg||response.statusText));}return response;}
+async function uploadDriveFile(file,title){
+ const metadata={name:title+" - "+file.name,mimeType:file.type||"application/octet-stream",description:"CampusKit student relaxation library"};
+ const init=await driveRequest("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,name,mimeType,size",{method:"POST",headers:{"Content-Type":"application/json; charset=UTF-8","X-Upload-Content-Type":metadata.mimeType,"X-Upload-Content-Length":String(file.size)},body:JSON.stringify(metadata)});
+ const uploadUrl=init.headers.get("Location");if(!uploadUrl)throw new Error("Drive did not return an upload URL.");
+ const put=await fetch(uploadUrl,{method:"PUT",headers:{"Content-Type":metadata.mimeType},body:file});if(!put.ok)throw new Error("Audio upload failed ("+put.status+").");
+ const saved=await put.json();
+ await driveRequest("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(saved.id)+"/permissions?fields=id",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"anyone",role:"reader"})});
+ return {id:saved.id,url:"https://drive.google.com/uc?export=download&id="+encodeURIComponent(saved.id)};
+}
+$("uploadBtn").addEventListener("click",async()=>{
+ const user=auth.currentUser,file=$("audioFile").files[0],title=$("songTitle").value.trim(),artist=$("songArtist").value.trim();
+ if(!user||user.email!==ADMIN_EMAIL||!user.emailVerified){status("uploadStatus","Admin sign-in required.",true);return;}
+ if(!file||!title){status("uploadStatus","Enter a title and choose an audio file.",true);return;}
+ if(!(file.type.startsWith("audio/")||/\.(mp3|m4a|wav|ogg|flac)$/i.test(file.name))){status("uploadStatus","Please select a supported audio file.",true);return;}
+ $("uploadBtn").disabled=true;status("uploadStatus","Uploading audio to Google Drive…");
+ let uploaded=null;
+ try{
+  uploaded=await uploadDriveFile(file,title);
+  await addDoc(collection(db,"publicMusic"),{title,artist,source:"google-drive",driveFileId:uploaded.id,downloadUrl:uploaded.url,status:"published",createdAt:new Date().toISOString(),uploadedBy:user.email,fileName:file.name,mimeType:file.type||"audio/mpeg",size:file.size});
+  $("songTitle").value="";$("songArtist").value="";$("audioFile").value="";
+  status("uploadStatus","Uploaded and published. It should now appear in CampusKit Relaxation.");
+ }catch(e){
+  console.error(e);status("uploadStatus","Upload/publish failed: "+e.message,true);
+  if(uploaded)status("uploadStatus","Drive file uploaded but playlist publish failed. Apply the Firestore rules, then retry or remove the orphan file from Drive.",true);
+ }finally{$("uploadBtn").disabled=false;}
+});
+function watchTracks(){stopTracks=onSnapshot(query(collection(db,"publicMusic"),where("status","==","published"),where("source","==","google-drive"),orderBy("createdAt","desc")),snap=>{const root=$("adminTracks");root.replaceChildren();const tracks=snap.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.source==="google-drive");if(!tracks.length){root.textContent="No uploaded tracks yet.";return;}for(const t of tracks){const row=document.createElement("div");row.className="track";const info=document.createElement("div"),name=document.createElement("strong"),meta=document.createElement("small");name.textContent=t.title||"Untitled";meta.textContent=(t.artist||"Unknown artist")+" · "+(t.fileName||"Audio");info.append(name,meta);const del=document.createElement("button");del.textContent="Delete";del.addEventListener("click",async()=>{if(!confirm("Delete this track from the student library and Drive?"))return;del.disabled=true;try{await driveRequest("https://www.googleapis.com/drive/v3/files/"+encodeURIComponent(t.driveFileId),{method:"DELETE"});await deleteDoc(doc(db,"publicMusic",t.id));}catch(e){status("uploadStatus","Delete failed: "+e.message,true);del.disabled=false;}});row.append(info,del);root.append(row);}},e=>{console.error(e);$("adminTracks").textContent="Could not load tracks. Check Firestore rules.";});}
+</script>
+</body></html>
