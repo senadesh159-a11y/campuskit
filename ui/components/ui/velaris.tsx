@@ -51,7 +51,7 @@ export function Velaris({bg="#11102d",colors=["#8057e8","#3158c9","#bd64df","#4b
  const canvasRef=useRef<HTMLCanvasElement>(null);
  useEffect(()=>{
   const canvas=canvasRef.current; if(!canvas) return;
-  const gl=canvas.getContext("webgl",{alpha:false,antialias:false,powerPreference:"low-power"}); if(!gl) return;
+  const gl=canvas.getContext("webgl",{alpha:true,antialias:false,powerPreference:"low-power"}); if(!gl) return;
   let program:WebGLProgram|null=null, buffer:WebGLBuffer|null=null, frame=0;
   const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   try{
@@ -59,7 +59,7 @@ export function Velaris({bg="#11102d",colors=["#8057e8","#3158c9","#bd64df","#4b
    program=gl.createProgram(); if(!program) throw new Error("Unable to create program");
    gl.attachShader(program,vs); gl.attachShader(program,fs); gl.linkProgram(program); gl.deleteShader(vs); gl.deleteShader(fs);
    if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program)||"Program link failed");
-   gl.useProgram(program); buffer=gl.createBuffer(); if(!buffer) throw new Error("Unable to create buffer");
+   gl.useProgram(program); gl.clearColor(0.04,0.09,0.16,1); buffer=gl.createBuffer(); if(!buffer) throw new Error("Unable to create buffer");
    gl.bindBuffer(gl.ARRAY_BUFFER,buffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
    const pos=gl.getAttribLocation(program,"position"); gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
    const timeLoc=gl.getUniformLocation(program,"uTime"), grainLoc=gl.getUniformLocation(program,"uGrain"), colorsLoc=gl.getUniformLocation(program,"uColors"), bgLoc=gl.getUniformLocation(program,"uBg");
@@ -71,5 +71,5 @@ export function Velaris({bg="#11102d",colors=["#8057e8","#3158c9","#bd64df","#4b
    return ()=>{cancelAnimationFrame(frame);observer?.disconnect();window.removeEventListener("resize",resize);if(buffer)gl.deleteBuffer(buffer);if(program)gl.deleteProgram(program);gl.getExtension("WEBGL_lose_context")?.loseContext();};
   }catch(error){console.error("[Velaris] WebGL initialization failed:",error);gl.getExtension("WEBGL_lose_context")?.loseContext();}
  },[bg,colors.join("|"),speed,grain]);
- return <div className={cn("relative isolate overflow-hidden",className)} style={{height,background:bg}}><canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full"/><div className="relative z-10 h-full">{children}</div></div>;
+ return <div className={cn("relative isolate overflow-hidden velaris-fallback-bg",className)} style={{height,background:"linear-gradient(120deg,#071827,#103c50,#252044,#071827)",backgroundSize:"300% 300%"}}><canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full"/><div className="relative z-10 h-full">{children}</div></div>;
 }
