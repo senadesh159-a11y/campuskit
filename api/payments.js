@@ -64,8 +64,10 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === "GET") {
-      const snapshot = await requests.where("status", "==", "pending").orderBy("createdAt", "asc").limit(100).get();
-      return res.status(200).json({ requests: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate?.().toISOString() || null })) });
+      const snapshot = await requests.where("status", "==", "pending").limit(100).get();
+      const pending = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), createdAt: doc.data().createdAt?.toDate?.().toISOString() || null }));
+      pending.sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")));
+      return res.status(200).json({ requests: pending });
     }
 
     const requestId = String(req.body?.requestId || "");
