@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#campuskit-velaris-root { position: relative; z-index: 1; }
+.velaris-section { width: min(100% - 36px, 1000px); margin: 0 auto 24px; }
+.velaris-panel { min-height: 260px; border-radius: 22px; overflow: hidden; isolation: isolate; }
+.velaris-copy { position: relative; z-index: 2; padding: clamp(24px, 5vw, 48px); color: #fff; }
+.velaris-copy h2 { margin: 0 0 10px; font-size: clamp(26px, 4vw, 42px); line-height: 1.12; color: #fff; }
+.velaris-copy p { max-width: 620px; color: rgba(255,255,255,.82); margin: 0; }
+@media (prefers-reduced-motion: reduce) { .velaris-static * { animation: none !important; } }
