@@ -35,8 +35,28 @@ a{color:inherit;text-decoration:none}.top{height:64px;display:flex;align-items:c
 </section>
 </main>
 <script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js';
+import {getAuth} from 'https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js';
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const labFirebaseApp=initializeApp({
+ apiKey:'AIzaSyDNs2ztqW4077C_-ngxEqkGhTrWcZbvL4I',
+ authDomain:'campuskit-11f47.firebaseapp.com',
+ projectId:'campuskit-11f47',
+ storageBucket:'campuskit-11f47.firebasestorage.app',
+ messagingSenderId:'900160377191',
+ appId:'1:900160377191:web:44a0220ce9fb85f4391fc2',
+ measurementId:'G-CM5NHSY03B'
+});
+const labAuth=getAuth(labFirebaseApp);
+async function getLabIdToken(){
+ if(window.parent!==window){
+  const parentToken=await window.parent.CampusKitAuth?.getIdToken();
+  if(parentToken)return parentToken;
+ }
+ await labAuth.authStateReady();
+ return labAuth.currentUser?await labAuth.currentUser.getIdToken():null;
+}
 const experiments=[
 ['Physics','Simple Pendulum','Mechanics','pendulum'],['Physics','Projectile Motion','Mechanics','projectile'],['Physics','Wave Interference','Waves & optics','wave'],['Physics','Electromagnetic Field','Electromagnetism','field'],['Physics','Gravitational Orbits','Mechanics','orbit'],['Physics','Doppler Effect','Waves','wave'],['Physics','Refraction & Reflection','Optics','prism'],['Physics','Spring-Mass System','Mechanics','spring'],['Physics',"Ohm's Law Circuit",'Electricity','circuit'],['Physics','Double-Slit Experiment','Quantum optics','wave'],
 ['Chemistry','Atomic Structure','Atomic model','atom'],['Chemistry','Chemical Bonding','Molecular model','molecule'],['Chemistry','Electrolysis','Electrochemistry','electrolysis'],['Chemistry','Acid-Base Titration','Volumetric analysis','titration'],['Chemistry','Gas Laws (PV=nRT)','Physical chemistry','gas'],['Chemistry','Acid-Base Reactions','Reactions','molecule'],['Chemistry','Crystal Lattice Structures','Solid state','lattice'],['Chemistry','Molecular Diffusion','Kinetics','diffusion'],['Chemistry','Exothermic & Endothermic','Thermochemistry','reaction'],['Chemistry','Periodic Table Trends','Periodic properties','atom'],
@@ -166,7 +186,7 @@ function draw2D(){
  ctx.restore();ctx.fillStyle='#c3dcde';ctx.font='12px system-ui';ctx.fillText('2D INTERACTIVE MODEL · Drag to move · Scroll to zoom · Adjust sliders',16,h-18);
 }
 $('#back').onclick=()=>{dispose();$('#viewer').classList.remove('open');$('#catalogView').classList.remove('hidden');history.replaceState(null,'',location.pathname)};$('#resetView').onclick=()=>{camera.position.set(7,5,9);orbit.target.set(0,1,0);orbit.update()};$('#topView').onclick=()=>{camera.position.set(0,12,.01);orbit.target.set(0,0,0);orbit.update()};$('#frontView').onclick=()=>{camera.position.set(0,2,12);orbit.target.set(0,1,0);orbit.update()};$('#fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.querySelector('.viewport').requestFullscreen?.();
-async function launchExperiment(experiment){const paid=paidExperiments[experiment[1]];if(paid){try{const token=await window.parent.CampusKitAuth?.getIdToken();if(!token)throw new Error('Please sign in to CampusKit first.');const response=await fetch('https://campuskit-six.vercel.app/api/payments?check='+encodeURIComponent(paid[0]),{headers:{Authorization:'Bearer '+token}});if(!response.ok)throw new Error('Access could not be checked. Please try again.');const access=await response.json();if(!access.active){const parent=window.parent;parent.location.hash='ck-premium-payment';const selector=parent.document.getElementById('ck-payment-feature');if(selector){selector.value=paid[0];selector.dispatchEvent(new Event('change',{bubbles:true}));}alert('This practical costs ₹'+paid[1]+'. Submit your UTR and wait for admin approval to unlock it.');return;}}catch(error){alert(error.message);return;}}openExp(experiment)}
+async function launchExperiment(experiment){const paid=paidExperiments[experiment[1]];if(paid){try{const token=await getLabIdToken();if(!token)throw new Error('Please sign in to CampusKit first.');const response=await fetch('https://campuskit-six.vercel.app/api/payments?check='+encodeURIComponent(paid[0]),{headers:{Authorization:'Bearer '+token}});if(!response.ok)throw new Error('Access could not be checked. Please try again.');const access=await response.json();if(!access.active){const parent=window.parent;parent.location.hash='ck-premium-payment';const selector=parent.document.getElementById('ck-payment-feature');if(selector){selector.value=paid[0];selector.dispatchEvent(new Event('change',{bubbles:true}));}alert('This practical costs ₹'+paid[1]+'. Submit your UTR and wait for admin approval to unlock it.');return;}}catch(error){alert(error.message);return;}}openExp(experiment)}
 $('#catalog').addEventListener('click',async e=>{let a=e.target.closest('a.exp');if(!a)return;e.preventDefault();let name=decodeURIComponent(a.getAttribute('href').slice(1));const experiment=experiments.find(x=>x[1]===name);if(experiment)await launchExperiment(experiment)});
 let initial=decodeURIComponent(location.hash.slice(1));if(initial){let found=experiments.find(x=>x[1]===initial);if(found)launchExperiment(found)}
 </script>
