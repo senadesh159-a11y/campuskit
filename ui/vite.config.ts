@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 export default defineConfig({
   root: __dirname,
   plugins: [react()],
+  resolve: { alias: { "@": resolve(__dirname, "src") } },
   base: "./",
   build: {
     outDir: resolve(__dirname, "../assets/velaris"),
