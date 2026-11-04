@@ -2479,7 +2479,14 @@ window.CampusKitCloud = {
       clearSelectedImage();
     } catch (error) {
       addMessage("CampusKit AI", error.message || "Sorry, the AI could not respond. Please try again.");
-      status.textContent = "Request failed.";
+      if (String(error.message || "").includes("15 free AI questions")) {
+        status.textContent = error.message;
+        const upgradeLink = document.createElement("a");
+        upgradeLink.href = "#ck-premium-payment";
+        upgradeLink.textContent = "View AI Premium options";
+        upgradeLink.style.cssText = "display:inline-block;margin:8px 0;color:#67D6D8;font-weight:700;";
+        chat.appendChild(upgradeLink);
+      } else status.textContent = "Request failed: " + (error.message || "Please try again.");
       console.error("CampusKit AI error:", error);
     } finally {
       sendButton.disabled = false;
