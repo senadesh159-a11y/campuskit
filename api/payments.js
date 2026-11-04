@@ -77,7 +77,9 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ active: data.status === "active", featureId });
     }
 
-    if (!process.env.CAMPUSKIT_ADMIN_EMAIL || (user.email || "").toLowerCase() !== process.env.CAMPUSKIT_ADMIN_EMAIL.toLowerCase()) {
+    const adminEmails = (process.env.CAMPUSKIT_ADMIN_EMAILS || process.env.CAMPUSKIT_ADMIN_EMAIL || "")
+      .split(",").map(email => email.trim().toLowerCase()).filter(Boolean);
+    if (!adminEmails.includes((user.email || "").toLowerCase())) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
     }
 
