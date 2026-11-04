@@ -9,3 +9,8 @@
 .velaris-copy h2 { margin: 0 0 10px; font-size: clamp(26px, 4vw, 42px); line-height: 1.12; color: #fff; }
 .velaris-copy p { max-width: 620px; color: rgba(255,255,255,.82); margin: 0; }
 @media (prefers-reduced-motion: reduce) { .velaris-static * { animation: none !important; } }
+
+@keyframes velarisFallbackFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.velaris-fallback-bg { animation: velarisFallbackFlow 14s ease-in-out infinite; }
+.velaris-fallback-bg canvas { background: transparent; }
+@media (prefers-reduced-motion: reduce) { .velaris-fallback-bg { animation: none; } }
