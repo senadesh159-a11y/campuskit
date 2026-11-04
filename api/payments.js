@@ -59,7 +59,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ active: data.status === "active", featureId });
     }
 
-    if (user.uid !== process.env.CAMPUSKIT_ADMIN_UID) {
+    if (!process.env.CAMPUSKIT_ADMIN_EMAIL || (user.email || "").toLowerCase() !== process.env.CAMPUSKIT_ADMIN_EMAIL.toLowerCase()) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
     }
 
