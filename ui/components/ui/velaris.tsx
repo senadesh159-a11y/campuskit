@@ -63,7 +63,7 @@ export function Velaris({bg="#11102d",colors=["#8057e8","#3158c9","#bd64df","#4b
    gl.bindBuffer(gl.ARRAY_BUFFER,buffer); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
    const pos=gl.getAttribLocation(program,"position"); gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
    const timeLoc=gl.getUniformLocation(program,"uTime"), grainLoc=gl.getUniformLocation(program,"uGrain"), colorsLoc=gl.getUniformLocation(program,"uColors"), bgLoc=gl.getUniformLocation(program,"uBg");
-   const palette=[...colors,...colors].slice(0,4).flatMap(toRgb);
+   const palette=Array.from({length:4},(_,i)=>toRgb(colors[i % Math.max(1,colors.length)] || "#8057e8")).flat();
    const resize=()=>{const dpr=Math.min(devicePixelRatio||1,1.75),w=Math.max(1,Math.floor(canvas.clientWidth*dpr)),h=Math.max(1,Math.floor(canvas.clientHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}};
    const observer=typeof ResizeObserver!=="undefined"?new ResizeObserver(resize):null; observer?.observe(canvas); window.addEventListener("resize",resize); resize();
    const draw=(now:number)=>{resize();gl.useProgram(program);gl.uniform1f(timeLoc,reduced?0:now/1000*Math.max(0,speed));gl.uniform1f(grainLoc,Math.max(0,Math.min(grain,.5)));gl.uniform3fv(colorsLoc,new Float32Array(palette));gl.uniform3fv(bgLoc,new Float32Array(toRgb(bg)));gl.drawArrays(gl.TRIANGLE_STRIP,0,4);if(!reduced)frame=requestAnimationFrame(draw);};
