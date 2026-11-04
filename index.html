@@ -1196,12 +1196,6 @@ footer{color:#7696A2!important}
   <div id="ck-my-payment-list" aria-live="polite">Sign in and refresh to view your requests.</div>
   <button type="button" id="ck-my-payment-refresh">Refresh my requests</button>
 </div>
-<div class="ck-premium-card" id="ck-admin-payments" hidden style="margin-top:18px">
-  <h3>Admin · Pending payment requests</h3>
-  <p>Check that the money has actually arrived in your UPI account before approving.</p>
-  <div id="ck-admin-payment-list">Loading…</div>
-  <button type="button" id="ck-admin-refresh">Refresh requests</button>
-</div>
 </section>
 
 <section class="card app-view" id="relaxation-section" aria-labelledby="relaxTitle">
@@ -2824,8 +2818,6 @@ loadLabExperiments("Physics");
   const form=document.getElementById('ck-payment-form');
   if(!form)return;
   const status=document.getElementById('ck-payment-status');
-  const list=document.getElementById('ck-admin-payment-list');
-  const adminPanel=document.getElementById('ck-admin-payments');
   async function token(){const value=await window.CampusKitAuth?.getIdToken();if(!value)throw new Error('Please sign in with Google first.');return value;}
   async function api(method,body,suffix=''){
     const idToken=await token();
@@ -2887,35 +2879,8 @@ loadLabExperiments("Physics");
       });
     }catch(error){myList.textContent=error.message;}
   }
-  async function loadAdmin(){
-    try{
-      const data=await api('GET');
-      adminPanel.hidden=false;
-      list.replaceChildren();
-      if(!data.requests.length){list.textContent='No pending requests.';return;}
-      data.requests.forEach(item=>{
-        const card=document.createElement('div');card.className='ck-intel-entry';
-        const title=document.createElement('strong');title.textContent=item.featureId+' · ₹'+item.amount;
-        const detail=document.createElement('p');detail.textContent='Student: '+(item.email||item.uid)+' | UTR: '+item.utr;
-        const approve=document.createElement('button');approve.type='button';approve.textContent='Approve';
-        const reject=document.createElement('button');reject.type='button';reject.textContent='Reject';reject.className='delete-btn';
-        const act=async decision=>{
-          approve.disabled=reject.disabled=true;
-          try{await api('PATCH',{requestId:item.id,decision});await loadAdmin();}
-          catch(error){detail.textContent=error.message;approve.disabled=reject.disabled=false;}
-        };
-        approve.addEventListener('click',()=>act('approve'));
-        reject.addEventListener('click',()=>act('reject'));
-        card.append(title,detail,approve,reject);list.append(card);
-      });
-    }catch(error){
-      if(!String(error.message).includes('Admin access is not configured'))console.warn('Admin payment panel:',error.message);
-    }
-  }
   document.getElementById('ck-my-payment-refresh')?.addEventListener('click',loadMyRequests);
-  document.getElementById('ck-admin-refresh')?.addEventListener('click',loadAdmin);
-  document.querySelector('.side-nav a[href="#ck-premium-payment"]')?.addEventListener('click',()=>setTimeout(loadAdmin,250));
-  window.addEventListener('hashchange',()=>{if(location.hash==='#ck-premium-payment'){loadAdmin();loadMyRequests();}});
+  window.addEventListener('hashchange',()=>{if(location.hash==='#ck-premium-payment')loadMyRequests();});
   window.addEventListener('ck-auth-ready',loadMyRequests);
   if(location.hash==='#ck-premium-payment')loadMyRequests();
 })();
