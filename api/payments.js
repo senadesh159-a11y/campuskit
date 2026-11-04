@@ -51,6 +51,24 @@ module.exports = async function handler(req, res) {
       return res.status(201).json({ ok: true, requestId: id, status: "pending", amount: PRICES[featureId], message: "Request submitted. Access unlocks only after the admin verifies the payment." });
     }
 
+    if (req.method === "GET" && req.query?.mine === "1") {
+      const snapshot = await requests.where("uid", "==", user.uid).limit(100).get();
+      const mine = snapshot.docs.map(doc => {
+        const item = doc.data();
+        return {
+          id: doc.id,
+          featureId: item.featureId,
+          amount: item.amount,
+          utr: item.utr,
+          status: item.status,
+          createdAt: item.createdAt?.toDate?.().toISOString() || null,
+          reviewedAt: item.reviewedAt?.toDate?.().toISOString() || null
+        };
+      });
+      mine.sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+      return res.status(200).json({ requests: mine });
+    }
+
     if (req.method === "GET" && typeof req.query?.check === "string") {
       const featureId = req.query.check;
       if (!Object.prototype.hasOwnProperty.call(PRICES, featureId)) return res.status(400).json({ error: "Unknown feature." });
