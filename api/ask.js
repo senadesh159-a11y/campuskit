@@ -8,6 +8,7 @@ const {
 } = require("firebase-admin/app");
 
 const { getAuth } = require("firebase-admin/auth");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -48,7 +49,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    await getAuth().verifyIdToken(token);
+    const decoded = await getAuth().verifyIdToken(token);
+    const db = getFirestore();
 
     // Validate question
     const question = req.body?.question;
@@ -76,6 +78,33 @@ module.exports = async function handler(req, res) {
         return res.status(413).json({ error: "Image is too large. Please use an image under 3 MB." });
       }
       imagePart = { inlineData: { mimeType: image.mimeType, data: image.data } };
+    }
+
+    // Enforce the free daily quota on the server (cannot be bypassed by editing localStorage).
+    // India-local calendar day; text and image questions both count as one request.
+    const dayKey = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(new Date());
+    const usageRef = db.collection("users").doc(decoded.uid).collection("aiUsage").doc(dayKey);
+    const premiumRef = db.collection("users").doc(decoded.uid).collection("entitlements").doc("ai-premium");
+    const quotaState = await db.runTransaction(async transaction => {
+      const [usageSnap, premiumSnap] = await Promise.all([
+        transaction.get(usageRef), transaction.get(premiumRef)
+      ]);
+      const premium = premiumSnap.exists ? premiumSnap.data() : {};
+      const expiry = premium.expiresAt && typeof premium.expiresAt.toDate === "function" ? premium.expiresAt.toDate() : null;
+      const isPremium = premium.status === "active" && (!expiry || expiry.getTime() > Date.now());
+      const used = Number(usageSnap.exists ? usageSnap.data().count || 0 : 0);
+      if (!isPremium && used >= 15) return { allowed: false, used, remaining: 0, premium: false };
+      const nextUsed = used + 1;
+      transaction.set(usageRef, { count: nextUsed, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      return { allowed: true, used: nextUsed, remaining: isPremium ? null : Math.max(0, 15 - nextUsed), premium: isPremium };
+    });
+    if (!quotaState.allowed) {
+      return res.status(429).json({
+        error: "You have used all 15 free AI questions for today. Upgrade to AI Premium or wait until midnight (India time).",
+        code: "DAILY_QUOTA_EXCEEDED", used: quotaState.used, limit: 15, resetTimeZone: "Asia/Kolkata"
+      });
     }
 
     if (!process.env.GEMINI_API_KEY) {
