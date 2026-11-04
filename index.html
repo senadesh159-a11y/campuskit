@@ -2324,6 +2324,7 @@ window.CampusKitCloud = {
     avatar.src = user.photoURL || "";
     avatar.style.display = user.photoURL ? "block" : "none";
     await syncOnLogin(user);
+    window.dispatchEvent(new Event('ck-auth-ready'));
   });
 </script>
 
@@ -2474,7 +2475,7 @@ window.CampusKitCloud = {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "AI request failed.");
       addMessage("CampusKit AI", data.answer || "No answer received.");
-      status.textContent = "Answer received.";
+      status.textContent = data.quota && !data.quota.premium ? ("Answer received · " + data.quota.remaining + " of 15 free questions left today.") : "Answer received · Premium access active.";
       clearSelectedImage();
     } catch (error) {
       addMessage("CampusKit AI", error.message || "Sorry, the AI could not respond. Please try again.");
