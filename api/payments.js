@@ -114,13 +114,15 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ active: data.status === "active", featureId });
     }
 
-    const adminEmails = (process.env.CAMPUSKIT_ADMIN_EMAILS || process.env.CAMPUSKIT_ADMIN_EMAIL || "")
+    const resource = String(req.query?.resource || "");
+    const managementAdminEmails = (process.env.CAMPUSKIT_ADMIN_EMAILS || process.env.CAMPUSKIT_ADMIN_EMAIL || "")
       .split(",").map(email => email.trim().toLowerCase()).filter(Boolean);
-    if (!adminEmails.includes((user.email || "").toLowerCase())) {
+    const socialAdminEmails = (process.env.CAMPUSKIT_SOCIAL_ADMIN_EMAILS || "")
+      .split(",").map(email => email.trim().toLowerCase()).filter(Boolean);
+    const allowedAdminEmails = ["social", "music"].includes(resource) ? socialAdminEmails : managementAdminEmails;
+    if (!allowedAdminEmails.includes((user.email || "").toLowerCase())) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
     }
-
-    const resource = String(req.query?.resource || "");
     if (resource === "users") {
       if (req.method === "GET") {
         const result = await getAuth().listUsers(200);
