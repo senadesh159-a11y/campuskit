@@ -1892,7 +1892,8 @@ updateDashboard();
 updateWelcome();
 
 /* Animated neural background. If the CDN/WebGL is unavailable, the aurora CSS still works. */
-(async function initNeuralBackground() {
+const startNeuralBackground = () => {
+  (async function initNeuralBackground() {
   const canvas = document.getElementById("neural-bg");
   if (!canvas) return;
   try {
@@ -1933,9 +1934,10 @@ updateWelcome();
     scene.add(lines);
 
     const palettes = [[0x9b7cff,0x7455ff],[0x42a5ff,0x386bff],[0x42ffe0,0x00a8bb],[0xff6bd6,0xa34dff]];
-    let paletteIndex = 0, lastChange = 0, animationId;
+    let paletteIndex = 0, lastChange = 0, animationId, animationRunning = false;
     let lastFrame = 0;
     function animate(time) {
+      if (document.hidden) { animationRunning = false; return; }
       animationId = requestAnimationFrame(animate);
       if (time - lastFrame < 32) return;
       lastFrame = time;
@@ -1951,7 +1953,20 @@ updateWelcome();
       lines.rotation.x = nodes.rotation.x;
       renderer.render(scene, camera);
     }
-    animate(0);
+    function startAnimation() {
+      if (animationRunning || document.hidden) return;
+      animationRunning = true;
+      animationId = requestAnimationFrame(animate);
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationId);
+        animationRunning = false;
+      } else {
+        startAnimation();
+      }
+    });
+    startAnimation();
 
     let resizeTimer;
     window.addEventListener("resize", () => {
@@ -1973,7 +1988,13 @@ updateWelcome();
   } catch (error) {
     console.warn("Neural background could not load; keeping the CSS aurora background.", error);
   }
-})();
+  })();
+};
+if ("requestIdleCallback" in window) {
+  window.requestIdleCallback(startNeuralBackground, { timeout: 2500 });
+} else {
+  window.setTimeout(startNeuralBackground, 1200);
+}
 
 // Bridge used by the Firebase module to refresh existing app state without replacing the UI.
 window.CampusKitCloud = {
@@ -3012,9 +3033,9 @@ loadLabExperiments("Physics");
   overlay.append(title,detail,button);card.append(overlay);
   card.querySelectorAll('form input,form textarea,form select,form button').forEach(el=>el.disabled=true);
  }
- async function refresh(){for(const card of cards)await check(card);}
- refresh();
- document.querySelector('.side-nav a[href="#intelligence-lab"]')?.addEventListener('click',()=>setTimeout(refresh,200));
+ async function refresh(){await Promise.all(cards.map(check));}
+  window.addEventListener('ck-auth-ready',refresh,{once:true});
+  document.querySelector('.side-nav a[href="#intelligence-lab"]')?.addEventListener('click',()=>setTimeout(refresh,200));
 })();
 </script>
 <script type="module" src="./assets/velaris/velaris.js"></script>
