@@ -172,6 +172,66 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed for music." });
     }
 
+    if (resource === "social") {
+      const profiles = db.collection("socialProfiles");
+      const reports = db.collection("socialReports");
+      const communities = db.collection("socialCommunities");
+      const posts = db.collection("socialPosts");
+
+      if (req.method === "GET") {
+        const view = String(req.query?.view || "summary");
+        if (view === "summary") {
+          const [profileCount, reportCount, communityCount, postCount, openReports] = await Promise.all([
+            profiles.count().get(), reports.count().get(), communities.count().get(), posts.count().get(),
+            reports.where("status", "==", "open").limit(100).get()
+          ]);
+          return res.status(200).json({
+            summary: {
+              profiles: profileCount.data().count,
+              openReports: reportCount.data().count ? openReports.size : 0,
+              communities: communityCount.data().count,
+              posts: postCount.data().count
+            },
+            reports: openReports.docs.map(d => ({ id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.().toISOString() || d.data().createdAt || null }))
+          });
+        }
+        if (view === "reports") {
+          const snap = await reports.orderBy("createdAt", "desc").limit(200).get();
+          return res.status(200).json({ reports: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.().toISOString() || d.data().createdAt || null })) });
+        }
+        if (view === "profiles") {
+          const snap = await profiles.orderBy("updatedAt", "desc").limit(200).get();
+          return res.status(200).json({ profiles: snap.docs.map(d => ({ uid: d.id, ...d.data(), updatedAt: d.data().updatedAt?.toDate?.().toISOString() || d.data().updatedAt || null })) });
+        }
+        if (view === "communities") {
+          const snap = await communities.orderBy("createdAt", "desc").limit(200).get();
+          return res.status(200).json({ communities: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.().toISOString() || d.data().createdAt || null })) });
+        }
+        return res.status(400).json({ error: "Unknown social management view." });
+      }
+
+      if (req.method === "PATCH") {
+        const type = String(req.body?.type || "");
+        const id = String(req.body?.id || "");
+        const action = String(req.body?.action || "");
+        if (!id || id.length > 180) return res.status(400).json({ error: "A valid record ID is required." });
+        if (type === "report" && ["resolve", "dismiss"].includes(action)) {
+          await reports.doc(id).set({ status: action === "resolve" ? "resolved" : "dismissed", reviewedAt: FieldValue.serverTimestamp(), reviewedBy: user.uid }, { merge: true });
+          return res.status(200).json({ ok: true, id, status: action === "resolve" ? "resolved" : "dismissed" });
+        }
+        if (type === "profile" && ["suspend", "restore"].includes(action)) {
+          await profiles.doc(id).set({ suspended: action === "suspend", updatedAt: FieldValue.serverTimestamp(), moderatedBy: user.uid }, { merge: true });
+          return res.status(200).json({ ok: true, id, suspended: action === "suspend" });
+        }
+        if (type === "community" && ["disable", "enable"].includes(action)) {
+          await communities.doc(id).set({ status: action === "disable" ? "disabled" : "active", moderatedAt: FieldValue.serverTimestamp(), moderatedBy: user.uid }, { merge: true });
+          return res.status(200).json({ ok: true, id, status: action === "disable" ? "disabled" : "active" });
+        }
+        return res.status(400).json({ error: "Unsupported social moderation action." });
+      }
+      return res.status(405).json({ error: "Method not allowed for social management." });
+    }
+
     if (req.method === "GET") {
       const requestedStatus = String(req.query?.status || "pending").toLowerCase();
       if (!["pending", "approved", "rejected", "all"].includes(requestedStatus)) {
