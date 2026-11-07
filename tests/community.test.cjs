@@ -77,11 +77,27 @@ test("Community API and browser interaction script pass JavaScript syntax checks
   assert.doesNotThrow(() => new vm.Script(script));
 });
 
-test("Photo and video uploads try the configured, current and legacy Firebase Storage buckets", () => {
-  assert.match(api, /STORAGE_BUCKETS = \[\.\.\.new Set\(\[process\.env\.FIREBASE_STORAGE_BUCKET, "campuskit-11f47\.firebasestorage\.app", "campuskit-11f47\.appspot\.com"/);
-  assert.match(api, /for \(const bucketName of STORAGE_BUCKETS\)/);
-  assert.match(api, /campuskit-social\/" \+ user\.uid \+ "\/"/);
-  assert.match(api, /"image\/jpeg".*"video\/mp4"/);
+test("Community photo and video uploads use the connected student's Google Drive", () => {
+  assert.match(html, /async uploadCommunityMedia\(file\)/);
+  assert.match(html, /https:\/\/www\.googleapis\.com\/upload\/drive\/v3\/files/);
+  assert.match(html, /type: "anyone", role: "reader"/);
+  assert.match(html, /ck-social-drive-consent/);
+  assert.match(html, /50 \* 1024 \* 1024/);
+  assert.match(html, /mediaProvider:uploaded\?'google-drive'/);
+  assert.doesNotMatch(api, /getStorage|STORAGE_BUCKETS|action === "upload"/);
+});
+
+test("Google Drive uploads retain the least-privilege drive.file OAuth scope", () => {
+  assert.match(html, /https:\/\/www\.googleapis\.com\/auth\/drive\.file/);
+  assert.match(html, /driveTokenExpiresAt/);
+  assert.match(html, /permissions\?fields=id,type,role/);
+});
+
+test("Community media publishing validates Drive references and protects private profiles", () => {
+  assert.match(api, /mediaProvider !== "google-drive"/);
+  assert.match(api, /profile\.isPrivate === true/);
+  assert.match(api, /driveFileId/);
+  assert.match(api, /https:\/\/drive\.google\.com\/uc\?export=download&id=/);
 });
 
 test("Story publishing persists media in socialStories with a 24-hour expiry", () => {
@@ -90,9 +106,14 @@ test("Story publishing persists media in socialStories with a 24-hour expiry", (
   assert.match(api, /await collection\.add\(type === "story"/);
 });
 
-test("Storage failures are returned with actionable backend details instead of a generic message", () => {
-  assert.match(api, /STORAGE_BUCKET_MISSING/);
-  assert.match(api, /Firebase Storage denied this upload/);
-  assert.match(api, /configured Firebase Storage bucket was not found/);
-  assert.doesNotMatch(api, /CampusKit Community could not complete this request\. Please try again\./);
+test("Deleting a Community post or story returns its Drive file ID for cleanup", () => {
+  assert.match(api, /const driveFileId = clean\(snap\.data\(\)\.driveFileId, 200\)/);
+  assert.match(api, /json\(\{ ok: true, driveFileId \}\)/);
+  assert.match(html, /CampusKitNotesStorage\.delete\(deleted\.driveFileId\)/);
+});
+
+test("Notes & Library keeps its existing private Google Drive upload workflow", () => {
+  assert.match(html, /async upload\(file, noteId\)/);
+  assert.match(html, /CampusKit note attachment/);
+  assert.match(html, /Files stay private in your Drive/);
 });
