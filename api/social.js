@@ -151,14 +151,25 @@ module.exports = async function handler(req, res) {
         const pair = [user.uid, otherUid].sort();
         const conversationId = pair.join("_");
         const conversation = db.collection("socialConversations").doc(conversationId);
-        const conversationSnap = await conversation.get();
-        if (!conversationSnap.exists || !(conversationSnap.data().memberUids || []).includes(user.uid)) return fail(res, 403, "You cannot access this conversation.");
-        const snap = await conversation.collection("messages").orderBy("createdAt", "desc").limit(100).get();
-        return res.status(200).json({ conversationId, messages: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
+        const [conversationSnap, peerSnap, blockedByPeer, blockedByMe] = await Promise.all([
+          conversation.get(), profiles.doc(otherUid).get(),
+          blocks.doc(otherUid + "_" + user.uid).get(), blocks.doc(user.uid + "_" + otherUid).get()
+        ]);
+        if (!peerSnap.exists || peerSnap.data().suspended) return fail(res, 404, "Student not found.");
+        if (blockedByPeer.exists || blockedByMe.exists) return fail(res, 403, "Messaging is unavailable for this connection.");
+        if (conversationSnap.exists && !(conversationSnap.data().memberUids || []).includes(user.uid)) return fail(res, 403, "You cannot access this conversation.");
+        const snap = conversationSnap.exists ? await conversation.collection("messages").orderBy("createdAt", "desc").limit(100).get() : { docs: [] };
+        const peer = publicProfile(otherUid, peerSnap.data());
+        return res.status(200).json({ conversationId, peer, messages: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
       }
       if (action === "inbox") {
         const snap = await db.collection("socialConversations").where("memberUids", "array-contains", user.uid).limit(100).get();
-        const conversations = snap.docs.map(d => ({ id: d.id, ...d.data(), updatedAt: dateValue(d.data().updatedAt) }));
+        const conversations = await Promise.all(snap.docs.map(async d => {
+          const data = d.data(), otherUid = (data.memberUids || []).find(uid => uid !== user.uid) || "";
+          const peerSnap = otherUid ? await profiles.doc(otherUid).get() : null;
+          const peer = peerSnap?.exists ? publicProfile(otherUid, peerSnap.data()) : {};
+          return { id: d.id, ...data, otherUid, otherName: peer.displayName || "CampusKit student", otherPhoto: peer.photoURL || "", updatedAt: dateValue(data.updatedAt) };
+        }));
         conversations.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
         return res.status(200).json({ conversations: conversations.slice(0, 50) });
       }
