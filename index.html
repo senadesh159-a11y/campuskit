@@ -3131,7 +3131,7 @@ loadLabExperiments("Physics");
  const avatar=()=>user.photo||fallback;
  const read=()=>{try{state={...blank,...JSON.parse(localStorage.getItem(KEY)||'{}')};}catch(_){state={...blank};}};
  const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
- function view(name){document.body.classList.add('ck-social-mode');document.querySelectorAll('.ck-social-screen').forEach(x=>x.classList.toggle('active',x.id==='ck-social-'+(name==='messages'?'messages-view':name)));document.querySelectorAll('[data-social-view]').forEach(x=>x.classList.toggle('active',x.dataset.socialView===name));if(name==='search')renderSearch('');if(name==='profile')renderProfile();if(name==='reels')renderReels();if(name==='messages')renderMessages();}
+ function view(name){document.body.classList.add('ck-social-mode');document.querySelectorAll('.ck-social-screen').forEach(x=>{const active=x.id==='ck-social-'+(name==='messages'?'messages-view':name);x.classList.toggle('active',active);if(x.id==='ck-social-profile-editor')x.hidden=!active;});document.querySelectorAll('[data-social-view]').forEach(x=>x.classList.toggle('active',x.dataset.socialView===name));if(name==='search')renderSearch('');if(name==='profile')renderProfile();if(name==='reels')renderReels();if(name==='messages')renderMessages();}
  function syncUser(){['ck-social-avatar','ck-social-avatar-side','ck-social-profile-photo'].forEach(id=>{const el=$(id);if(el)el.src=avatar();});['ck-social-name','ck-social-profile-name'].forEach(id=>{const el=$(id);if(el)el.textContent=user.name;});$('ck-social-email').textContent=user.email;$('ck-social-profile-bio').textContent=user.bio||'Your campus story starts here.';}
  function mediaMarkup(item){if(!item.media)return '';return item.mediaType==='video'?'<video class="ck-social-post-media" src="'+item.media+'" controls playsinline></video>':'<img class="ck-social-post-media" src="'+item.media+'" alt="Shared campus media">';}
  function renderStories(){const root=$('ck-social-stories');root.innerHTML='<button class="ck-social-story add" data-social-view="create"><span>＋</span><small>Your story</small></button>'+state.stories.slice(-20).reverse().map(x=>'<div class="ck-social-story"><div class="ring"><img src="'+safe(x.photo||avatar())+'" alt=""></div><small>'+safe(x.author)+'</small></div>').join('');}
@@ -3155,6 +3155,7 @@ loadLabExperiments("Physics");
  try{const saved=JSON.parse(localStorage.getItem('campuskitSocialProfileV1')||'null');if(saved)user={...user,...saved};}catch(_){}read();syncUser();renderAll();
  window.addEventListener('ck-auth-ready',()=>{const u=window.CampusKitUser||{};user.name=u.displayName||u.name||$('ck-name')?.textContent||user.name;user.email=u.email||'';user.photo=u.photoURL||$('ck-avatar')?.src||user.photo;syncUser();renderProfile();});
  window.addEventListener('hashchange',()=>{if(location.hash==='#social'){view('home');}else if(document.body.classList.contains('ck-social-mode'))document.body.classList.remove('ck-social-mode');});
+ const socialLink=document.querySelector('.side-nav a[href="#social"]');socialLink?.addEventListener('click',()=>view('home'),true);document.querySelectorAll('.side-nav a[href]:not([href="#social"])').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('ck-social-mode'),true));
  if(location.hash==='#social')view('home');
 })();
 </script>
