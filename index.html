@@ -746,6 +746,44 @@ li,.note-item,.music-item,.lab-record,.lab-viva-item{
 .music-embed{background:#05161A!important}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
+
+/* Social Campus panel */
+#campus-hero.app-view.active-view{display:grid!important}
+#social{max-width:1440px;margin:28px auto}
+.social-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.social-heading h2{font-size:clamp(25px,4vw,34px);margin:3px 0}
+.social-heading p{margin:3px 0}
+.social-online{font-size:12px;color:#8fe1d4;border:1px solid rgba(109,210,190,.28);padding:7px 12px;border-radius:99px;background:#0b51432b}
+.social-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.85fr);gap:18px;align-items:start}
+.social-main,.social-side{display:grid;gap:16px;min-width:0}
+.social-compose textarea{min-height:90px}
+.social-section-title,.social-profile-mini{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.social-section-title h3{margin:0}
+#ck-social-post-count,.social-note{font-size:12px;color:#a9c8ce}
+.social-post{padding:16px 0;border-bottom:1px solid var(--ck-line)}
+.social-post:last-child{border-bottom:0}
+.social-post-head{display:flex;align-items:center;gap:10px}
+.social-post-head img,.social-profile-mini img{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#123b46;border:1px solid var(--ck-line)}
+.social-post-head strong,.social-profile-mini strong{display:block}
+.social-post-head small,.social-profile-mini small{display:block;color:#9bb7bf;font-size:12px;overflow-wrap:anywhere}
+.social-post-content{white-space:pre-wrap;overflow-wrap:anywhere;color:#e5f4f6;margin:12px 0}
+.social-comments{margin:10px 0 0 12px;padding-left:12px;border-left:2px solid var(--ck-line)}
+.social-comment{font-size:13px;color:#c7dce0;margin:7px 0;overflow-wrap:anywhere}
+.social-comment-form{display:flex;gap:8px;align-items:center;margin-top:10px}
+.social-comment-form input{margin:0;min-width:0}
+.social-comment-form button{flex-shrink:0}
+.social-secondary{background:rgba(109,165,192,.12);border-color:var(--ck-line);box-shadow:none}
+.social-side .card{margin:0}
+.social-profile-mini{justify-content:flex-start;margin:10px 0}
+.social-profile-mini img{width:48px;height:48px}
+.social-community{padding:10px;margin:9px 0;border:1px solid var(--ck-line);border-radius:12px;background:rgba(12,112,117,.1)}
+.social-community strong{display:block}
+.social-community small{color:#a9c8ce}
+.social-message{padding:10px;margin:8px 0;border-radius:10px;background:rgba(109,165,192,.1);font-size:13px;overflow-wrap:anywhere}
+#ck-social-profile-editor[hidden]{display:none!important}
+@media(max-width:850px){.social-layout{grid-template-columns:1fr}.social-side{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}}
+@media(max-width:520px){.social-side{grid-template-columns:1fr}.social-comment-form{align-items:stretch}.social-comment-form button{padding:9px}}
+
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -1009,6 +1047,7 @@ footer{color:#7696A2!important}
   <div class="side-brand"><span class="ck-brand-mark"><img src="./assets/campuskit-icon.svg" alt=""></span><span>CampusKit</span></div>
   <a href="#dashboard" class="active"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9M9 21v-7h6v7"/></svg><span>Dashboard</span></a>
   <a href="#study-tools"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg><span>Study Tools</span></a>
+  <a href="#social"> <svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M20 8v6M17 11h6"/></svg><span>Social</span></a>
   <a href="#notes-library"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Notes Library</span></a>
   <a href="#ai-assistant"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M9 13h.01M15 13h.01M9 17h6"/></svg><span>AI Assistant</span></a>
   <a href="#relaxation-section"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>Relaxation</span></a>
@@ -1023,7 +1062,8 @@ footer{color:#7696A2!important}
   <a href="#intelligence-lab"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></svg><span>Intelligence Lab</span></a>
   <a href="#ck-premium-payment"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg><span>Premium</span></a>
   <div class="side-hint">Your college life,<br>organized in one place.</div>
-  <button id="ck-sidebar-logout" type="button"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg><span>Sign out</span></button>
+  <a href="#profile" id="ck-profile-nav"><svg class="ck-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span></a>
+  <button id="ck-sidebar-logout" type="button" hidden><span>Sign out</span></button>
 </nav>
 <header>
   <h1><img class="ck-header-logo" src="./assets/campuskit-icon.svg" alt=""> CampusKit</h1>
@@ -1031,7 +1071,7 @@ footer{color:#7696A2!important}
 </header>
 
 <main>
-  <section class="cinematic-hero" aria-label="CampusKit immersive student workspace">
+  <section class="cinematic-hero app-view active-view" id="campus-hero" aria-label="CampusKit immersive student workspace">
 <div class="ck-hero-copy"><div class="ck-hero-pill"><span class="ck-live-dot"></span> YOUR DIGITAL CAMPUS • ALL IN ONE PLACE</div>
 <h1>Study beyond<br><span>the ordinary.</span></h1><p>A smarter student universe for your assignments, notes, study tools and immersive virtual laboratories.</p>
 <div class="ck-hero-actions"><a class="ck-hero-primary" href="#study-tools" data-ck-view="study-tools">Explore workspace ↗</a><a class="ck-hero-secondary" href="#laboratory" data-ck-view="laboratory">Enter 3D laboratory</a></div></div>
@@ -1069,6 +1109,23 @@ footer{color:#7696A2!important}
     <input type="search" id="campusSearch" placeholder="Search assignments, classes, notes..." aria-label="Search assignments, classes and notes">
     <p id="searchMessage" aria-live="polite">Type something to search.</p>
     <button type="button" id="clearSearchBtn">Clear Search</button>
+  </section>
+
+
+  <section class="app-view" id="social" aria-labelledby="socialTitle">
+    <div class="social-heading"><div><div class="eyebrow">CampusKit community</div><h2 id="socialTitle">Social Campus</h2><p>Share updates, meet classmates and stay connected.</p></div><span class="social-online">● Student space</span></div>
+    <div class="social-layout">
+      <div class="social-main">
+        <section class="card social-compose"><h3>Create a post</h3><form id="ck-social-post-form"><textarea id="ck-social-post-text" maxlength="1200" placeholder="What's happening on campus?" required></textarea><button type="submit">Share post</button></form></section>
+        <section class="card"><div class="social-section-title"><h3>Campus Feed</h3><span id="ck-social-post-count">0 posts</span></div><div id="ck-social-feed"><p class="empty-state">No posts yet. Be the first to share something.</p></div></section>
+      </div>
+      <aside class="social-side">
+        <section class="card"><h3>My Profile</h3><div class="social-profile-mini"><img id="ck-social-avatar" alt="Profile photo" src=""><div><strong id="ck-social-name">Student</strong><small id="ck-social-email"></small></div></div><button type="button" class="social-secondary" id="ck-social-edit-profile">Edit profile</button></section>
+        <section class="card"><h3>Communities</h3><form id="ck-social-community-form"><input id="ck-social-community-name" maxlength="60" placeholder="Community name" required><button type="submit">Create community</button></form><div id="ck-social-communities"><p class="empty-state">No communities yet.</p></div></section>
+        <section class="card"><h3>Messages</h3><p class="social-note">Start a campus conversation. Messages are saved in this browser in this first version.</p><form id="ck-social-message-form"><input id="ck-social-message-to" maxlength="80" placeholder="Classmate name" required><textarea id="ck-social-message-text" maxlength="600" placeholder="Write a message..." required></textarea><button type="submit">Save message</button></form><div id="ck-social-messages"></div></section>
+      </aside>
+    </div>
+    <section class="card" id="ck-social-profile-editor" hidden><h3>Edit your profile</h3><form id="ck-social-profile-form"><label for="ck-social-display-name">Display name</label><input id="ck-social-display-name" maxlength="60" required><label for="ck-social-bio">Bio</label><textarea id="ck-social-bio" maxlength="240" placeholder="A little about you"></textarea><label for="ck-social-photo">Profile picture</label><input id="ck-social-photo" type="file" accept="image/*"><button type="submit">Save profile</button><button type="button" class="social-secondary" id="ck-social-cancel-profile">Cancel</button><p id="ck-social-profile-status" aria-live="polite"></p></form></section>
   </section>
 
   <div class="app-view" id="study-tools-view">
@@ -2585,7 +2642,10 @@ window.CampusKitCloud = {
   const nav = document.querySelector('.side-nav');
   const links = [...nav.querySelectorAll('a[href^="#"]')];
  const views = [
+  'campus-hero',
   'dashboard',
+  'social',
+  'profile',
   'search-section',
   'study-tools-view',
   'notes-library',
@@ -2598,7 +2658,7 @@ window.CampusKitCloud = {
   'ck-premium-payment'
 ];
   function setView(name) {
-    const map = { dashboard: ['dashboard','search-section'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], 'ck-premium-payment':['ck-premium-payment'] };
+    const map = { dashboard: ['campus-hero','dashboard','search-section'], social: ['social'], profile: ['social'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], 'ck-premium-payment':['ck-premium-payment'] };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
@@ -2607,7 +2667,7 @@ window.CampusKitCloud = {
       const notes = document.getElementById('notes-library');
       if (notes) notes.style.display = name === 'notes-library' ? '' : 'none';
     }
-    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name)));
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name === 'profile' ? 'social' : name)));
     if (name === 'notes-library') { document.getElementById('notes-library').style.display = ''; }
     if (name === 'study-tools') document.getElementById('study-tools').querySelectorAll(':scope > section').forEach(card => card.style.display = card.id === 'notes-library' ? 'none' : '');
     if (name === 'dashboard') { document.getElementById('search-section').classList.add('active-view'); }
@@ -2615,7 +2675,7 @@ window.CampusKitCloud = {
   }
   links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); const id = a.getAttribute('href').slice(1); setView(id); }));
   const initial = location.hash.slice(1);
-  setView(['study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download','intelligence-lab','ck-premium-payment'].includes(initial) ? initial : 'dashboard');
+  setView(['social','profile','study-tools','notes-library','ai-assistant','relaxation-section','focus-mode','laboratory','apk-download','intelligence-lab','ck-premium-payment'].includes(initial) ? initial : 'dashboard');
 })();
 </script>
 <script>
@@ -3027,5 +3087,45 @@ loadLabExperiments("Physics");
  document.querySelector('.side-nav a[href="#intelligence-lab"]')?.addEventListener('click',()=>setTimeout(refresh,200));
 })();
 </script>
+
+<script id="ck-social-campus">
+(() => {
+ const $=id=>document.getElementById(id), KEY='campuskitSocialV1';
+ let user={name:'Student',email:'',photo:'',bio:''}, state={posts:[],communities:[],messages:[]};
+ const safe=value=>String(value||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const read=()=>{try{state=JSON.parse(localStorage.getItem(KEY)||'{"posts":[],"communities":[],"messages":[]}');}catch(_){state={posts:[],communities:[],messages:[]};}};
+ const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+ const avatar=()=>user.photo||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="#164b59"/><circle cx="32" cy="24" r="12" fill="#9dd6dc"/><path d="M10 62c2-15 11-22 22-22s20 7 22 22" fill="#9dd6dc"/></svg>');
+ function syncUser(){ $('ck-social-name').textContent=user.name;$('ck-social-email').textContent=user.email;$('ck-social-avatar').src=avatar(); }
+ function render(){
+  const feed=$('ck-social-feed');feed.replaceChildren();$('ck-social-post-count').textContent=state.posts.length+' posts';
+  if(!state.posts.length)feed.innerHTML='<p class="empty-state">No posts yet. Be the first to share something.</p>';
+  [...state.posts].reverse().forEach(post=>{
+   const article=document.createElement('article');article.className='social-post';
+   article.innerHTML='<div class="social-post-head"><img alt="" src="'+safe(post.photo||avatar())+'"><div><strong>'+safe(post.author)+'</strong><small>'+safe(post.when)+'</small></div></div><p class="social-post-content">'+safe(post.text)+'</p><div class="social-comments">'+(post.comments||[]).map(c=>'<p class="social-comment"><strong>'+safe(c.author)+':</strong> '+safe(c.text)+'</p>').join('')+'</div><form class="social-comment-form"><input maxlength="400" placeholder="Write a comment…" required aria-label="Write a comment"><button type="submit">Comment</button></form>';
+   article.querySelector('form').addEventListener('submit',e=>{e.preventDefault();const input=e.currentTarget.querySelector('input');post.comments=post.comments||[];post.comments.push({author:user.name,text:input.value.trim()});save();render();});
+   feed.append(article);
+  });
+  const communities=$('ck-social-communities');communities.replaceChildren();
+  if(!state.communities.length)communities.innerHTML='<p class="empty-state">No communities yet.</p>';
+  state.communities.forEach(c=>{const div=document.createElement('div');div.className='social-community';div.innerHTML='<strong>'+safe(c.name)+'</strong><small>Created by '+safe(c.by)+'</small>';communities.append(div);});
+  const messages=$('ck-social-messages');messages.replaceChildren();
+  if(!state.messages.length)messages.innerHTML='<p class="empty-state">No saved messages yet.</p>';
+  state.messages.slice(-8).reverse().forEach(m=>{const div=document.createElement('div');div.className='social-message';div.innerHTML='<strong>To '+safe(m.to)+'</strong><br>'+safe(m.text);messages.append(div);});
+ }
+ $('ck-social-post-form').addEventListener('submit',e=>{e.preventDefault();const text=$('ck-social-post-text').value.trim();if(!text)return;state.posts.push({id:Date.now(),author:user.name,photo:user.photo,text,when:new Date().toLocaleString(),comments:[]});save();e.currentTarget.reset();render();});
+ $('ck-social-community-form').addEventListener('submit',e=>{e.preventDefault();const name=$('ck-social-community-name').value.trim();if(!name)return;state.communities.push({name,by:user.name});save();e.currentTarget.reset();render();});
+ $('ck-social-message-form').addEventListener('submit',e=>{e.preventDefault();state.messages.push({to:$('ck-social-message-to').value.trim(),text:$('ck-social-message-text').value.trim()});save();e.currentTarget.reset();render();});
+ function openEditor(){ $('ck-social-display-name').value=user.name;$('ck-social-bio').value=user.bio;$('ck-social-profile-editor').hidden=false;$('ck-social-profile-editor').scrollIntoView({behavior:'smooth',block:'center'});}
+ $('ck-social-edit-profile').addEventListener('click',openEditor);
+ $('ck-profile-nav').addEventListener('click',e=>{e.preventDefault();location.hash='#profile';document.querySelector('.side-nav a[href="#social"]')?.classList.add('active');setTimeout(openEditor,0);});
+ $('ck-social-cancel-profile').addEventListener('click',()=>$('ck-social-profile-editor').hidden=true);
+ $('ck-social-profile-form').addEventListener('submit',e=>{e.preventDefault();user.name=$('ck-social-display-name').value.trim()||'Student';user.bio=$('ck-social-bio').value.trim();const file=$('ck-social-photo').files[0];const finish=()=>{localStorage.setItem('campuskitSocialProfileV1',JSON.stringify(user));syncUser();$('ck-social-profile-status').textContent='Profile saved on this device.';$('ck-social-profile-editor').hidden=true;};if(file){if(file.size>2*1024*1024){$('ck-social-profile-status').textContent='Choose an image smaller than 2 MB.';return;}const reader=new FileReader();reader.onload=()=>{user.photo=reader.result;finish();};reader.readAsDataURL(file);}else finish();});
+ window.addEventListener('ck-auth-ready',()=>{const u=window.CampusKitUser||{};user.name=u.displayName||u.name||$('ck-name')?.textContent||'Student';user.email=u.email||'';user.photo=u.photoURL||$('ck-avatar')?.src||'';syncUser();});
+ try{const saved=JSON.parse(localStorage.getItem('campuskitSocialProfileV1')||'null');if(saved)user={...user,...saved};}catch(_){}
+ read();syncUser();render();
+})();
+</script>
+
 </body>
 </html>
