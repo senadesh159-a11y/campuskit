@@ -124,7 +124,8 @@ module.exports = async function handler(req, res) {
           .filter(p => !p.suspended && (p.displayName.toLowerCase().includes(term) || p.username.toLowerCase().includes(term))).slice(0, 30);
         const followed = new Set(followingSnap.docs.map(d => d.data().followingUid));
         const postResults = postSnap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) }))
-          .filter(p => p.status === "active" && {
+          .filter(p => {
+            if (p.status !== "active") return false;
             const owner = profileSnap.docs.find(d => d.id === p.ownerUid);
             const privateBlocked = owner?.data()?.isPrivate === true && p.ownerUid !== user.uid && !followed.has(p.ownerUid);
             return !privateBlocked && String(p.caption || "").toLowerCase().includes(term);
