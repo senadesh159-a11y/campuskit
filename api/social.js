@@ -47,6 +47,7 @@ module.exports = async function handler(req, res) {
     const posts = db.collection("socialPosts");
     const stories = db.collection("socialStories");
     const follows = db.collection("socialFollows");
+    const followRequests = db.collection("socialFollowRequests");
     const reports = db.collection("socialReports");
     const notifications = uid => db.collection("socialNotifications").doc(uid).collection("items");
     const blocks = db.collection("socialBlocks");
@@ -59,18 +60,23 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const action = clean(req.query?.action || "feed", 30);
       if (action === "feed") {
-        const [postSnap, storySnap, blockedA, blockedB] = await Promise.all([
+        const [postSnap, storySnap, blockedA, blockedB, followingSnap] = await Promise.all([
           posts.orderBy("createdAt", "desc").limit(120).get(),
           stories.where("expiresAt", ">", now).orderBy("expiresAt").limit(80).get(),
           blocks.where("blockerUid", "==", user.uid).limit(200).get(),
-          blocks.where("blockedUid", "==", user.uid).limit(200).get()
+          blocks.where("blockedUid", "==", user.uid).limit(200).get(),
+          follows.where("followerUid", "==", user.uid).limit(500).get()
         ]);
         const hidden = new Set([...blockedA.docs.map(d => d.data().blockedUid), ...blockedB.docs.map(d => d.data().blockerUid)]);
+        const followed = new Set(followingSnap.docs.map(d => d.data().followingUid));
+        const owners = [...new Set([...postSnap.docs, ...storySnap.docs].map(d => d.data().ownerUid).filter(Boolean))];
+        const ownerProfiles = await Promise.all(owners.map(uid => profiles.doc(uid).get()));
+        const privateOwners = new Set(ownerProfiles.filter(d => d.exists && d.data().isPrivate === true).map(d => d.id));
+        const canSee = uid => !hidden.has(uid) && (!privateOwners.has(uid) || uid === user.uid || followed.has(uid));
         const shape = d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) });
         return res.status(200).json({
-          posts: await Promise.all(postSnap.docs.map(async d => {
+          posts: await Promise.all(postSnap.docs.filter(d => d.data().status === "active" && d.data().type !== "reel" && canSee(d.data().ownerUid)).slice(0, 60).map(async d => {
             const p = shape(d);
-            if (p.status !== "active" || p.type === "reel" || hidden.has(p.ownerUid)) return null;
             const [like, comments] = await Promise.all([
               d.ref.collection("likes").doc(user.uid).get(),
               d.ref.collection("comments").orderBy("createdAt", "desc").limit(3).get()
@@ -78,28 +84,30 @@ module.exports = async function handler(req, res) {
             p.likedByMe = like.exists;
             p.comments = comments.docs.map(x => ({ id: x.id, ...x.data(), createdAt: dateValue(x.data().createdAt) })).reverse();
             return p;
-          })).then(items => items.filter(Boolean).slice(0, 60)),
-          stories: storySnap.docs.map(shape).filter(s => !hidden.has(s.ownerUid)),
-          reels: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type === "reel" && !hidden.has(p.ownerUid)).slice(0, 30)
+          })),
+          stories: storySnap.docs.map(shape).filter(s => canSee(s.ownerUid)),
+          reels: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type === "reel" && canSee(p.ownerUid)).slice(0, 30)
         });
       }
       if (action === "profile") {
         const uid = clean(req.query?.uid || user.uid, 128);
         if (!uid) return fail(res, 400, "A profile ID is required.");
-        const [profileSnap, postSnap, followerSnap, followingSnap] = await Promise.all([
+        const [profileSnap, postSnap, followerSnap, followingSnap, requestSnap] = await Promise.all([
           profiles.doc(uid).get(),
           posts.orderBy("createdAt", "desc").limit(120).get(),
           follows.where("followingUid", "==", uid).limit(500).get(),
-          follows.where("followerUid", "==", uid).limit(500).get()
+          follows.where("followerUid", "==", uid).limit(500).get(),
+          followRequests.doc(user.uid + "_" + uid).get()
         ]);
         if (!profileSnap.exists) return fail(res, 404, "Student profile not found.");
         const profile = publicProfile(uid, profileSnap.data());
         const isFollowing = followerSnap.docs.some(d => d.data().followerUid === user.uid);
+        const isRequested = requestSnap.exists;
         if (profile.isPrivate && uid !== user.uid && !isFollowing) {
-          return res.status(200).json({ profile, posts: [], locked: true, isFollowing });
+          return res.status(200).json({ profile, posts: [], locked: true, isFollowing, isRequested });
         }
         return res.status(200).json({
-          profile, isFollowing,
+          profile, isFollowing, isRequested,
           followers: followerSnap.size, following: followingSnap.size,
           posts: postSnap.docs.filter(d => d.data().ownerUid === uid && d.data().status === "active" && d.data().type !== "reel").slice(0, 60).map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) }))
         });
@@ -252,6 +260,14 @@ module.exports = async function handler(req, res) {
       const targetRef = profiles.doc(targetUid), targetSnap = await targetRef.get();
       if (!targetSnap.exists || targetSnap.data().suspended) return fail(res, 404, "Student not found.");
       const followRef = follows.doc(user.uid + "_" + targetUid);
+      if (targetSnap.data().isPrivate === true) {
+        const requestRef = followRequests.doc(user.uid + "_" + targetUid);
+        const pending = await requestRef.get();
+        if (pending.exists) { await requestRef.delete(); return res.status(200).json({ ok: true, requested: false, following: false }); }
+        await requestRef.create({ followerUid: user.uid, followingUid: targetUid, createdAt: FieldValue.serverTimestamp() });
+        await notifications(targetUid).add({ type: "follow_request", fromUid: user.uid, fromName: user.name || user.email || "A student", read: false, createdAt: FieldValue.serverTimestamp() });
+        return res.status(200).json({ ok: true, requested: true, following: false });
+      }
       const result = await db.runTransaction(async tx => {
         const snap = await tx.get(followRef);
         if (snap.exists) {
@@ -267,6 +283,29 @@ module.exports = async function handler(req, res) {
       });
       if (result) await notifications(targetUid).add({ type: "follow", fromUid: user.uid, fromName: user.name || user.email || "A student", read: false, createdAt: FieldValue.serverTimestamp() });
       return res.status(200).json({ ok: true, following: result });
+    }
+
+    if (action === "follow-request") {
+      const fromUid = clean(req.body?.fromUid, 128);
+      const accept = req.body?.accept === true;
+      const requestRef = followRequests.doc(fromUid + "_" + user.uid);
+      const requestSnap = await requestRef.get();
+      if (!requestSnap.exists) return fail(res, 404, "Follow request not found.");
+      if (accept) {
+        const followRef = follows.doc(fromUid + "_" + user.uid);
+        await db.runTransaction(async tx => {
+          const [pending, existing] = await Promise.all([tx.get(requestRef), tx.get(followRef)]);
+          if (!pending.exists) throw new Error("Follow request is no longer available.");
+          if (!existing.exists) {
+            tx.create(followRef, { followerUid: fromUid, followingUid: user.uid, createdAt: FieldValue.serverTimestamp() });
+            tx.set(profiles.doc(fromUid), { followingCount: FieldValue.increment(1) }, { merge: true });
+            tx.set(myRef, { followersCount: FieldValue.increment(1) }, { merge: true });
+          }
+          tx.delete(requestRef);
+        });
+        await notifications(fromUid).add({ type: "follow_accepted", fromUid: user.uid, fromName: user.name || user.email || "A student", read: false, createdAt: FieldValue.serverTimestamp() });
+      } else await requestRef.delete();
+      return res.status(200).json({ ok: true, accepted: accept });
     }
 
     if (action === "message") {
