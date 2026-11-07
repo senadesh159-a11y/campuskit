@@ -346,7 +346,7 @@ module.exports = async function handler(req, res) {
         if (mediaProvider !== "google-drive" || !/^[A-Za-z0-9_-]{10,200}$/.test(driveFileId)) return fail(res, 400, "The Google Drive media reference is invalid.");
         if (!["image", "video"].includes(mediaType)) return fail(res, 400, "Choose a valid photo or video.");
         if (profile.isPrivate === true) return fail(res, 403, "Private profiles cannot publish Google Drive media because link sharing would bypass profile privacy.");
-        mediaUrl = "https://drive.google.com/uc?export=download&id=" + encodeURIComponent(driveFileId);
+        mediaUrl = "https://drive.google.com/uc?export=view&id=" + encodeURIComponent(driveFileId);
       } else if (mediaProvider) {
         return fail(res, 400, "The media provider is missing its Drive file ID.");
       }
