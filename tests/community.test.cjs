@@ -3,6 +3,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const vm = require("node:vm");
 
 const root = path.join(__dirname, "..");
 const api = fs.readFileSync(path.join(root, "api/social.js"), "utf8");
@@ -44,4 +45,11 @@ test("Existing posts, video reels, member profiles and direct messages remain wi
 test("A first direct message can open a conversation before any message exists", () => {
   assert.match(api, /conversationSnap\.exists \? await conversation\.collection\("messages"\)/);
   assert.match(html, /async function conversation\(uid\)/);
+});
+
+test("Community API and browser interaction script pass JavaScript syntax checks", () => {
+  assert.doesNotThrow(() => new vm.Script(api));
+  const script = html.match(/<script id="ck-social-campus">([\\s\\S]*?)<\\/script>/)?.[1];
+  assert.ok(script, "Community interaction script should exist");
+  assert.doesNotThrow(() => new vm.Script(script));
 });
