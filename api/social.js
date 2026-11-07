@@ -2,18 +2,12 @@ const crypto = require("crypto");
 const { initializeApp, cert, getApps } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getFirestore, FieldValue, Timestamp } = require("firebase-admin/firestore");
-const { getStorage } = require("firebase-admin/storage");
-
-const STORAGE_BUCKETS = [...new Set([process.env.FIREBASE_STORAGE_BUCKET, "campuskit-11f47.firebasestorage.app", "campuskit-11f47.appspot.com"].filter(Boolean))];
-const MAX_MEDIA_BYTES = 3 * 1024 * 1024;
-const ALLOWED_MEDIA = new Set(["image/jpeg", "image/png", "image/webp", "video/mp4"]);
 
 function initFirebase() {
   if (!getApps().length) {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT) throw new Error("Firebase service account is not configured.");
     initializeApp({
       credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)),
-      storageBucket: STORAGE_BUCKETS[0]
     });
   }
 }
@@ -237,8 +231,9 @@ module.exports = async function handler(req, res) {
         const snap = await ref.get();
         if (!snap.exists) return fail(res, 404, "Item not found.");
         if (snap.data().ownerUid !== user.uid) return fail(res, 403, "You can delete only your own content.");
+        const driveFileId = clean(snap.data().driveFileId, 200);
         await ref.delete();
-        return res.status(200).json({ ok: true });
+        return res.status(200).json({ ok: true, driveFileId });
       }
       return fail(res, 400, "Unsupported delete request.");
     }
@@ -338,51 +333,28 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, profile: publicProfile(user.uid, { ...mySnap.data(), ...profile }) });
     }
 
-    if (action === "upload") {
-      const mimeType = clean(req.body?.mimeType, 80);
-      const base64 = String(req.body?.data || "").replace(/^data:[^,]+,/, "").replace(/\s/g, "");
-      if (!ALLOWED_MEDIA.has(mimeType)) return fail(res, 415, "Use JPG, PNG, WebP or MP4 media.");
-      if (!base64 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) return fail(res, 400, "The selected media could not be read. Please choose the file again.");
-      if (base64.length > Math.ceil(MAX_MEDIA_BYTES * 4 / 3) + 8) return fail(res, 413, "Media must be smaller than 3 MB.");
-      const buffer = Buffer.from(base64, "base64");
-      if (!buffer.length || buffer.length > MAX_MEDIA_BYTES) return fail(res, 413, "Media must be smaller than 3 MB.");
-      const extension = ({ "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "video/mp4": "mp4" })[mimeType];
-      const objectPath = "campuskit-social/" + user.uid + "/" + crypto.randomUUID() + "." + extension;
-      const downloadToken = crypto.randomUUID();
-      let uploadedBucket = "";
-      let lastBucketError = null;
-      for (const bucketName of STORAGE_BUCKETS) {
-        try {
-          const file = getStorage().bucket(bucketName).file(objectPath);
-          await file.save(buffer, { resumable: false, metadata: { contentType: mimeType, metadata: { firebaseStorageDownloadTokens: downloadToken, ownerUid: user.uid } } });
-          uploadedBucket = bucketName;
-          break;
-        } catch (storageError) {
-          if (Number(storageError?.code) !== 404) throw storageError;
-          lastBucketError = storageError;
-        }
-      }
-      if (!uploadedBucket) {
-        const storageError = new Error("No Firebase Storage bucket exists for this project. Enable Firebase Storage and set FIREBASE_STORAGE_BUCKET to its exact bucket name.");
-        storageError.code = "STORAGE_BUCKET_MISSING";
-        storageError.cause = lastBucketError;
-        throw storageError;
-      }
-      const url = "https://firebasestorage.googleapis.com/v0/b/" + uploadedBucket + "/o/" + encodeURIComponent(objectPath) + "?alt=media&token=" + downloadToken;
-      return res.status(201).json({ ok: true, url, path: objectPath, mimeType, bucket: uploadedBucket });
-    }
-
     if (action === "publish") {
       const type = ["post", "story", "reel"].includes(req.body?.type) ? req.body.type : "post";
       const caption = clean(req.body?.caption, 2200);
-      const mediaUrl = clean(req.body?.mediaUrl, 1800);
-      if (!caption && !mediaUrl) return fail(res, 400, "Add a caption or media first.");
-      if (mediaUrl && !mediaUrl.startsWith("https://firebasestorage.googleapis.com/")) return fail(res, 400, "Media URL is not a valid CampusKit upload.");
+      const mediaProvider = clean(req.body?.mediaProvider, 30);
+      const driveFileId = clean(req.body?.driveFileId, 200);
+      const mediaType = clean(req.body?.mediaType, 20);
       const profile = mySnap.exists ? mySnap.data() : {};
+      if (!caption && !driveFileId) return fail(res, 400, "Add a caption or media first.");
+      let mediaUrl = "";
+      if (driveFileId) {
+        if (mediaProvider !== "google-drive" || !/^[A-Za-z0-9_-]{10,200}$/.test(driveFileId)) return fail(res, 400, "The Google Drive media reference is invalid.");
+        if (!["image", "video"].includes(mediaType)) return fail(res, 400, "Choose a valid photo or video.");
+        if (profile.isPrivate === true) return fail(res, 403, "Private profiles cannot publish Google Drive media because link sharing would bypass profile privacy.");
+        mediaUrl = "https://drive.google.com/uc?export=download&id=" + encodeURIComponent(driveFileId);
+      } else if (mediaProvider) {
+        return fail(res, 400, "The media provider is missing its Drive file ID.");
+      }
       const record = {
         ownerUid: user.uid, author: profile.displayName || user.name || user.email || "CampusKit Student",
         username: profile.username || "", photo: profile.photoURL || user.picture || "",
-        caption, mediaUrl, mediaType: clean(req.body?.mediaType, 20) || "",
+        caption, mediaUrl, mediaType, mediaProvider: driveFileId ? "google-drive" : "",
+        driveFileId: driveFileId || "",
         type, status: "active", likesCount: 0, commentsCount: 0,
         createdAt: FieldValue.serverTimestamp()
       };
@@ -531,15 +503,6 @@ module.exports = async function handler(req, res) {
   } catch (error) {
     const errorCode = error?.code || error?.statusCode || "UNKNOWN";
     console.error("CampusKit Community API failure:", { code: errorCode, message: error?.message || String(error), stack: error?.stack });
-    if (errorCode === "STORAGE_BUCKET_MISSING") {
-      return fail(res, 503, "Photo/video storage is not enabled for CampusKit yet. Firebase Storage needs an active bucket; no post or story was published.");
-    }
-    if (Number(errorCode) === 403) {
-      return fail(res, 403, "Firebase Storage denied this upload. Check the service account's Storage permissions.");
-    }
-    if (Number(errorCode) === 404) {
-      return fail(res, 503, "The configured Firebase Storage bucket was not found. Check FIREBASE_STORAGE_BUCKET in Vercel.");
-    }
     return fail(res, 500, "CampusKit Community request failed (" + String(errorCode) + "): " + clean(error?.message || "Unknown server error", 220));
   }
 };
