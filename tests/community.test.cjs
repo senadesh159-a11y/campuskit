@@ -97,7 +97,9 @@ test("Community media publishing validates Drive references and protects private
   assert.match(api, /mediaProvider !== "google-drive"/);
   assert.match(api, /profile\.isPrivate === true/);
   assert.match(api, /driveFileId/);
-  assert.match(api, /https:\/\/drive\.google\.com\/uc\?export=download&id=/);
+  assert.match(api, /https:\/\/drive\.google\.com\/uc\?export=view&id=/);
+  assert.match(html, /ck-social-drive-video/);
+  assert.match(html, /drive\.google\.com\/file\/d\/\x27\+safe\(p\.driveFileId\)\+\x27\/preview/);
 });
 
 test("Story publishing persists media in socialStories with a 24-hour expiry", () => {
