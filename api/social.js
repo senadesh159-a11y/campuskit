@@ -115,10 +115,11 @@ module.exports = async function handler(req, res) {
       if (action === "search") {
         const term = clean(req.query?.q, 50).toLowerCase();
         if (term.length < 2) return res.status(200).json({ profiles: [], posts: [] });
-        const [profileSnap, postSnap, followingSnap] = await Promise.all([
+        const [profileSnap, postSnap, followingSnap, communitySnap] = await Promise.all([
           profiles.orderBy("updatedAt", "desc").limit(200).get(),
           posts.orderBy("createdAt", "desc").limit(120).get(),
-          follows.where("followerUid", "==", user.uid).limit(500).get()
+          follows.where("followerUid", "==", user.uid).limit(500).get(),
+          db.collection("socialCommunities").orderBy("createdAt", "desc").limit(100).get()
         ]);
         const profileResults = profileSnap.docs.map(d => publicProfile(d.id, d.data()))
           .filter(p => !p.suspended && (p.displayName.toLowerCase().includes(term) || p.username.toLowerCase().includes(term))).slice(0, 30);
@@ -130,7 +131,18 @@ module.exports = async function handler(req, res) {
             const privateBlocked = owner?.data()?.isPrivate === true && p.ownerUid !== user.uid && !followed.has(p.ownerUid);
             return !privateBlocked && String(p.caption || "").toLowerCase().includes(term);
           }).slice(0, 30);
-        return res.status(200).json({ profiles: profileResults, posts: postResults });
+        const matchingCommunities = communitySnap.docs.filter(d => {
+          const c = d.data();
+          return c.status === "active" &&
+            (String(c.name || "").toLowerCase().includes(term) || String(c.description || "").toLowerCase().includes(term));
+        }).slice(0, 20);
+        const communityResults = await Promise.all(matchingCommunities.map(async d => {
+          const member = await d.ref.collection("members").doc(user.uid).get();
+          const c = d.data();
+          return { id: d.id, name: c.name || "Campus community", description: c.description || "",
+            memberCount: c.memberCount || 0, joined: member.exists };
+        }));
+        return res.status(200).json({ profiles: profileResults, posts: postResults, communities: communityResults });
       }
       if (action === "comments") {
         const postId = clean(req.query?.postId, 160);
@@ -159,8 +171,21 @@ module.exports = async function handler(req, res) {
         if (blockedByPeer.exists || blockedByMe.exists) return fail(res, 403, "Messaging is unavailable for this connection.");
         if (conversationSnap.exists && !(conversationSnap.data().memberUids || []).includes(user.uid)) return fail(res, 403, "You cannot access this conversation.");
         const snap = conversationSnap.exists ? await conversation.collection("messages").orderBy("createdAt", "desc").limit(100).get() : { docs: [] };
+        if (conversationSnap.exists) {
+          const unread = snap.docs.filter(d => d.data().toUid === user.uid && d.data().read !== true);
+          if (unread.length) {
+            const batch = db.batch();
+            unread.forEach(d => batch.update(d.ref, { read: true, readAt: FieldValue.serverTimestamp() }));
+            await batch.commit();
+          }
+        }
         const peer = publicProfile(otherUid, peerSnap.data());
-        return res.status(200).json({ conversationId, peer, messages: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
+        const messages = snap.docs.map(d => ({
+          id: d.id, ...d.data(),
+          read: d.data().toUid === user.uid ? true : d.data().read === true,
+          createdAt: dateValue(d.data().createdAt)
+        })).reverse();
+        return res.status(200).json({ conversationId, peer, messages });
       }
       if (action === "inbox") {
         const snap = await db.collection("socialConversations").where("memberUids", "array-contains", user.uid).limit(100).get();
@@ -285,6 +310,16 @@ module.exports = async function handler(req, res) {
         createdAt: FieldValue.serverTimestamp()
       });
       await ref.set({ lastMessage: text.slice(0, 120), lastMessageAt: FieldValue.serverTimestamp() }, { merge: true });
+      const members = await ref.collection("members").get();
+      const notificationsBatch = db.batch();
+      members.docs.filter(member => member.id !== user.uid).forEach(member => {
+        notificationsBatch.set(notifications(member.id).doc(), {
+          type: "community_message", communityId, communityName: communitySnap.data().name || "Community",
+          fromUid: user.uid, fromName: profile.displayName || user.name || "CampusKit Student",
+          text: text.slice(0, 120), read: false, createdAt: FieldValue.serverTimestamp()
+        });
+      });
+      if (members.docs.some(member => member.id !== user.uid)) await notificationsBatch.commit();
       return res.status(201).json({ ok: true, id: message.id });
     }
 
