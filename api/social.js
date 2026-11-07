@@ -115,14 +115,20 @@ module.exports = async function handler(req, res) {
       if (action === "search") {
         const term = clean(req.query?.q, 50).toLowerCase();
         if (term.length < 2) return res.status(200).json({ profiles: [], posts: [] });
-        const [profileSnap, postSnap] = await Promise.all([
+        const [profileSnap, postSnap, followingSnap] = await Promise.all([
           profiles.orderBy("updatedAt", "desc").limit(200).get(),
-          posts.where("status", "==", "active").orderBy("createdAt", "desc").limit(100).get()
+          posts.where("status", "==", "active").orderBy("createdAt", "desc").limit(100).get(),
+          follows.where("followerUid", "==", user.uid).limit(500).get()
         ]);
         const profileResults = profileSnap.docs.map(d => publicProfile(d.id, d.data()))
           .filter(p => !p.suspended && (p.displayName.toLowerCase().includes(term) || p.username.toLowerCase().includes(term))).slice(0, 30);
+        const followed = new Set(followingSnap.docs.map(d => d.data().followingUid));
         const postResults = postSnap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) }))
-          .filter(p => String(p.caption || "").toLowerCase().includes(term)).slice(0, 30);
+          .filter(p => {
+            const owner = profileSnap.docs.find(d => d.id === p.ownerUid);
+            const privateBlocked = owner?.data()?.isPrivate === true && p.ownerUid !== user.uid && !followed.has(p.ownerUid);
+            return !privateBlocked && String(p.caption || "").toLowerCase().includes(term);
+          }).slice(0, 30);
         return res.status(200).json({ profiles: profileResults, posts: postResults });
       }
       if (action === "comments") {
@@ -137,6 +143,8 @@ module.exports = async function handler(req, res) {
         const pair = [user.uid, otherUid].sort();
         const conversationId = pair.join("_");
         const conversation = db.collection("socialConversations").doc(conversationId);
+        const conversationSnap = await conversation.get();
+        if (!conversationSnap.exists || !(conversationSnap.data().memberUids || []).includes(user.uid)) return fail(res, 403, "You cannot access this conversation.");
         const snap = await conversation.collection("messages").orderBy("createdAt", "desc").limit(100).get();
         return res.status(200).json({ conversationId, messages: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
       }
@@ -315,8 +323,11 @@ module.exports = async function handler(req, res) {
       if (!target.exists || target.data().suspended) return fail(res, 404, "Student not found.");
       const pair = [user.uid, toUid].sort(), conversationId = pair.join("_");
       const conversation = db.collection("socialConversations").doc(conversationId);
-      const blocked = await blocks.where("blockerUid", "==", toUid).where("blockedUid", "==", user.uid).limit(1).get();
-      if (!blocked.empty) return fail(res, 403, "This student does not accept messages from this account.");
+      const [blockedByRecipient, blockedBySender] = await Promise.all([
+        blocks.where("blockerUid", "==", toUid).where("blockedUid", "==", user.uid).limit(1).get(),
+        blocks.where("blockerUid", "==", user.uid).where("blockedUid", "==", toUid).limit(1).get()
+      ]);
+      if (!blockedByRecipient.empty || !blockedBySender.empty) return fail(res, 403, "Messaging is unavailable for this connection.");
       await conversation.set({ memberUids: pair, updatedAt: FieldValue.serverTimestamp(), lastMessage: text.slice(0, 120), lastSenderUid: user.uid }, { merge: true });
       const message = await conversation.collection("messages").add({ fromUid: user.uid, toUid, text, createdAt: FieldValue.serverTimestamp(), read: false });
       await notifications(toUid).add({ type: "message", fromUid: user.uid, fromName: user.name || user.email || "A student", messageId: message.id, read: false, createdAt: FieldValue.serverTimestamp() });
