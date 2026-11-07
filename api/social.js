@@ -340,7 +340,7 @@ module.exports = async function handler(req, res) {
 
     if (action === "upload") {
       const mimeType = clean(req.body?.mimeType, 80);
-      const base64 = String(req.body?.data || "").replace(/^data:[^,]+,/, "").replace(/\\s/g, "");
+      const base64 = String(req.body?.data || "").replace(/^data:[^,]+,/, "").replace(/\s/g, "");
       if (!ALLOWED_MEDIA.has(mimeType)) return fail(res, 415, "Use JPG, PNG, WebP or MP4 media.");
       if (!base64 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) return fail(res, 400, "The selected media could not be read. Please choose the file again.");
       if (base64.length > Math.ceil(MAX_MEDIA_BYTES * 4 / 3) + 8) return fail(res, 413, "Media must be smaller than 3 MB.");
