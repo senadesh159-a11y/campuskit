@@ -76,3 +76,23 @@ test("Community API and browser interaction script pass JavaScript syntax checks
   const script = html.slice(start + '<script id="ck-social-campus">'.length, end);
   assert.doesNotThrow(() => new vm.Script(script));
 });
+
+test("Photo and video uploads try the configured, current and legacy Firebase Storage buckets", () => {
+  assert.match(api, /STORAGE_BUCKETS = \[\.\.\.new Set\(\[process\.env\.FIREBASE_STORAGE_BUCKET, "campuskit-11f47\.firebasestorage\.app", "campuskit-11f47\.appspot\.com"/);
+  assert.match(api, /for \(const bucketName of STORAGE_BUCKETS\)/);
+  assert.match(api, /campuskit-social\/" \+ user\.uid \+ "\/"/);
+  assert.match(api, /"image\/jpeg".*"video\/mp4"/);
+});
+
+test("Story publishing persists media in socialStories with a 24-hour expiry", () => {
+  assert.match(api, /const collection = type === "story" \? stories : posts/);
+  assert.match(api, /expiresAt: Timestamp\.fromMillis\(Date\.now\(\) \+ 24 \* 60 \* 60 \* 1000\)/);
+  assert.match(api, /await collection\.add\(type === "story"/);
+});
+
+test("Storage failures are returned with actionable backend details instead of a generic message", () => {
+  assert.match(api, /STORAGE_BUCKET_MISSING/);
+  assert.match(api, /Firebase Storage denied this upload/);
+  assert.match(api, /configured Firebase Storage bucket was not found/);
+  assert.doesNotMatch(api, /CampusKit Community could not complete this request\. Please try again\./);
+});
