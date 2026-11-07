@@ -68,7 +68,17 @@ module.exports = async function handler(req, res) {
         const hidden = new Set([...blockedA.docs.map(d => d.data().blockedUid), ...blockedB.docs.map(d => d.data().blockerUid)]);
         const shape = d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) });
         return res.status(200).json({
-          posts: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type !== "reel" && !hidden.has(p.ownerUid)).slice(0, 60),
+          posts: await Promise.all(postSnap.docs.map(async d => {
+            const p = shape(d);
+            if (p.status !== "active" || p.type === "reel" || hidden.has(p.ownerUid)) return null;
+            const [like, comments] = await Promise.all([
+              d.ref.collection("likes").doc(user.uid).get(),
+              d.ref.collection("comments").orderBy("createdAt", "desc").limit(3).get()
+            ]);
+            p.likedByMe = like.exists;
+            p.comments = comments.docs.map(x => ({ id: x.id, ...x.data(), createdAt: dateValue(x.data().createdAt) })).reverse();
+            return p;
+          })).then(items => items.filter(Boolean).slice(0, 60)),
           stories: storySnap.docs.map(shape).filter(s => !hidden.has(s.ownerUid)),
           reels: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type === "reel" && !hidden.has(p.ownerUid)).slice(0, 30)
         });
