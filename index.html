@@ -2011,6 +2011,8 @@ window.CampusKitCloud = {
   import {
     getAuth,
     GoogleAuthProvider,
+    browserLocalPersistence,
+    setPersistence,
     signInWithPopup,
     signOut,
     onAuthStateChanged
@@ -2039,8 +2041,11 @@ window.CampusKitCloud = {
   };
 
   const app = initializeApp(firebaseConfig);
-  // Use Firebase's standard browser dependencies, including the popup resolver.
+  // Keep the Firebase session in first-party browser storage across mobile page
+  // restores. Do not use redirect auth here: some mobile/in-app browsers partition
+  // redirect session storage and lose Firebase's pending sign-in state.
   const auth = getAuth(app);
+  const authPersistenceReady = setPersistence(auth, browserLocalPersistence);
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
   window.CampusKitAuth = {
@@ -2343,7 +2348,12 @@ window.CampusKitCloud = {
     loginBtn.disabled = true;
     showStatus("Opening Google sign-in...");
     try {
-      await signInWithPopup(auth, provider);
+      // Wait until durable local persistence is configured before opening Google.
+      await authPersistenceReady;
+      const credential = await signInWithPopup(auth, provider);
+      if (credential?.user) {
+        showStatus("Signed in. Opening your CampusKit workspace...");
+      }
     } catch (error) {
       showStatus(explainAuthError(error));
       console.error("Google sign-in error:", error);
