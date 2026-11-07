@@ -49,7 +49,9 @@ test("A first direct message can open a conversation before any message exists",
 
 test("Community API and browser interaction script pass JavaScript syntax checks", () => {
   assert.doesNotThrow(() => new vm.Script(api));
-  const script = html.match(/<script id="ck-social-campus">([\\s\\S]*?)<\\/script>/)?.[1];
-  assert.ok(script, "Community interaction script should exist");
+  const start = html.indexOf('<script id="ck-social-campus">');
+  const end = html.indexOf('</script>', start);
+  assert.ok(start >= 0 && end > start, "Community interaction script should exist");
+  const script = html.slice(start + '<script id="ck-social-campus">'.length, end);
   assert.doesNotThrow(() => new vm.Script(script));
 });
