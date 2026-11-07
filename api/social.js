@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
 
     const myRef = profiles.doc(user.uid);
     const mySnap = await myRef.get();
-    if (mySnap.exists && mySnap.data().suspended === true) return fail(res, 403, "This CampusKit Social account is currently restricted.");
+    if (mySnap.exists && mySnap.data().suspended === true) return fail(res, 403, "This CampusKit Community account is currently restricted.");
 
     if (req.method === "GET") {
       const action = clean(req.query?.action || "feed", 30);
@@ -199,7 +199,7 @@ module.exports = async function handler(req, res) {
         const messages = snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse();
         return res.status(200).json({ community: { id: communitySnap.id, ...communitySnap.data() }, messages });
       }
-      return fail(res, 400, "Unknown Social request.");
+      return fail(res, 400, "Unknown Community request.");
     }
 
     if (req.method === "DELETE") {
@@ -473,9 +473,9 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ ok: true, updated: snap.size });
     }
 
-    return fail(res, 400, "Unknown Social action.");
+    return fail(res, 400, "Unknown Community action.");
   } catch (error) {
-    console.error("CampusKit Social API:", error);
-    return fail(res, 500, "CampusKit Social could not complete this request. Please try again.");
+    console.error("CampusKit Community API:", error);
+    return fail(res, 500, "CampusKit Community could not complete this request. Please try again.");
   }
 };
