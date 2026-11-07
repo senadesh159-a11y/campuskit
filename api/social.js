@@ -134,6 +134,13 @@ module.exports = async function handler(req, res) {
       if (action === "comments") {
         const postId = clean(req.query?.postId, 160);
         if (!idSafe(postId)) return fail(res, 400, "Invalid post.");
+        const postSnap = await posts.doc(postId).get();
+        if (!postSnap.exists) return fail(res, 404, "Post not found.");
+        const ownerProfile = await profiles.doc(postSnap.data().ownerUid).get();
+      if (ownerProfile.exists && ownerProfile.data().isPrivate === true && postSnap.data().ownerUid !== user.uid) {
+        const relation = await follows.doc(user.uid + "_" + postSnap.data().ownerUid).get();
+        if (!relation.exists) return fail(res, 403, "Follow this private account to view this content.");
+      }
         const snap = await posts.doc(postId).collection("comments").orderBy("createdAt", "desc").limit(50).get();
         return res.status(200).json({ comments: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
       }
@@ -238,6 +245,11 @@ module.exports = async function handler(req, res) {
       const postRef = posts.doc(postId), likeRef = postRef.collection("likes").doc(user.uid);
       const postSnap = await postRef.get();
       if (!postSnap.exists) return fail(res, 404, "Post not found.");
+      const ownerProfile = await profiles.doc(postSnap.data().ownerUid).get();
+      if (ownerProfile.exists && ownerProfile.data().isPrivate === true && postSnap.data().ownerUid !== user.uid) {
+        const relation = await follows.doc(user.uid + "_" + postSnap.data().ownerUid).get();
+        if (!relation.exists) return fail(res, 403, "Follow this private account to interact.");
+      }
       const result = await db.runTransaction(async tx => {
         const likeSnap = await tx.get(likeRef);
         if (likeSnap.exists) { tx.delete(likeRef); tx.update(postRef, { likesCount: FieldValue.increment(-1) }); return false; }
@@ -254,6 +266,11 @@ module.exports = async function handler(req, res) {
       if (!idSafe(postId) || !text) return fail(res, 400, "Write a comment first.");
       const ref = posts.doc(postId), snap = await ref.get();
       if (!snap.exists) return fail(res, 404, "Post not found.");
+      const ownerProfile = await profiles.doc(snap.data().ownerUid).get();
+      if (ownerProfile.exists && ownerProfile.data().isPrivate === true && snap.data().ownerUid !== user.uid) {
+        const relation = await follows.doc(user.uid + "_" + snap.data().ownerUid).get();
+        if (!relation.exists) return fail(res, 403, "Follow this private account to interact.");
+      }
       const profile = mySnap.exists ? mySnap.data() : {};
       const comment = { uid: user.uid, author: profile.displayName || user.name || "Student", text, createdAt: FieldValue.serverTimestamp() };
       const commentRef = await ref.collection("comments").add(comment);
