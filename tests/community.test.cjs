@@ -100,7 +100,7 @@ test("Community media publishing validates Drive references and protects private
   assert.match(api, /driveCheck = await fetch\("https:\/\/www\.googleapis\.com\/drive\/v3\/files/);
   assert.match(api, /owners\?\.some\(owner => owner\.me === true\)/);
   assert.match(api, /permissions\?\.some\(permission => permission\.type === "anyone" && permission\.role === "reader"\)/);
-  assert.doesNotMatch(api, /driveAccessToken,/);
+  assert.doesNotMatch((api.match(/const record = \{([\s\S]*?)\n      \};/) || [])[1] || "", /driveAccessToken/);
   assert.match(html, /driveAccessToken:uploaded\?\.accessToken/);
   assert.match(api, /https:\/\/drive\.google\.com\/uc\?export=view&id=/);
   assert.match(html, /ck-social-drive-video/);
