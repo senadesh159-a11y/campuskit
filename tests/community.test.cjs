@@ -90,6 +90,7 @@ test("Community photo and video uploads use the connected student's Google Drive
 test("Google Drive uploads retain the least-privilege drive.file OAuth scope", () => {
   assert.match(html, /https:\/\/www\.googleapis\.com\/auth\/drive\.file/);
   assert.match(html, /driveTokenExpiresAt/);
+  assert.match(html, /requestDriveToken\(""\)/);
   assert.match(html, /permissions\?fields=id,type,role/);
 });
 
