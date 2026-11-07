@@ -2163,6 +2163,10 @@ window.CampusKitCloud = {
   window.CampusKitAuth = {
     async getIdToken() {
       return auth.currentUser ? await auth.currentUser.getIdToken() : null;
+    },
+    getUser() {
+      const user = auth.currentUser;
+      return user ? { uid: user.uid, displayName: user.displayName || "", email: user.email || "", photoURL: user.photoURL || "" } : null;
     }
   };
   const loginBtn = document.getElementById("ck-google-login");
@@ -3180,7 +3184,7 @@ $('ck-social-message-form')?.addEventListener('submit',async e=>{e.preventDefaul
 const rail=document.querySelector('.ck-social-rail');if(rail&&!rail.querySelector('[data-social-view=notifications]')){const b=document.createElement('button');b.className='ck-social-tab';b.dataset.socialView='notifications';b.innerHTML='♡ <span>Activity</span>';rail.insertBefore(b,rail.querySelector('.ck-social-back'));}
 const form=$('ck-social-profile-form');if(form&&!$('ck-social-username')){const l=document.createElement('label');l.textContent='Username';const i=document.createElement('input');i.id='ck-social-username';i.minLength=3;i.maxLength=24;i.pattern='[A-Za-z0-9._]+';i.required=true;i.placeholder='your.username';l.append(i);form.insertBefore(l,form.querySelector('label:nth-child(2)'));}if(form&&!$('ck-social-private')){const l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.id='ck-social-private';l.append(i,document.createTextNode(' Private account'));form.insertBefore(l,form.querySelector('button[type=submit]'));}
 const mf=$('ck-social-message-form');if(mf&&!$('ck-social-recipient-results')){const d=document.createElement('div');d.id='ck-social-recipient-results';$('ck-social-message-to').after(d);}
-async function init(){const u=window.CampusKitUser||{};user.uid=u.uid||'';user.name=u.displayName||u.name||$('ck-name')?.textContent||'Student';user.email=u.email||'';user.photo=u.photoURL||$('ck-avatar')?.src||'';sync();try{const d=await api('profile','GET',{}, {uid:user.uid});if(d.profile){user={...user,...d.profile,photo:d.profile.photoURL||user.photo};sync();}}catch(e){console.warn('Social profile:',e.message);}try{const d=await api('communities');state.communities=d.communities||[];communities();}catch(_){}await feed();}
+async function init(){const u=window.CampusKitAuth?.getUser?.()||window.CampusKitUser||{};user.uid=u.uid||'';user.name=u.displayName||u.name||$('ck-name')?.textContent||'Student';user.email=u.email||'';user.photo=u.photoURL||$('ck-avatar')?.src||'';sync();try{const d=await api('profile','GET',{}, {uid:user.uid});if(d.profile){user={...user,...d.profile,photo:d.profile.photoURL||user.photo};sync();}}catch(e){console.warn('Social profile:',e.message);}try{const d=await api('communities');state.communities=d.communities||[];communities();}catch(_){}await feed();}
 window.addEventListener('ck-auth-ready',init);window.addEventListener('hashchange',()=>{if(location.hash==='#social')show('home');else document.body.classList.remove('ck-social-mode');});
 document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',()=>show('home'),true);document.querySelectorAll('.side-nav a[href]:not([href="#social"])').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('ck-social-mode'),true));if(location.hash==='#social')show('home');if(window.CampusKitAuth?.getIdToken)init();
 })();
