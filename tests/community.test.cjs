@@ -47,6 +47,27 @@ test("A first direct message can open a conversation before any message exists",
   assert.match(html, /async function conversation\(uid\)/);
 });
 
+test("Explore Campus searches active communities and displays join or chat actions", () => {
+  assert.match(api, /const matchingCommunities = communitySnap\.docs\.filter/);
+  assert.match(api, /communities: communityResults/);
+  assert.match(html, /<h3>Communities<\/h3>/);
+  assert.match(html, /data-community-join=/);
+});
+
+test("Direct messages record read receipts and show sent or seen state", () => {
+  assert.match(api, /readAt: FieldValue\.serverTimestamp\(\)/);
+  assert.match(html, /m\.read\?' · Seen':' · Sent'/);
+});
+
+test("Community chat messages create Activity notifications for other members", () => {
+  assert.match(api, /type: "community_message"/);
+  assert.match(html, /n\.type==='community_message'/);
+});
+
+test("Member profiles include a visible Details section", () => {
+  assert.match(html, /ck-social-profile-details/);
+});
+
 test("Community API and browser interaction script pass JavaScript syntax checks", () => {
   assert.doesNotThrow(() => new vm.Script(api));
   const start = html.indexOf('<script id="ck-social-campus">');
