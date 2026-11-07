@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.browser.customtabs.CustomTabsIntent;
 
 public class MainActivity extends Activity {
-    private static final String HOME_URL = "https://senadesh159-a11y.github.io/campuskit/";
+    private static final String HOME_URL = "https://campuskit-six.vercel.app/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
