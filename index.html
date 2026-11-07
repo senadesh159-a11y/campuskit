@@ -2376,7 +2376,7 @@ window.CampusKitCloud = {
       const mimeType = file.type || "";
       if (!["image/jpeg", "image/png", "image/webp", "video/mp4"].includes(mimeType)) throw new Error("Use JPG, PNG, WebP or MP4 media.");
       let token = driveAccessToken;
-      if (!token || driveTokenExpiresAt <= Date.now() + 60000) token = await requestDriveToken("consent");
+      if (!token || driveTokenExpiresAt <= Date.now() + 60000) token = await requestDriveToken("");
       const metadata = { name: `CampusKit Community - ${file.name}`, mimeType, description: `CampusKit Community media uploaded by ${auth.currentUser.uid}` };
       const startResponse = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id,name,mimeType,size,webViewLink", {
         method: "POST",
@@ -2405,7 +2405,7 @@ window.CampusKitCloud = {
     async delete(driveFileId) {
       if (!driveFileId) return;
       let token = driveAccessToken;
-      if (!token || driveTokenExpiresAt <= Date.now() + 60000) token = await requestDriveToken("consent");
+      if (!token || driveTokenExpiresAt <= Date.now() + 60000) token = await requestDriveToken("");
       const response = await fetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(driveFileId)}`, {
         method: "DELETE", headers: { Authorization: `Bearer ${token}` }
       });
