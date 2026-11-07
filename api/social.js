@@ -59,19 +59,18 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET") {
       const action = clean(req.query?.action || "feed", 30);
       if (action === "feed") {
-        const [postSnap, storySnap, reelSnap, blockedA, blockedB] = await Promise.all([
-          posts.where("status", "==", "active").orderBy("createdAt", "desc").limit(60).get(),
+        const [postSnap, storySnap, blockedA, blockedB] = await Promise.all([
+          posts.orderBy("createdAt", "desc").limit(120).get(),
           stories.where("expiresAt", ">", now).orderBy("expiresAt").limit(80).get(),
-          posts.where("type", "==", "reel").where("status", "==", "active").orderBy("createdAt", "desc").limit(30).get(),
           blocks.where("blockerUid", "==", user.uid).limit(200).get(),
           blocks.where("blockedUid", "==", user.uid).limit(200).get()
         ]);
         const hidden = new Set([...blockedA.docs.map(d => d.data().blockedUid), ...blockedB.docs.map(d => d.data().blockerUid)]);
         const shape = d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) });
         return res.status(200).json({
-          posts: postSnap.docs.map(shape).filter(p => !hidden.has(p.ownerUid)),
+          posts: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type !== "reel" && !hidden.has(p.ownerUid)).slice(0, 60),
           stories: storySnap.docs.map(shape).filter(s => !hidden.has(s.ownerUid)),
-          reels: reelSnap.docs.map(shape).filter(p => !hidden.has(p.ownerUid))
+          reels: postSnap.docs.map(shape).filter(p => p.status === "active" && p.type === "reel" && !hidden.has(p.ownerUid)).slice(0, 30)
         });
       }
       if (action === "profile") {
@@ -79,7 +78,7 @@ module.exports = async function handler(req, res) {
         if (!uid) return fail(res, 400, "A profile ID is required.");
         const [profileSnap, postSnap, followerSnap, followingSnap] = await Promise.all([
           profiles.doc(uid).get(),
-          posts.where("ownerUid", "==", uid).where("status", "==", "active").orderBy("createdAt", "desc").limit(60).get(),
+          posts.orderBy("createdAt", "desc").limit(120).get(),
           follows.where("followingUid", "==", uid).limit(500).get(),
           follows.where("followerUid", "==", uid).limit(500).get()
         ]);
@@ -92,7 +91,7 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({
           profile, isFollowing,
           followers: followerSnap.size, following: followingSnap.size,
-          posts: postSnap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) }))
+          posts: postSnap.docs.filter(d => d.data().ownerUid === uid && d.data().status === "active" && d.data().type !== "reel").slice(0, 60).map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) }))
         });
       }
       if (action === "search") {
@@ -108,6 +107,12 @@ module.exports = async function handler(req, res) {
           .filter(p => String(p.caption || "").toLowerCase().includes(term)).slice(0, 30);
         return res.status(200).json({ profiles: profileResults, posts: postResults });
       }
+      if (action === "comments") {
+        const postId = clean(req.query?.postId, 160);
+        if (!idSafe(postId)) return fail(res, 400, "Invalid post.");
+        const snap = await posts.doc(postId).collection("comments").orderBy("createdAt", "desc").limit(50).get();
+        return res.status(200).json({ comments: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
+      }
       if (action === "messages") {
         const otherUid = clean(req.query?.with, 128);
         if (!otherUid || otherUid === user.uid) return fail(res, 400, "Choose another student to message.");
@@ -118,16 +123,18 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ conversationId, messages: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse() });
       }
       if (action === "inbox") {
-        const snap = await db.collection("socialConversations").where("memberUids", "array-contains", user.uid).orderBy("updatedAt", "desc").limit(50).get();
-        return res.status(200).json({ conversations: snap.docs.map(d => ({ id: d.id, ...d.data(), updatedAt: dateValue(d.data().updatedAt) })) });
+        const snap = await db.collection("socialConversations").where("memberUids", "array-contains", user.uid).limit(100).get();
+        const conversations = snap.docs.map(d => ({ id: d.id, ...d.data(), updatedAt: dateValue(d.data().updatedAt) }));
+        conversations.sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")));
+        return res.status(200).json({ conversations: conversations.slice(0, 50) });
       }
       if (action === "notifications") {
         const snap = await notifications(user.uid).orderBy("createdAt", "desc").limit(60).get();
         return res.status(200).json({ notifications: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })) });
       }
       if (action === "communities") {
-        const snap = await db.collection("socialCommunities").where("status", "==", "active").orderBy("createdAt", "desc").limit(50).get();
-        return res.status(200).json({ communities: snap.docs.map(d => ({ id: d.id, ...d.data() })) });
+        const snap = await db.collection("socialCommunities").orderBy("createdAt", "desc").limit(100).get();
+        return res.status(200).json({ communities: snap.docs.filter(d => d.data().status === "active").slice(0, 50).map(d => ({ id: d.id, ...d.data() })) });
       }
       return fail(res, 400, "Unknown Social request.");
     }
