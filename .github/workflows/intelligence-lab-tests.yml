@@ -1,7 +1,7 @@
 name: CampusKit Intelligence Lab Tests
 on:
   push:
-    branches: ["feature/intelligence-lab-v2"]
+    branches: ["feature/intelligence-lab-v2", "main"]
   pull_request:
     branches: ["main"]
     paths:
