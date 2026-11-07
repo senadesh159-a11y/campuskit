@@ -339,6 +339,7 @@ module.exports = async function handler(req, res) {
       const mediaProvider = clean(req.body?.mediaProvider, 30);
       const driveFileId = clean(req.body?.driveFileId, 200);
       const mediaType = clean(req.body?.mediaType, 20);
+      const driveAccessToken = clean(req.body?.driveAccessToken, 4096);
       const profile = mySnap.exists ? mySnap.data() : {};
       if (!caption && !driveFileId) return fail(res, 400, "Add a caption or media first.");
       let mediaUrl = "";
@@ -346,8 +347,25 @@ module.exports = async function handler(req, res) {
         if (mediaProvider !== "google-drive" || !/^[A-Za-z0-9_-]{10,200}$/.test(driveFileId)) return fail(res, 400, "The Google Drive media reference is invalid.");
         if (!["image", "video"].includes(mediaType)) return fail(res, 400, "Choose a valid photo or video.");
         if (profile.isPrivate === true) return fail(res, 403, "Private profiles cannot publish Google Drive media because link sharing would bypass profile privacy.");
+        if (!driveAccessToken) return fail(res, 401, "Reconnect Google Drive before publishing this media.");
+        // Verify the file belongs to the connected Drive account and is link-viewable.
+        // The short-lived OAuth token is used only for this request and is never stored.
+        const driveCheck = await fetch("https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(driveFileId) + "?fields=id,mimeType,owners(me),permissions(type,role)", {
+          headers: { Authorization: "Bearer " + driveAccessToken }
+        });
+        if (!driveCheck.ok) {
+          if (driveCheck.status === 401) return fail(res, 401, "Your Google Drive session expired. Reconnect Drive and try again.");
+          if (driveCheck.status === 403) return fail(res, 403, "CampusKit cannot verify this Drive file. Check the Google Drive permission and try again.");
+          if (driveCheck.status === 404) return fail(res, 404, "The uploaded media file was not found in your Google Drive.");
+          return fail(res, 502, "Google Drive could not verify the uploaded media. Please try again.");
+        }
+        const driveFile = await driveCheck.json();
+        if (!driveFile.owners?.some(owner => owner.me === true)) return fail(res, 403, "This media file does not belong to the Google Drive account you connected.");
+        const allowedMime = mediaType === "video" ? ["video/mp4"] : ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedMime.includes(driveFile.mimeType)) return fail(res, 415, "The Google Drive file type does not match the selected media.");
+        if (!driveFile.permissions?.some(permission => permission.type === "anyone" && permission.role === "reader")) return fail(res, 403, "This Drive file is not shared as viewable by link. No post was published.");
         mediaUrl = "https://drive.google.com/uc?export=view&id=" + encodeURIComponent(driveFileId);
-      } else if (mediaProvider) {
+      } else if (mediaProvider || driveAccessToken) {
         return fail(res, 400, "The media provider is missing its Drive file ID.");
       }
       const record = {
