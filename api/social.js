@@ -168,7 +168,25 @@ module.exports = async function handler(req, res) {
       }
       if (action === "communities") {
         const snap = await db.collection("socialCommunities").orderBy("createdAt", "desc").limit(100).get();
-        return res.status(200).json({ communities: snap.docs.filter(d => d.data().status === "active").slice(0, 50).map(d => ({ id: d.id, ...d.data() })) });
+        const active = snap.docs.filter(d => d.data().status === "active").slice(0, 50);
+        const communities = await Promise.all(active.map(async d => {
+          const member = await d.ref.collection("members").doc(user.uid).get();
+          return { id: d.id, ...d.data(), joined: member.exists };
+        }));
+        return res.status(200).json({ communities });
+      }
+      if (action === "community-chat") {
+        const communityId = clean(req.query?.communityId, 160);
+        if (!idSafe(communityId)) return fail(res, 400, "Choose a valid community.");
+        const communityRef = db.collection("socialCommunities").doc(communityId);
+        const [communitySnap, memberSnap] = await Promise.all([
+          communityRef.get(), communityRef.collection("members").doc(user.uid).get()
+        ]);
+        if (!communitySnap.exists || communitySnap.data().status !== "active") return fail(res, 404, "Community not found.");
+        if (!memberSnap.exists) return fail(res, 403, "Join this community to enter its chat.");
+        const snap = await communityRef.collection("messages").orderBy("createdAt", "desc").limit(100).get();
+        const messages = snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: dateValue(d.data().createdAt) })).reverse();
+        return res.status(200).json({ community: { id: communitySnap.id, ...communitySnap.data() }, messages });
       }
       return fail(res, 400, "Unknown Social request.");
     }
@@ -190,6 +208,75 @@ module.exports = async function handler(req, res) {
     }
 
     const action = clean(req.body?.action, 30);
+    if (action === "community-create") {
+      const name = clean(req.body?.name, 70);
+      const description = clean(req.body?.description, 300);
+      if (name.length < 3) return fail(res, 400, "Community name must be at least 3 characters.");
+      const profile = mySnap.exists ? mySnap.data() : {};
+      const ref = db.collection("socialCommunities").doc();
+      await ref.set({
+        name, description, status: "active", createdBy: user.uid,
+        createdByName: profile.displayName || user.name || "CampusKit Student",
+        memberCount: 1, createdAt: FieldValue.serverTimestamp()
+      });
+      await ref.collection("members").doc(user.uid).set({
+        uid: user.uid, role: "owner", displayName: profile.displayName || user.name || "CampusKit Student",
+        photoURL: profile.photoURL || user.picture || "", joinedAt: FieldValue.serverTimestamp()
+      });
+      return res.status(201).json({ ok: true, communityId: ref.id });
+    }
+
+    if (action === "community-join" || action === "community-leave") {
+      const communityId = clean(req.body?.communityId, 160);
+      if (!idSafe(communityId)) return fail(res, 400, "Choose a valid community.");
+      const ref = db.collection("socialCommunities").doc(communityId);
+      const memberRef = ref.collection("members").doc(user.uid);
+      const profile = mySnap.exists ? mySnap.data() : {};
+      const communitySnap = await ref.get();
+      if (!communitySnap.exists || communitySnap.data().status !== "active") return fail(res, 404, "Community not found.");
+      if (action === "community-join") {
+        await db.runTransaction(async tx => {
+          const member = await tx.get(memberRef);
+          if (!member.exists) {
+            tx.create(memberRef, {
+              uid: user.uid, role: "member", displayName: profile.displayName || user.name || "CampusKit Student",
+              photoURL: profile.photoURL || user.picture || "", joinedAt: FieldValue.serverTimestamp()
+            });
+            tx.update(ref, { memberCount: FieldValue.increment(1) });
+          }
+        });
+        return res.status(200).json({ ok: true, joined: true });
+      }
+      await db.runTransaction(async tx => {
+        const member = await tx.get(memberRef);
+        if (member.exists) {
+          tx.delete(memberRef);
+          tx.update(ref, { memberCount: FieldValue.increment(-1) });
+        }
+      });
+      return res.status(200).json({ ok: true, joined: false });
+    }
+
+    if (action === "community-message") {
+      const communityId = clean(req.body?.communityId, 160);
+      const text = clean(req.body?.text, 1200);
+      if (!idSafe(communityId) || !text) return fail(res, 400, "Write a message first.");
+      const ref = db.collection("socialCommunities").doc(communityId);
+      const [communitySnap, memberSnap] = await Promise.all([
+        ref.get(), ref.collection("members").doc(user.uid).get()
+      ]);
+      if (!communitySnap.exists || communitySnap.data().status !== "active") return fail(res, 404, "Community not found.");
+      if (!memberSnap.exists) return fail(res, 403, "Join this community before sending messages.");
+      const profile = mySnap.exists ? mySnap.data() : {};
+      const message = await ref.collection("messages").add({
+        uid: user.uid, author: profile.displayName || user.name || "CampusKit Student",
+        photoURL: profile.photoURL || user.picture || "", text,
+        createdAt: FieldValue.serverTimestamp()
+      });
+      await ref.set({ lastMessage: text.slice(0, 120), lastMessageAt: FieldValue.serverTimestamp() }, { merge: true });
+      return res.status(201).json({ ok: true, id: message.id });
+    }
+
     if (action === "profile") {
       const displayName = clean(req.body?.displayName, 60) || clean(user.name || user.email?.split("@")[0], 60) || "CampusKit Student";
       const username = clean(req.body?.username, 24).toLowerCase().replace(/[^a-z0-9._]/g, "");
