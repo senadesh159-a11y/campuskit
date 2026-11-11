@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["main"]
     paths:
-      - "index.html"
+      - "index.html"\n      - "api/**"\n      - "laboratory/**"\n      - "android/**"
       - "assets/intelligence-lab.js"
       - "assets/intelligence-lab.css"
       - "tests/**"
