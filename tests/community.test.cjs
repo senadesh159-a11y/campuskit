@@ -138,7 +138,7 @@ test("Community profile editor actions use one unique edit button", () => {
   const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(match => match[1]);
   const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
   assert.deepEqual(duplicates, []);
-  assert.equal((html.match(/id="ck-social-edit-profile"/g) || []).length, 1);
+  assert.equal((html.match(/id=\\?"ck-social-edit-profile\\?"/g) || []).length, 1);
   assert.match(html, /actions\.innerHTML=profileUid===user\.uid\?/);
 });
 
