@@ -201,6 +201,20 @@ module.exports = async function handler(req, res) {
           const snap = await reports.orderBy("createdAt", "desc").limit(200).get();
           return res.status(200).json({ reports: snap.docs.map(d => ({ id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.().toISOString() || d.data().createdAt || null })) });
         }
+        if (view === "posts") {
+          const snap = await posts.orderBy("createdAt", "desc").limit(200).get();
+          return res.status(200).json({ posts: snap.docs.map(d => {
+            const item = d.data();
+            return {
+              id: d.id, ownerUid: item.ownerUid || null,
+              ownerName: item.ownerName || item.displayName || "CampusKit student",
+              type: item.type || "post", caption: item.caption || "",
+              mediaUrl: item.mediaUrl || item.fileUrl || "",
+              status: item.status || "active",
+              createdAt: item.createdAt?.toDate?.().toISOString() || item.createdAt || null
+            };
+          }) });
+        }
         if (view === "profiles") {
           const snap = await profiles.orderBy("updatedAt", "desc").limit(200).get();
           return res.status(200).json({ profiles: snap.docs.map(d => ({ uid: d.id, ...d.data(), updatedAt: d.data().updatedAt?.toDate?.().toISOString() || d.data().updatedAt || null })) });
@@ -228,6 +242,13 @@ module.exports = async function handler(req, res) {
         if (type === "community" && ["disable", "enable"].includes(action)) {
           await communities.doc(id).set({ status: action === "disable" ? "disabled" : "active", moderatedAt: FieldValue.serverTimestamp(), moderatedBy: user.uid }, { merge: true });
           return res.status(200).json({ ok: true, id, status: action === "disable" ? "disabled" : "active" });
+        }
+        if (type === "post" && ["hide", "restore"].includes(action)) {
+          await posts.doc(id).set({
+            status: action === "hide" ? "removed" : "active",
+            moderatedAt: FieldValue.serverTimestamp(), moderatedBy: user.uid
+          }, { merge: true });
+          return res.status(200).json({ ok: true, id, status: action === "hide" ? "removed" : "active" });
         }
         return res.status(400).json({ error: "Unsupported social moderation action." });
       }
