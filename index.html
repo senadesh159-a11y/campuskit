@@ -1079,6 +1079,7 @@ footer{color:#7696A2!important}
 .ck-community-message-form{display:flex;align-items:flex-end;gap:10px;margin-top:12px}.ck-community-message-form textarea{flex:1;min-height:55px}
 @media(max-width:560px){.ck-community-card{align-items:flex-start;flex-direction:column;width:100%}.ck-community-message-form{align-items:stretch;flex-direction:column}}
 </style>
+  <link rel="stylesheet" href="./assets/campuskit-office.css">
 </head>
 <body>
 <div id="campuskit-login-screen" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -1294,7 +1295,20 @@ footer{color:#7696A2!important}
       <p id="notesLibraryStatus" class="notes-status" role="status" aria-live="polite">Your notes will appear here.</p>
       <div id="notesList" class="notes-library-grid"></div>
     </section>
+    <section class="card ck-office-launch"><div class="ck-office-app-icon ck-writer-icon">W</div><h3>CampusKit Writer</h3><p>Create, format and save your documents in CampusKit.</p><button type="button" data-office-new="writer">Open Writer</button></section>
+    <section class="card ck-office-launch"><div class="ck-office-app-icon ck-sheets-icon">▦</div><h3>CampusKit Sheets</h3><p>Create spreadsheets, use formulas and organise your data.</p><button type="button" data-office-new="sheet">Open Sheets</button></section>
   </div>
+  <section id="ck-office-workspace" class="ck-office-workspace" hidden>
+    <div class="ck-office-topbar"><button type="button" id="ck-office-back">← Study Tools</button><strong>CampusKit Office</strong><span id="ck-office-save-state">Your workspace</span><button type="button" id="ck-office-create-doc">＋ New file</button></div>
+    <div id="ck-office-home" class="ck-office-home"><div class="ck-office-welcome"><span class="eyebrow">YOUR PRODUCTIVITY SPACE</span><h2>My Office Files</h2><p>Your documents and spreadsheets, saved privately to your CampusKit account.</p><button type="button" data-office-new="writer">＋ New document</button> <button type="button" data-office-new="sheet">＋ New spreadsheet</button><input type="search" id="ck-office-search" placeholder="Search files…"></div><div id="ck-office-files" class="ck-office-files"></div></div>
+    <div id="ck-office-editor" class="ck-office-editor" hidden>
+      <div class="ck-office-filebar"><input id="ck-office-file-name" maxlength="120" aria-label="File name"><span id="ck-office-file-kind"></span><button type="button" id="ck-office-save">Save</button><button type="button" id="ck-office-drive">Sync to Drive</button><button type="button" id="ck-office-export">Export</button><button type="button" id="ck-office-close-file">Close</button></div>
+      <div id="ck-writer-tools" class="ck-writer-tools" hidden><select id="ck-writer-style"><option value="p">Normal</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option></select><select id="ck-writer-font"><option>Arial</option><option>Calibri</option><option>Georgia</option><option>Times New Roman</option></select><button type="button" data-writer-cmd="bold"><b>B</b></button><button type="button" data-writer-cmd="italic"><i>I</i></button><button type="button" data-writer-cmd="underline"><u>U</u></button><button type="button" data-writer-cmd="insertUnorderedList">• List</button><button type="button" data-writer-cmd="insertOrderedList">1. List</button><button type="button" data-writer-cmd="justifyLeft">Left</button><button type="button" data-writer-cmd="justifyCenter">Center</button><button type="button" id="ck-writer-link">Link</button><input type="color" id="ck-writer-color" value="#172033" aria-label="Text colour"><button type="button" id="ck-writer-undo">↶</button><button type="button" id="ck-writer-redo">↷</button></div>
+      <div id="ck-writer-page-wrap" hidden><div id="ck-writer-page" class="ck-writer-page" contenteditable="true" spellcheck="true"><h1>Untitled document</h1><p>Start writing here…</p></div></div>
+      <div id="ck-sheets-tools" class="ck-sheets-tools" hidden><label id="ck-sheet-address">A1</label><input id="ck-sheet-formula" placeholder="Value or formula, e.g. =SUM(A1:A5)"><button type="button" id="ck-sheet-add-row">＋ Row</button><button type="button" id="ck-sheet-add-col">＋ Column</button><button type="button" id="ck-sheet-add-tab">＋ Sheet</button></div>
+      <div id="ck-sheets-wrap" class="ck-sheets-wrap" hidden><div id="ck-sheet-tabs" class="ck-sheet-tabs"></div><div class="ck-sheet-scroll"><table id="ck-sheet-grid" class="ck-sheet-grid"></table></div><p class="ck-sheet-hint">Supported formulas: SUM, AVERAGE, MIN, MAX, COUNT and basic arithmetic.</p></div>
+    </div>
+  </section>
   </div>
 
 <section class="card app-view" id="intelligence-lab" aria-labelledby="ck-intel-title">
@@ -2144,6 +2158,10 @@ window.CampusKitCloud = {
       savedNotes = data.notes.map(normalizeNote);
       localStorage.setItem(STORAGE_KEYS.notes, JSON.stringify(savedNotes));
     }
+    if (Array.isArray(data.officeFiles)) {
+      localStorage.setItem("campuskitOfficeFiles", JSON.stringify(data.officeFiles));
+      window.dispatchEvent(new Event("campuskit-office-cloud-ready"));
+    }
     displayAssignments();
     displayTimetable();
     displayNotes();
@@ -2220,7 +2238,8 @@ window.CampusKitCloud = {
   const collections = {
     campuskitAssignments: "assignments",
     campusTimetable: "timetable",
-    campusNotes: "notes"
+    campusNotes: "notes",
+    campuskitOfficeFiles: "officeFiles"
   };
 
   function showStatus(message) {
@@ -2415,6 +2434,24 @@ window.CampusKitCloud = {
         throw error;
       }
       return { driveFileId: saved.id, accessToken: token, url: `https://drive.google.com/uc?export=view&id=${encodeURIComponent(saved.id)}`, name: saved.name || file.name, size: Number(saved.size || file.size), mimeType: saved.mimeType || mimeType, provider: "google-drive" };
+    },
+    async saveOfficeFile(file, driveFileId = null) {
+      if (!auth.currentUser) throw new Error("Sign in to CampusKit first.");
+      if (!file) throw new Error("Choose an Office file first.");
+      let token = driveAccessToken;
+      if (!token || driveTokenExpiresAt <= Date.now() + 60000) token = await requestDriveToken("consent");
+      setDriveStatus("Syncing your Office file to Google Drive…");
+      const metadata = { name: file.name, mimeType: file.type || "application/octet-stream", description: "CampusKit Office personal synced copy." };
+      const body = new FormData();
+      body.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
+      body.append("file", file, file.name);
+      const endpoint = "https://www.googleapis.com/upload/drive/v3/files" + (driveFileId ? "/" + encodeURIComponent(driveFileId) : "") + "?uploadType=multipart&fields=id,name,mimeType,size,webViewLink";
+      const response = await fetch(endpoint, { method: driveFileId ? "PATCH" : "POST", headers: { Authorization: "Bearer " + token }, body });
+      if (!response.ok) throw await driveApiError(response);
+      const saved = await response.json();
+      if (!saved.id) throw new Error("Google Drive did not return a file ID.");
+      setDriveStatus("Office file synced to your personal Google Drive.");
+      return { driveFileId: saved.id, name: saved.name || file.name, url: saved.webViewLink || "" };
     },
     async delete(driveFileId) {
       if (!driveFileId) return;
@@ -3279,5 +3316,6 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 })();
 </script>
 
+  <script src="./assets/campuskit-office.js" defer></script>
 </body>
 </html>
