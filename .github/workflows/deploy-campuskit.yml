@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: 20
       - run: npm install
+      - run: npm test
       - run: npm run build:velaris
       - run: mkdir -p _site && rsync -a --exclude=.git --exclude=node_modules --exclude=_site ./ _site/
       - uses: actions/upload-pages-artifact@v3
