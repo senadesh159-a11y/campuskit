@@ -125,3 +125,25 @@ test("Notes & Library keeps its existing private Google Drive upload workflow", 
   assert.match(html, /CampusKit note attachment/);
   assert.match(html, /Files stay private in your Drive/);
 });
+
+
+test("Community profile editor has every field required by the profile API", () => {
+  assert.match(html, /id="ck-social-username"[^>]*required/);
+  assert.match(html, /id="ck-social-private" type="checkbox"/);
+  assert.match(html, /username:\$\('ck-social-username'\)\.value\.trim\(\)/);
+  assert.match(html, /isPrivate:\$\('ck-social-private'\)\.checked/);
+});
+
+test("Community profile editor actions use one unique edit button", () => {
+  const ids = [...html.matchAll(/\\bid=["']([^"']+)["']/g)].map(match => match[1]);
+  const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+  assert.deepEqual(duplicates, []);
+  assert.equal((html.match(/id="ck-social-edit-profile"/g) || []).length, 1);
+  assert.match(html, /actions\.innerHTML=profileUid===user\.uid\?/);
+});
+
+test("Opening own Community profile hydrates editable username and privacy state", () => {
+  assert.match(html, /if\(profileUid===user\.uid\)user=\{\.\.\.user,\.\.\.p,name:p\.displayName/);
+  assert.match(html, /\$\('ck-social-username'\)\.value=user\.username\|\|''/);
+  assert.match(html, /\$\('ck-social-private'\)\.checked=!!user\.isPrivate/);
+});
