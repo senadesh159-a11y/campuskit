@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
     const db = getFirestore();
     const requests = db.collection("paymentRequests");
 
-    if (req.method === "POST" && !["social", "music"].includes(String(req.query?.resource || ""))) {
+    if (req.method === "POST" && !["social", "music", "notes"].includes(String(req.query?.resource || ""))) {
       const featureId = String(req.body?.featureId || "");
       const utr = String(req.body?.utr || "").trim().toUpperCase();
       if (!Object.prototype.hasOwnProperty.call(PRICES, featureId)) return res.status(400).json({ error: "Unknown paid feature." });
