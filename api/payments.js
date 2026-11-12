@@ -119,7 +119,7 @@ module.exports = async function handler(req, res) {
       .split(",").map(email => email.trim().toLowerCase()).filter(Boolean);
     const socialAdminEmails = (process.env.CAMPUSKIT_SOCIAL_ADMIN_EMAILS || "")
       .split(",").map(email => email.trim().toLowerCase()).filter(Boolean);
-    const allowedAdminEmails = ["social", "music"].includes(resource) ? socialAdminEmails : managementAdminEmails;
+    const allowedAdminEmails = ["social", "music", "notes"].includes(resource) ? socialAdminEmails : managementAdminEmails;
     if (!allowedAdminEmails.includes((user.email || "").toLowerCase())) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
     }
