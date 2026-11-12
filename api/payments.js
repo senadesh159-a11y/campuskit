@@ -67,7 +67,7 @@ module.exports = async function handler(req, res) {
     initFirebase();
     const authHeader = req.headers.authorization || "";
     const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-    if (!token) return res.status(401).json({ error: "Sign in first." });
+    if (!token) { if(req.method==="GET" && req.query?.resource==="notes") { initFirebase(); const db=getFirestore(); const snap=await db.collection("webLibraryNotes").where("status","==","published").limit(300).get(); const notes=snap.docs.map(d=>({id:d.id,title:d.data().title,subject:d.data().subject,kind:d.data().kind,url:d.data().url,createdAt:d.data().createdAt?.toDate?.().toISOString()||d.data().createdAt||null})); notes.sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||""))); return res.status(200).json({notes}); } return res.status(401).json({ error: "Sign in first." }); }
     const user = await getAuth().verifyIdToken(token);
     const db = getFirestore();
     const requests = db.collection("paymentRequests");
@@ -122,6 +122,18 @@ module.exports = async function handler(req, res) {
     const allowedAdminEmails = ["social", "music"].includes(resource) ? socialAdminEmails : managementAdminEmails;
     if (!allowedAdminEmails.includes((user.email || "").toLowerCase())) {
       return res.status(403).json({ error: "Admin access is not configured for this account." });
+    }
+    if (resource === "notes") {
+      const notes = db.collection("webLibraryNotes");
+      if (req.method === "POST") {
+        const title=String(req.body?.title||"").trim().slice(0,150), subject=String(req.body?.subject||"").trim().slice(0,80), kind=String(req.body?.kind||""), rawUrl=String(req.body?.url||"").trim();
+        let parsed; try{parsed=new URL(rawUrl);}catch(_){parsed=null;}
+        if(!title||!subject||!["pdf","image"].includes(kind)||!parsed||parsed.protocol!=="https:"||!["drive.google.com","docs.google.com"].includes(parsed.hostname)) return res.status(400).json({error:"Enter a title, subject, PDF/image type and a valid Google Drive HTTPS share link."});
+        const ref=await notes.add({title,subject,kind,url:parsed.toString(),status:"published",createdAt:FieldValue.serverTimestamp(),createdBy:user.uid,createdByEmail:user.email||null});
+        return res.status(201).json({ok:true,id:ref.id});
+      }
+      if (req.method === "DELETE") { const id=String(req.query?.id||""); if(!/^[A-Za-z0-9_-]{8,128}$/.test(id)) return res.status(400).json({error:"Invalid note ID."}); await notes.doc(id).delete(); return res.status(200).json({ok:true,id}); }
+      return res.status(405).json({error:"Method not allowed for notes."});
     }
     if (resource === "users") {
       if (req.method === "GET") {
