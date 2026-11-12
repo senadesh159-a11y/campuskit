@@ -1244,6 +1244,9 @@ footer{color:#7696A2!important}
     <section class="card" aria-labelledby="notesTitle" id="notes-library">
       <h3 id="notesTitle" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v19H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20M8 7h8M8 11h8"/></svg></span>Notes Library</h3>
       <p>Organize notes by subject, search them, bookmark important topics, and attach PDFs.</p>
+      
+      <div class="notes-library-switch" role="tablist" aria-label="Notes library views"><button type="button" class="active" id="myLibraryTab" aria-selected="true">My Library</button><button type="button" id="webLibraryTab" aria-selected="false">Web Library</button></div>
+      <section id="webLibraryPanel" hidden aria-label="Web Library"><p class="notes-status">Published handwritten notes and study materials from CampusKit.</p><div id="webLibraryGrid" class="notes-library-grid"><p class="notes-status">Loading Web Library…</p></div></section>
       <form id="notesForm">
         <div class="notes-form-grid">
           <div>
@@ -3318,5 +3321,19 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
   <script src="./assets/campuskit-office-v2.js" defer></script>
-</body>
+<style>
+.notes-library-switch{display:flex;gap:9px;margin:12px 0 18px}.notes-library-switch button{border:1px solid var(--border,rgba(100,180,220,.3));border-radius:12px;padding:10px 18px;background:rgba(12,35,55,.7);color:inherit;font-weight:700}.notes-library-switch button.active{background:linear-gradient(120deg,#126e9e,#164d79);border-color:#52b8dc}.web-note-card{overflow:hidden;border:1px solid rgba(110,180,220,.22);border-radius:15px;background:rgba(8,30,48,.75);padding:10px;min-width:0}.web-note-preview{height:180px;display:flex;align-items:center;justify-content:center;background:#071827;border-radius:10px;overflow:hidden;text-decoration:none}.web-note-preview img{width:100%;height:100%;object-fit:contain}.web-note-pdf{font-size:32px;font-weight:900;color:#78d7ed;border:2px solid #3688a5;border-radius:12px;padding:20px 24px}.web-note-name{font-weight:800;margin:10px 2px 3px;overflow-wrap:anywhere}.web-note-meta{font-size:12px;opacity:.75;margin:0 2px 8px}.web-note-open{font-size:13px;color:#72d8ed;margin:2px}
+</style><script>
+// CampusKit Web Library: public catalogue of admin-published PDF and image notes.
+(function(){
+ const myTab=document.getElementById("myLibraryTab"),webTab=document.getElementById("webLibraryTab"),webPanel=document.getElementById("webLibraryPanel");
+ if(!myTab||!webTab||!webPanel)return;
+ const myNodes=["notesForm","notesSearch","notesSubjectFilter","notesSort","notesBookmarksOnly","notesCountLabel","notesLibraryStatus","notesList"].map(id=>document.getElementById(id)).filter(Boolean);
+ const grid=document.getElementById("webLibraryGrid"); let loaded=false;
+ const escHtml=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ async function load(){if(loaded)return;grid.innerHTML='<p class="notes-status">Loading published notes…</p>';try{const r=await fetch("https://campuskit-six.vercel.app/api/payments?resource=notes");const d=await r.json();if(!r.ok)throw new Error(d.error||"Unable to load Web Library");const items=d.notes||[];grid.innerHTML=items.length?items.map(n=>{const image=n.kind==="image";const href=escHtml(n.url);return '<article class="web-note-card"><a class="web-note-preview" href="'+href+'" target="_blank" rel="noopener noreferrer">'+(image?'<img loading="lazy" src="'+href+'" alt="'+escHtml(n.title)+' handwritten notes">':'<span class="web-note-pdf">PDF</span>')+'</a><div class="web-note-name">'+escHtml(n.title)+'</div><div class="web-note-meta">'+escHtml(n.subject||"General")+' · '+(image?"Handwritten image":"PDF document")+'</div><a class="web-note-open" href="'+href+'" target="_blank" rel="noopener noreferrer">Open note ↗</a></article>';}).join(""):'<p class="notes-status">No notes have been published yet.</p>';loaded=true;}catch(e){grid.innerHTML='<p class="notes-status">Web Library could not load. '+escHtml(e.message)+'</p>';}}
+ function show(which){const web=which==="web";myNodes.forEach(el=>el.hidden=web);webPanel.hidden=!web;myTab.classList.toggle("active",!web);webTab.classList.toggle("active",web);myTab.setAttribute("aria-selected",String(!web));webTab.setAttribute("aria-selected",String(web));if(web)load();}
+ myTab.addEventListener("click",()=>show("my"));webTab.addEventListener("click",()=>show("web"));
+})();
+</script></body>
 </html>
