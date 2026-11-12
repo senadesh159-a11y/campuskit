@@ -125,6 +125,11 @@ module.exports = async function handler(req, res) {
     }
     if (resource === "notes") {
       const notes = db.collection("webLibraryNotes");
+      if (req.method === "GET") {
+        const snapshot = await notes.orderBy("createdAt", "desc").limit(300).get();
+        const items = snapshot.docs.map(doc => ({ id:doc.id, ...doc.data(), createdAt:doc.data().createdAt?.toDate?.().toISOString() || doc.data().createdAt || null }));
+        return res.status(200).json({notes:items});
+      }
       if (req.method === "POST") {
         const title=String(req.body?.title||"").trim().slice(0,150), subject=String(req.body?.subject||"").trim().slice(0,80), kind=String(req.body?.kind||""), rawUrl=String(req.body?.url||"").trim();
         let parsed; try{parsed=new URL(rawUrl);}catch(_){parsed=null;}
