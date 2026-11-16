@@ -2869,7 +2869,7 @@ window.CampusKitCloud = {
   'campus-hero',
   'dashboard',
   'social',
-  'profile',
+  'profile-view',
   'search-section',
   'study-tools-view',
   'notes-library',
@@ -2883,7 +2883,7 @@ window.CampusKitCloud = {
 ];
   function setView(name, animate = true) {
     if (animate) playDotMatrixTransition();
-    const map = { dashboard: ['campus-hero','dashboard','search-section'], social: ['social'], profile: ['social'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], 'ck-premium-payment':['ck-premium-payment'] };
+    const map = { dashboard: ['campus-hero','dashboard','search-section'], social: ['social'], profile: ['profile-view'], 'study-tools': ['study-tools-view'], 'notes-library': ['study-tools-view','notes-library'], 'ai-assistant': ['ai-assistant'], 'relaxation-section': ['relaxation-section'],laboratory: ['laboratory-section'], 'focus-mode': ['focus-mode'], 'apk-download': ['apk-download'], 'intelligence-lab':['intelligence-lab'], 'ck-premium-payment':['ck-premium-payment'] };
     const selected = map[name] || map.dashboard;
     views.forEach(id => { const el = document.getElementById(id); if (el) el.classList.toggle('active-view', selected.includes(id)); });
     const tools = document.getElementById('study-tools');
@@ -2892,7 +2892,7 @@ window.CampusKitCloud = {
       const notes = document.getElementById('notes-library');
       if (notes) notes.style.display = name === 'notes-library' ? '' : 'none';
     }
-    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name === 'profile' ? 'social' : name)));
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + (name === 'study-tools' ? 'study-tools' : name === 'profile' ? 'profile' : name)));
     if (name === 'notes-library') { document.getElementById('notes-library').style.display = ''; }
     if (name === 'study-tools') document.getElementById('study-tools').querySelectorAll(':scope > section').forEach(card => card.style.display = card.id === 'notes-library' ? 'none' : '');
     if (name === 'dashboard') { document.getElementById('search-section').classList.add('active-view'); }
