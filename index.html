@@ -3464,14 +3464,18 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 (()=> {
  const $=id=>document.getElementById(id);
  const status=(s)=>{$('ck-graph-status').textContent=s;};
- let libs=null;
- function loadLibs(){
-  if(libs)return libs;
-  libs=Promise.all([
-   window.Plotly?Promise.resolve():new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.plot.ly/plotly-2.35.2.min.js';s.onload=resolve;s.onerror=()=>reject(Error('Graph plotting library could not load. Check your internet connection.'));document.head.append(s);}),
-   window.math?Promise.resolve():new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.js';s.onload=resolve;s.onerror=()=>reject(Error('Math expression library could not load. Check your internet connection.'));document.head.append(s);})
-  ]).then(()=>true);
-  return libs;
+ let plotlyPromise=null,mathPromise=null;
+ function loadPlotly(){
+  if(window.Plotly)return Promise.resolve();
+  if(plotlyPromise)return plotlyPromise;
+  plotlyPromise=new Promise((resolve,reject)=>{const el=document.createElement('script');el.src='https://cdn.plot.ly/plotly-2.35.2.min.js';el.onload=()=>window.Plotly?resolve():reject(Error('Plotly is unavailable.'));el.onerror=()=>{plotlyPromise=null;reject(Error('Graph library could not load. Check your internet connection.'));};document.head.append(el);});
+  return plotlyPromise;
+ }
+ function loadMath(){
+  if(window.math)return Promise.resolve();
+  if(mathPromise)return mathPromise;
+  mathPromise=new Promise((resolve,reject)=>{const el=document.createElement('script');el.src='https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.js';el.onload=()=>window.math?resolve():reject(Error('Math library is unavailable.'));el.onerror=()=>{mathPromise=null;reject(Error('Equation library could not load.'));};document.head.append(el);});
+  return mathPromise;
  }
  function rows(text,n){
   return text.split(/\n|;/).map((line,i)=>line.trim()).filter(Boolean).map((line,i)=>{
@@ -3493,7 +3497,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
  function rangePair(s,label){const a=s.split(',').map(Number);if(a.length!==2||!a.every(Number.isFinite)||a[0]>=a[1])throw Error(label+' range must be two numbers: minimum, maximum.');return a;}
  async function plot(){
   try{
-   status('Preparing graph…');await loadLibs();
+   status('Loading graph engine…');await loadPlotly();
    const dim=$('ck-graph-dimension').value,style=$('ck-graph-style').value;
    const xlab=$('ck-graph-xlabel').value.trim()||'X',ylab=$('ck-graph-ylabel').value.trim()||'Y';
    const traces=[];
@@ -3532,18 +3536,20 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
     });
     const eq=$('ck-graph-equation-2d').value.trim();
     if(eq){
+     await loadMath();
      const min=Number($('ck-graph-xmin').value),max=Number($('ck-graph-xmax').value),steps=Math.min(2000,Math.max(50,Number($('ck-graph-steps').value)||400));
      if(!Number.isFinite(min)||!Number.isFinite(max)||min>=max)throw Error('X minimum must be smaller than X maximum.');
      const xs=[],ys=[];for(let i=0;i<=steps;i++){const x=min+(max-min)*i/steps;xs.push(x);ys.push(expressionValue(eq,{x}));}
      traces.push({type:'scatter',mode:'lines',x:xs,y:ys,name:eq,line:{width:3, color:'#0C8F98'},connectgaps:false});
     }
     if(!traces.length)throw Error('Add coordinate pairs, a multiple-readings table, or an equation.');
-    Plotly.newPlot('ck-graph-plot-area',traces,{paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#132b38'},margin:{l:65,r:25,t:35,b:65},xaxis:{title:chart==='pie'?'':xlab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true},yaxis:{title:chart==='pie'?'':chart==='histogram'?'Frequency':ylab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true,scaleanchor:null},showlegend:true,legend:{orientation:'h'}},{responsive:true,displaylogo:false});
+    await Plotly.newPlot('ck-graph-plot-area',traces,{paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#132b38'},margin:{l:65,r:25,t:35,b:65},xaxis:{title:chart==='pie'?'':xlab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true},yaxis:{title:chart==='pie'?'':chart==='histogram'?'Frequency':ylab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true,scaleanchor:null},showlegend:true,legend:{orientation:'h'}},{responsive:true,displaylogo:false});
    }else{
     const pts=rows($('ck-graph-points-3d').value,3);
     if(pts.length)traces.push({type:'scatter3d',mode:style,x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),z:pts.map(p=>p[2]),name:'3D coordinates',marker:{size:5}});
     const eq=$('ck-graph-equation-3d').value.trim();
     if(eq){
+     await loadMath();
      const xr=rangePair($('ck-graph-3dxrange').value,'X'),yr=rangePair($('ck-graph-3dyrange').value,'Y'),steps=Math.min(80,Math.max(10,Number($('ck-graph-3dsteps').value)||35));
      const x=[],y=[],z=[];for(let i=0;i<=steps;i++){x.push(xr[0]+(xr[1]-xr[0])*i/steps);y.push(yr[0]+(yr[1]-yr[0])*i/steps);}for(let j=0;j<=steps;j++){const row=[];for(let i=0;i<=steps;i++)row.push(expressionValue(eq,{x:x[i],y:y[j]}));z.push(row);}
      traces.push({type:'surface',x,y,z, name:eq,showscale:true,opacity:.82});
@@ -3558,7 +3564,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
  $('ck-graph-csv-file').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const text=await file.text();$('ck-graph-multi-data').value=text;status('Imported '+file.name+'. Review the table, then plot the graph.');}catch(err){status('Could not read the selected data file.');}});
  $('ck-graph-plot').addEventListener('click',plot);
  $('ck-graph-clear').addEventListener('click',()=>{['ck-graph-points-2d','ck-graph-multi-data','ck-graph-equation-2d','ck-graph-points-3d','ck-graph-equation-3d'].forEach(id=>$(id).value='');if(window.Plotly)Plotly.purge('ck-graph-plot-area');$('ck-graph-plot-area').replaceChildren();status('Graph inputs cleared.');});
- $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadLibs();const area=$('ck-graph-plot-area');let head=area.querySelector('.ck-graph-print-brand');if(!head){head=document.createElement('div');head.className='ck-graph-print-brand';head.innerHTML='<img src="./assets/campuskit-icon.svg" alt="CampusKit logo"><div><strong>CampusKit</strong><span>Graph Maker · Study Tools</span></div>';area.prepend(head);}document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
+ $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadPlotly();const area=$('ck-graph-plot-area');let head=area.querySelector('.ck-graph-print-brand');if(!head){head=document.createElement('div');head.className='ck-graph-print-brand';head.innerHTML='<img src="./assets/campuskit-icon.svg" alt="CampusKit logo"><div><strong>CampusKit</strong><span>Graph Maker · Study Tools</span></div>';area.prepend(head);}document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
 })();
 </script>
 </body>
