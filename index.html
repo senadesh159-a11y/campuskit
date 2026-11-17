@@ -3596,5 +3596,58 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
  $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadPlotly();const area=$('ck-graph-plot-area');let head=area.querySelector('.ck-graph-print-brand');if(!head){head=document.createElement('div');head.className='ck-graph-print-brand';head.innerHTML='<img src="./assets/campuskit-icon.svg" alt="CampusKit logo"><div><strong>CampusKit</strong><span>Graph Maker · Study Tools</span></div>';area.prepend(head);}document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
 })();
 </script>
+
+<script>
+/* CampusKit global tactile click sound */
+(()=>{
+ if(window.__campusKitClickSoundInstalled)return;
+ window.__campusKitClickSoundInstalled=true;
+ let audioContext=null,lastSoundAt=0;
+ const interactive='button,a,[role="button"],[role="tab"],[role="menuitem"],summary,input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"],select,[onclick],[tabindex]:not([tabindex="-1"])';
+ function playTap(){
+  const now=Date.now();
+  if(now-lastSoundAt<38)return;
+  lastSoundAt=now;
+  try{
+   const AudioCtx=window.AudioContext||window.webkitAudioContext;
+   if(!AudioCtx)return;
+   if(!audioContext)audioContext=new AudioCtx();
+   if(audioContext.state==='suspended')audioContext.resume();
+   const t=audioContext.currentTime;
+   const master=audioContext.createGain();
+   master.gain.setValueAtTime(0.0001,t);
+   master.gain.exponentialRampToValueAtTime(0.105,t+0.006);
+   master.gain.exponentialRampToValueAtTime(0.0001,t+0.085);
+   master.connect(audioContext.destination);
+   const body=audioContext.createOscillator();
+   const bodyGain=audioContext.createGain();
+   body.type='sine';
+   body.frequency.setValueAtTime(185,t);
+   body.frequency.exponentialRampToValueAtTime(118,t+0.075);
+   bodyGain.gain.setValueAtTime(0.72,t);
+   bodyGain.gain.exponentialRampToValueAtTime(0.0001,t+0.08);
+   body.connect(bodyGain);bodyGain.connect(master);
+   body.start(t);body.stop(t+0.09);
+   const tick=audioContext.createOscillator();
+   const tickGain=audioContext.createGain();
+   tick.type='triangle';
+   tick.frequency.setValueAtTime(980,t);
+   tick.frequency.exponentialRampToValueAtTime(620,t+0.028);
+   tickGain.gain.setValueAtTime(0.16,t);
+   tickGain.gain.exponentialRampToValueAtTime(0.0001,t+0.032);
+   tick.connect(tickGain);tickGain.connect(master);
+   tick.start(t);tick.stop(t+0.04);
+  }catch(_){}
+ }
+ document.addEventListener('click',event=>{
+  const target=event.target instanceof Element?event.target:null;
+  const control=target?.closest(interactive);
+  if(!control||control.matches(':disabled,[aria-disabled="true"],[data-sound-off]'))return;
+  if(control.matches('input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]),textarea,[contenteditable="true"]'))return;
+  playTap();
+ },true);
+})();
+</script>
+
 </body>
 </html>
