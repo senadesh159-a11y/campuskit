@@ -44,10 +44,18 @@ test("Main app scripts and serverless APIs pass JavaScript syntax checks", () =>
   assert.doesNotThrow(() => new vm.Script(html.slice(start + '<script id="ck-social-campus">'.length, end)));
 });
 
-test("Google sign-in waits for persistent local auth and explains domain errors", () => {
-  assert.match(html, /setPersistence\(auth, browserLocalPersistence\)/);
-  assert.match(html, /await authPersistenceReady/);
+test("Google sign-in configures storage fallbacks before enabling the mobile popup", () => {
+  assert.match(html, /browserLocalPersistence/);
+  assert.match(html, /browserSessionPersistence/);
+  assert.match(html, /inMemoryPersistence/);
+  assert.match(html, /authPersistenceReady\.then\(mode =>/);
+  assert.match(html, /loginBtn\.disabled = true;\s*showStatus\("Preparing secure sign-in/);
+  assert.match(html, /signInWithPopup\(auth, provider\)\.then/);
+  assert.doesNotMatch(html, /await authPersistenceReady;\s*const credential = await signInWithPopup/);
   assert.match(html, /auth\/unauthorized-domain/);
+  assert.match(html, /auth\/popup-blocked/);
+  assert.match(html, /auth\/popup-closed-by-user/);
+  assert.match(html, /auth\/network-request-failed/);
   assert.match(html, /Authorized domains/);
 });
 
