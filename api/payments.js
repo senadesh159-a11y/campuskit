@@ -72,10 +72,14 @@ module.exports = async function handler(req, res) {
     const db = getFirestore();
     const requests = db.collection("paymentRequests");
 
-    if (req.method === "POST" && !["social", "music", "notes"].includes(String(req.query?.resource || ""))) {
+    if (req.method === "POST" && !["social", "music", "notes", "free-premium"].includes(String(req.query?.resource || ""))) {
       const featureId = String(req.body?.featureId || "");
       const utr = String(req.body?.utr || "").trim().toUpperCase();
       if (!Object.prototype.hasOwnProperty.call(PRICES, featureId)) return res.status(400).json({ error: "Unknown paid feature." });
+      const existingFreeAccess = await db.collection("premiumFreeAccess").doc(user.uid).get();
+      if (existingFreeAccess.exists && existingFreeAccess.data().active === true) {
+        return res.status(409).json({ error: "Your account already has free access to all CampusKit Premium features." });
+      }
       if (!/^[A-Z0-9]{8,24}$/.test(utr)) return res.status(400).json({ error: "Enter a valid 8–24 character UPI transaction reference (UTR)." });
       const id = crypto.createHash("sha256").update(user.uid + ":" + utr).digest("hex");
       const ref = requests.doc(id);
