@@ -3507,22 +3507,26 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
     const matrix=$('ck-graph-multi-data').value.trim();
     let seriesData=[];
     if(matrix){
-     const lines=matrix.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-     if(lines.length<2)throw Error('Multiple readings need a header row and at least one data row.');
-     const splitLine=s=>s.includes('\t')?s.split('\t'):s.split(',');
-     const headers=splitLine(lines[0]).map(s=>s.trim());
-     if(headers.length<2||!headers[0])throw Error('Table format: X,Reading 1,Reading 2…');
-     const cols=headers.length;
+     const lines=matrix.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+     if(!lines.length)throw Error('Enter at least one row of readings.');
+     const splitLine=v=>v.includes('\t')?v.split('\t'):v.includes(',')?v.split(','):v.trim().split(/\s+/);
+     const first=splitLine(lines[0]).map(v=>v.trim());
+     const hasHeader=first.some(v=>v!==''&&!Number.isFinite(Number(v)));
+     const headers=hasHeader?first.slice(1):[];
+     const dataLines=hasHeader?lines.slice(1):lines;
+     if(!dataLines.length)throw Error('Add numeric reading rows below the header.');
+     const cols=hasHeader?first.length:splitLine(dataLines[0]).length;
+     if(cols<2)throw Error('Use at least two columns: X, Reading 1, Reading 2…');
      const xs=Array.from({length:cols-1},()=>[]),ys=Array.from({length:cols-1},()=>[]);
-     lines.slice(1).forEach((line,ri)=>{
-      const cells=splitLine(line).map(s=>s.trim());
-      if(cells.length!==cols)throw Error('Table row '+(ri+2)+' has '+cells.length+' columns; expected '+cols+'.');
+     dataLines.forEach((line,ri)=>{
+      const cells=splitLine(line).map(v=>v.trim());
+      if(cells.length!==cols)throw Error('Table row '+(ri+(hasHeader?2:1))+' has '+cells.length+' columns; expected '+cols+'.');
       if(!cells[0])return;
-      const xv=Number(cells[0]);if(!Number.isFinite(xv))throw Error('Invalid X value in table row '+(ri+2)+'.');
-      for(let c=1;c<cols;c++){if(cells[c]==='')continue;const yv=Number(cells[c]);if(!Number.isFinite(yv))throw Error('Invalid number in row '+(ri+2)+', column '+(c+1)+'.');xs[c-1].push(xv);ys[c-1].push(yv);}
+      const xv=Number(cells[0]);if(!Number.isFinite(xv))throw Error('Invalid X value in table row '+(ri+(hasHeader?2:1))+'.');
+      for(let c=1;c<cols;c++){if(cells[c]==='')continue;const yv=Number(cells[c]);if(!Number.isFinite(yv))throw Error('Invalid number in row '+(ri+(hasHeader?2:1))+', column '+(c+1)+'.');xs[c-1].push(xv);ys[c-1].push(yv);}
      });
-     seriesData=headers.slice(1).map((name,i)=>({x:xs[i],y:ys[i],name:name||('Reading '+(i+1))})).filter(s=>s.x.length);
-     if(!seriesData.length)throw Error('No numeric readings found in the multiple-series table.');
+     seriesData=Array.from({length:cols-1},(_,i)=>({x:xs[i],y:ys[i],name:headers[i]||('Reading '+(i+1))})).filter(v=>v.x.length);
+     if(!seriesData.length)throw Error('No numeric readings found. Add rows like 1.0, 3.4, 5.6.');
     }
     const plotSeries=seriesData.length?seriesData:(pts.length?[{x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Coordinates'}]:[]);
     plotSeries.forEach((s,i)=>{
