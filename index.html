@@ -3505,7 +3505,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
     if(matrix){
      const lines=matrix.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
      if(lines.length<2)throw Error('Multiple readings need a header row and at least one data row.');
-     const splitLine=s=>s.includes('\\t')?s.split('\\t'):s.split(',');
+     const splitLine=s=>s.includes('\t')?s.split('\t'):s.split(',');
      const headers=splitLine(lines[0]).map(s=>s.trim());
      if(headers.length<2||!headers[0])throw Error('Table format: X,Reading 1,Reading 2…');
      const cols=headers.length;
