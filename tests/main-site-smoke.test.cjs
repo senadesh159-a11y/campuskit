@@ -59,6 +59,13 @@ test("Google sign-in configures storage fallbacks before enabling the mobile pop
   assert.match(html, /Authorized domains/);
 });
 
+test("PWA browser theme metadata is unique and consistent with the installed app theme", () => {
+  assert.equal((html.match(/<meta name="theme-color"/g) || []).length, 1);
+  const manifest = JSON.parse(fs.readFileSync(path.join(root, "manifest.webmanifest"), "utf8"));
+  assert.equal(manifest.theme_color, "#070812");
+  assert.equal(manifest.background_color, "#070812");
+});
+
 test("Main website asset files are present and under the agreed 10 MB per-file ceiling", () => {
   for (const file of ["assets/campuskit-office-v2.js", "assets/campuskit-office.css", "assets/intelligence-lab.js", "assets/intelligence-lab.css", "manifest.webmanifest"]) {
     const full = path.join(root, file);
