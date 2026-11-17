@@ -1335,6 +1335,13 @@ footer{color:#7696A2!important}
         <div id="ck-graph-2d-inputs">
           <label for="ck-graph-points-2d">2D coordinates (one point per line: x, y)</label>
           <textarea id="ck-graph-points-2d" spellcheck="false" placeholder="-3, 4&#10;0, 0&#10;2, 5"></textarea>
+          <div class="ck-graph-multi-series">
+            <label for="ck-graph-multi-data">Multiple readings / data series (paste a table)</label>
+            <p class="ck-graph-note">First column is X; every next column becomes a separate plotted series. Add as many reading columns and rows as needed.</p>
+            <textarea id="ck-graph-multi-data" spellcheck="false" placeholder="X,Reading 1,Reading 2,Reading 3&#10;1.0,3.4,5.6,2.1&#10;2.0,8.9,3.3,4.7&#10;3.0,5.6,8.4,6.2"></textarea>
+            <label for="ck-graph-csv-file">Or import a CSV / TSV data file</label>
+            <input id="ck-graph-csv-file" type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values">
+          </div>
           <label for="ck-graph-equation-2d">Optional function / equation (e.g. y = x^2 - 2*x)</label>
           <input id="ck-graph-equation-2d" spellcheck="false" placeholder="y = sin(x) or y = x^2">
           <div class="ck-graph-controls">
@@ -3451,7 +3458,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 <style id="ck-graph-maker-style">
 .ck-graph-maker{grid-column:1/-1;min-width:0}.ck-graph-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:12px 0}.ck-graph-controls label,.ck-graph-input-grid label{display:grid;gap:6px;color:#c8e4ed;font-size:13px;font-weight:650}.ck-graph-controls input,.ck-graph-controls select,.ck-graph-input-grid input,.ck-graph-input-grid textarea{width:100%;min-width:0;margin:0;padding:10px;border:1px solid rgba(100,190,207,.28);border-radius:10px;background:#041722;color:#eaf7fa;font:inherit}.ck-graph-input-grid textarea{min-height:125px;resize:vertical}.ck-graph-input-grid{display:grid;gap:12px}.ck-graph-input-grid>div{display:grid;gap:10px}.ck-graph-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.ck-graph-actions button{margin:0}.ck-graph-status{min-height:22px;color:#83dfe1!important;font-size:13px}.ck-graph-note{font-size:12px;color:#8faeb8!important}.ck-graph-maker #ck-graph-plot-area{width:100%;min-height:420px;border:1px solid rgba(100,190,207,.2);border-radius:14px;background:#fff;overflow:hidden}.ck-graph-maker #ck-graph-plot-area .plot-container{width:100%}@media(max-width:560px){.ck-graph-maker #ck-graph-plot-area{min-height:340px}.ck-graph-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .ck-graph-print-brand{display:none;align-items:center;gap:12px;padding:8px 14px;color:#142a35;font-family:Arial,sans-serif}.ck-graph-print-brand img{width:42px;height:42px;object-fit:contain}.ck-graph-print-brand strong{display:block;font-size:20px;letter-spacing:.4px}.ck-graph-print-brand span{display:block;font-size:11px;color:#52636b}@media print{body.ck-print-graph *{visibility:hidden!important}body.ck-print-graph #ck-graph-plot-area,body.ck-print-graph #ck-graph-plot-area *{visibility:visible!important}body.ck-print-graph #ck-graph-plot-area{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:95vh!important;border:0!important}body.ck-print-graph #ck-graph-plot-area .ck-graph-print-brand{display:flex!important}body.ck-print-graph #ck-graph-plot-area .modebar{display:none!important}}
-</style>
+.ck-graph-multi-series{display:grid;gap:7px;padding:14px;border:1px solid rgba(100,190,207,.2);border-radius:12px;background:rgba(5,23,34,.45)}.ck-graph-multi-series p{margin:0 0 4px}.ck-graph-multi-series textarea{min-height:150px;font-family:ui-monospace,monospace;font-size:13px}.ck-graph-multi-series input[type=file]{padding:8px}</style>
 
 <script id="ck-graph-maker-script">
 (()=> {
@@ -3493,15 +3500,36 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
    if(dim==='2d'){
     const pts=rows($('ck-graph-points-2d').value,2);
     const chart=$('ck-graph-charttype').value;
-    if(pts.length){
-     if(chart==='scatter')traces.push({type:'scatter',mode:style,x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Coordinates',marker:{size:9}});
-     else if(chart==='line')traces.push({type:'scatter',mode:'lines+markers',x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Line data',line:{width:3}});
-     else if(chart==='bar')traces.push({type:'bar',x:pts.map(p=>String(p[0])),y:pts.map(p=>p[1]),name:'Bar data'});
-     else if(chart==='area')traces.push({type:'scatter',mode:'lines',x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),fill:'tozeroy',name:'Area data'});
-     else if(chart==='histogram')traces.push({type:'histogram',x:pts.map(p=>p[1]),name:'Frequency distribution',nbinsx:Math.max(5,Math.min(30,pts.length))});
-     else if(chart==='box')traces.push({type:'box',y:pts.map(p=>p[1]),name:'Statistical distribution',boxpoints:'all',jitter:.35,pointpos:0});
-     else if(chart==='pie')traces.push({type:'pie',labels:pts.map(p=>String(p[0])),values:pts.map(p=>Math.abs(p[1])),name:'Proportions',hole:0});
+    const matrix=$('ck-graph-multi-data').value.trim();
+    let seriesData=[];
+    if(matrix){
+     const lines=matrix.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+     if(lines.length<2)throw Error('Multiple readings need a header row and at least one data row.');
+     const splitLine=s=>s.includes('\\t')?s.split('\\t'):s.split(',');
+     const headers=splitLine(lines[0]).map(s=>s.trim());
+     if(headers.length<2||!headers[0])throw Error('Table format: X,Reading 1,Reading 2…');
+     const cols=headers.length;
+     const xs=Array.from({length:cols-1},()=>[]),ys=Array.from({length:cols-1},()=>[]);
+     lines.slice(1).forEach((line,ri)=>{
+      const cells=splitLine(line).map(s=>s.trim());
+      if(cells.length!==cols)throw Error('Table row '+(ri+2)+' has '+cells.length+' columns; expected '+cols+'.');
+      if(!cells[0])return;
+      const xv=Number(cells[0]);if(!Number.isFinite(xv))throw Error('Invalid X value in table row '+(ri+2)+'.');
+      for(let c=1;c<cols;c++){if(cells[c]==='')continue;const yv=Number(cells[c]);if(!Number.isFinite(yv))throw Error('Invalid number in row '+(ri+2)+', column '+(c+1)+'.');xs[c-1].push(xv);ys[c-1].push(yv);}
+     });
+     seriesData=headers.slice(1).map((name,i)=>({x:xs[i],y:ys[i],name:name||('Reading '+(i+1))})).filter(s=>s.x.length);
+     if(!seriesData.length)throw Error('No numeric readings found in the multiple-series table.');
     }
+    const plotSeries=seriesData.length?seriesData:(pts.length?[{x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Coordinates'}]:[]);
+    plotSeries.forEach((s,i)=>{
+     if(chart==='scatter')traces.push({type:'scatter',mode:style,x:s.x,y:s.y,name:s.name,marker:{size:9}});
+     else if(chart==='line')traces.push({type:'scatter',mode:'lines+markers',x:s.x,y:s.y,name:s.name,line:{width:3}});
+     else if(chart==='bar')traces.push({type:'bar',x:s.x.map(String),y:s.y,name:s.name});
+     else if(chart==='area')traces.push({type:'scatter',mode:'lines',x:s.x,y:s.y,fill:seriesData.length?'tonexty':'tozeroy',name:s.name});
+     else if(chart==='histogram')traces.push({type:'histogram',x:s.y,name:s.name,nbinsx:Math.max(5,Math.min(30,s.y.length))});
+     else if(chart==='box')traces.push({type:'box',y:s.y,name:s.name,boxpoints:'all',jitter:.35,pointpos:0});
+     else if(chart==='pie')traces.push({type:'pie',labels:s.x.map(String),values:s.y.map(Math.abs),name:s.name,hole:0});
+    });
     const eq=$('ck-graph-equation-2d').value.trim();
     if(eq){
      const min=Number($('ck-graph-xmin').value),max=Number($('ck-graph-xmax').value),steps=Math.min(2000,Math.max(50,Number($('ck-graph-steps').value)||400));
@@ -3509,7 +3537,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
      const xs=[],ys=[];for(let i=0;i<=steps;i++){const x=min+(max-min)*i/steps;xs.push(x);ys.push(expressionValue(eq,{x}));}
      traces.push({type:'scatter',mode:'lines',x:xs,y:ys,name:eq,line:{width:3, color:'#0C8F98'},connectgaps:false});
     }
-    if(!traces.length)throw Error('Add at least one 2D coordinate or equation.');
+    if(!traces.length)throw Error('Add coordinate pairs, a multiple-readings table, or an equation.');
     Plotly.newPlot('ck-graph-plot-area',traces,{paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#132b38'},margin:{l:65,r:25,t:35,b:65},xaxis:{title:chart==='pie'?'':xlab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true},yaxis:{title:chart==='pie'?'':chart==='histogram'?'Frequency':ylab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true,scaleanchor:null},showlegend:true,legend:{orientation:'h'}},{responsive:true,displaylogo:false});
    }else{
     const pts=rows($('ck-graph-points-3d').value,3);
@@ -3527,8 +3555,9 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
   }catch(e){status(e.message||'Could not plot this graph.');}
  }
  $('ck-graph-dimension').addEventListener('change',e=>{const d=e.target.value;$('ck-graph-2d-inputs').hidden=d!=='2d';$('ck-graph-3d-inputs').hidden=d!=='3d';$('ck-graph-zlabel-wrap').hidden=d!=='3d';$('ck-graph-plot-area').replaceChildren();status('Enter values for the selected coordinate system.');});
+ $('ck-graph-csv-file').addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;try{const text=await file.text();$('ck-graph-multi-data').value=text;status('Imported '+file.name+'. Review the table, then plot the graph.');}catch(err){status('Could not read the selected data file.');}});
  $('ck-graph-plot').addEventListener('click',plot);
- $('ck-graph-clear').addEventListener('click',()=>{['ck-graph-points-2d','ck-graph-equation-2d','ck-graph-points-3d','ck-graph-equation-3d'].forEach(id=>$(id).value='');if(window.Plotly)Plotly.purge('ck-graph-plot-area');$('ck-graph-plot-area').replaceChildren();status('Graph inputs cleared.');});
+ $('ck-graph-clear').addEventListener('click',()=>{['ck-graph-points-2d','ck-graph-multi-data','ck-graph-equation-2d','ck-graph-points-3d','ck-graph-equation-3d'].forEach(id=>$(id).value='');if(window.Plotly)Plotly.purge('ck-graph-plot-area');$('ck-graph-plot-area').replaceChildren();status('Graph inputs cleared.');});
  $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadLibs();const area=$('ck-graph-plot-area');let head=area.querySelector('.ck-graph-print-brand');if(!head){head=document.createElement('div');head.className='ck-graph-print-brand';head.innerHTML='<img src="./assets/campuskit-icon.svg" alt="CampusKit logo"><div><strong>CampusKit</strong><span>Graph Maker · Study Tools</span></div>';area.prepend(head);}document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
 })();
 </script>
