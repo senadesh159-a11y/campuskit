@@ -3503,7 +3503,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
     const matrix=$('ck-graph-multi-data').value.trim();
     let seriesData=[];
     if(matrix){
-     const lines=matrix.split(/\\r?\\n/).map(s=>s.trim()).filter(Boolean);
+     const lines=matrix.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
      if(lines.length<2)throw Error('Multiple readings need a header row and at least one data row.');
      const splitLine=s=>s.includes('\\t')?s.split('\\t'):s.split(',');
      const headers=splitLine(lines[0]).map(s=>s.trim());
