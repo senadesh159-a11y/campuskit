@@ -5,8 +5,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#050d0a",
-  "theme_color": "#07110b",
+  "background_color": "#070812",
+  "theme_color": "#070812",
   "icons": [
     {
       "src": "./assets/campuskit-icon.svg",
