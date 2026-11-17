@@ -3219,38 +3219,60 @@ loadLabExperiments("Physics");
  const status=document.getElementById('ck-apk-status');
  const link=document.getElementById('ck-apk-download-link');
  if(!status||!link)return;
- const section=document.getElementById('apk-download');
- const meta=document.createElement('div');
- meta.id='ck-apk-build-meta';
- meta.setAttribute('aria-live','polite');
- status.insertAdjacentElement('afterend',meta);
- const item=(label,value,accent=false)=>{
+ const meta=document.getElementById('ck-apk-build-meta')||document.createElement('div');
+ meta.id='ck-apk-build-meta';meta.setAttribute('aria-live','polite');
+ if(!meta.isConnected)status.insertAdjacentElement('afterend',meta);
+ const note=document.getElementById('ck-apk-size-note')||document.createElement('p');
+ note.id='ck-apk-size-note';note.className='ck-apk-size-note';
+ if(!note.isConnected)meta.insertAdjacentElement('afterend',note);
+ const releasesUrl='https://github.com/senadesh159-a11y/campuskit/releases';
+ const apiUrl='https://api.github.com/repos/senadesh159-a11y/campuskit/releases?per_page=20';
+ const item=(label,value)=>{
    const box=document.createElement('div');box.className='ck-apk-meta-item';
    const small=document.createElement('small');small.textContent=label;
-   const strong=document.createElement('strong');strong.textContent=value;if(accent)strong.classList.add('ck-lime');
+   const strong=document.createElement('strong');strong.textContent=value;
    box.append(small,strong);return box;
  };
- const note=document.createElement('p');note.className='ck-apk-size-note';meta.insertAdjacentElement('afterend',note);
+ const showFallback=(message)=>{
+   status.textContent=message;
+   meta.replaceChildren(item('Build','Release lookup unavailable'),item('Download','Official releases'));
+   note.classList.remove('is-good');note.classList.add('is-warning');
+   note.textContent='Use the official GitHub Releases page. Install only the APK asset published by senadesh159-a11y/campuskit.';
+   link.href=releasesUrl;link.removeAttribute('download');
+   link.textContent='Open official releases ↗';
+ };
  try{
-  status.textContent='Checking the official GitHub release…';
-  const response=await fetch('https://api.github.com/repos/senadesh159-a11y/campuskit/releases/latest',{headers:{Accept:'application/vnd.github+json'}});
-  if(response.status===404){status.textContent='No official APK release has been published yet.';meta.append(item('Build status','Not published'),item('Download','Unavailable'),item('Target size','10 MB+'));note.classList.add('is-warning');note.textContent='The download button will point to the official release page until a real APK is published. No fake or padded APK is provided.';link.href='https://github.com/senadesh159-a11y/campuskit/releases';return;}
-  if(!response.ok)throw new Error('GitHub release lookup returned '+response.status);
-  const release=await response.json();
-  const asset=(release.assets||[]).find(file=>/\.apk$/i.test(file.name));
-  if(!asset){status.textContent='A release exists, but it has no APK asset yet.';meta.append(item('Version',release.tag_name||'—'),item('APK asset','Missing'),item('Target size','10 MB+'));note.classList.add('is-warning');note.textContent='Publish the signed Android APK as a release asset before asking students to install it.';link.href=release.html_url||'https://github.com/senadesh159-a11y/campuskit/releases';return;}
-  const mb=asset.size/1024/1024, pretty=mb.toFixed(2)+' MB';
-  link.href=asset.browser_download_url;
-  link.setAttribute('download',asset.name);
-  status.textContent='Official Android build is available · '+(release.tag_name||'Latest release');
-  meta.append(item('Version',release.tag_name||'Latest',true),item('APK size',pretty),item('Package',asset.name));
-  if(mb>=10){note.classList.add('is-good');note.textContent='Size target met: this is a real release asset of at least 10 MB. Published '+(release.published_at?new Date(release.published_at).toLocaleDateString():'date unavailable')+'.';}
-  else{note.classList.add('is-warning');note.textContent='This real APK is below the requested 10 MB target. The file is not padded; increase size only through genuine app features, resources and required libraries.';}
+   status.textContent='Checking official CampusKit Android builds…';
+   link.setAttribute('aria-disabled','true');
+   const controller=new AbortController();
+   const timeout=setTimeout(()=>controller.abort(),10000);
+   let response;
+   try{response=await fetch(apiUrl,{headers:{Accept:'application/vnd.github+json'},cache:'no-store',signal:controller.signal});}
+   finally{clearTimeout(timeout);}
+   if(!response.ok)throw new Error('Release lookup failed ('+response.status+')');
+   const releases=await response.json();
+   const release=(Array.isArray(releases)?releases:[]).find(r=>!r.draft&&!r.prerelease&&(r.assets||[]).some(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded'));
+   if(!release){showFallback('No downloadable APK is published yet.');return;}
+   const asset=release.assets.find(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded');
+   if(!asset||!asset.browser_download_url||!Number.isFinite(Number(asset.size))||Number(asset.size)<=0){showFallback('The latest Android build is not ready for download yet.');return;}
+   const sizeBytes=Number(asset.size);
+   const sizeText=sizeBytes>=1024*1024?(sizeBytes/1024/1024).toFixed(2)+' MB':(sizeBytes/1024).toFixed(1)+' KB';
+   link.href=asset.browser_download_url;link.setAttribute('download',asset.name);
+   link.removeAttribute('aria-disabled');
+   link.textContent=(/Android/i.test(navigator.userAgent)?'Download & install APK ':'Download Android APK ')+'↓';
+   status.textContent='Verified official APK available · '+(release.tag_name||release.name||'Latest');
+   meta.replaceChildren(item('Version',release.tag_name||'Latest'),item('Actual file size',sizeText),item('File',asset.name));
+   if(asset.digest&&/^sha256:[a-f0-9]{64}$/i.test(asset.digest)){
+     const checksum=item('SHA-256',asset.digest.slice(7,23)+'…');
+     checksum.title=asset.digest;meta.append(checksum);
+   }
+   note.classList.remove('is-warning','is-good');
+   note.textContent='File size is taken from the actual GitHub release asset—not an estimate. This is a web-connected Android companion: internet is required for live CampusKit features.';
  }catch(error){
-  status.textContent='Could not verify the latest APK release. Use “All versions & release notes” to check manually.';
-  meta.append(item('Build status','Could not verify'),item('Download','Check releases'),item('Target size','10 MB+'));
-  note.classList.add('is-warning');note.textContent='Release information is temporarily unavailable. Only install an APK attached to the official repository release.';
-  console.warn('CampusKit APK release check:',error);
+   console.warn('CampusKit APK release check:',error);
+   showFallback('Could not verify the latest APK right now. You can still open the official releases page.');
+ }finally{
+   link.removeAttribute('aria-disabled');
  }
 })();
 </script>
