@@ -3251,7 +3251,7 @@ loadLabExperiments("Physics");
    finally{clearTimeout(timeout);}
    if(!response.ok)throw new Error('Release lookup failed ('+response.status+')');
    const releases=await response.json();
-   const release=(Array.isArray(releases)?releases:[]).find(r=>!r.draft&&!r.prerelease&&(r.assets||[]).some(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded'));
+   const release=(Array.isArray(releases)?releases:[]).filter(r=>!r.draft&&!r.prerelease&&(r.assets||[]).some(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded')).sort((a,b)=>Date.parse(b.published_at||b.created_at||0)-Date.parse(a.published_at||a.created_at||0)||Number(b.id||0)-Number(a.id||0))[0];
    if(!release){showFallback('No downloadable APK is published yet.');return;}
    const asset=release.assets.find(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded');
    if(!asset||!asset.browser_download_url||!Number.isFinite(Number(asset.size))||Number(asset.size)<=0){showFallback('The latest Android build is not ready for download yet.');return;}
