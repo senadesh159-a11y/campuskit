@@ -1322,9 +1322,10 @@ footer{color:#7696A2!important}
 
     <section class="card ck-graph-maker" aria-labelledby="ck-graph-title">
       <h3 id="ck-graph-title" class="ck-icon-heading"><span class="ck-section-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 6-7"/><circle cx="7" cy="15" r="1"/><circle cx="11" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="20" cy="7" r="1"/></svg></span>Graph Maker</h3>
-      <p>Plot custom coordinates, equations, curves and 3D points. Enter your own values and labels, then print the graph.</p>
+      <p>Choose coordinate plotting, line, bar, area, histogram, box plot or pie chart. Use multi-row data, equations and 3D coordinates, then print a branded graph sheet.</p>
       <div class="ck-graph-controls">
-        <label>Graph type<select id="ck-graph-dimension"><option value="2d">2D · X–Y plane</option><option value="3d">3D · X–Y–Z space</option></select></label>
+        <label>Coordinate space<select id="ck-graph-dimension"><option value="2d">2D · X–Y plane</option><option value="3d">3D · X–Y–Z space</option></select></label>
+        <label>Graph design<select id="ck-graph-charttype"><option value="scatter">Scatter / coordinate plot</option><option value="line">Simple line graph</option><option value="bar">Bar graph</option><option value="area">Area graph</option><option value="histogram">Histogram (frequency)</option><option value="box">Box plot (statistics)</option><option value="pie">Pie chart (proportions)</option></select></label>
         <label>Plot style<select id="ck-graph-style"><option value="markers">Points</option><option value="lines+markers">Points + connected line</option><option value="lines">Connected line</option></select></label>
         <label>X-axis label<input id="ck-graph-xlabel" value="X axis" maxlength="40"></label>
         <label>Y-axis label<input id="ck-graph-ylabel" value="Y axis" maxlength="40"></label>
@@ -3449,7 +3450,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 </script>
 <style id="ck-graph-maker-style">
 .ck-graph-maker{grid-column:1/-1;min-width:0}.ck-graph-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:12px 0}.ck-graph-controls label,.ck-graph-input-grid label{display:grid;gap:6px;color:#c8e4ed;font-size:13px;font-weight:650}.ck-graph-controls input,.ck-graph-controls select,.ck-graph-input-grid input,.ck-graph-input-grid textarea{width:100%;min-width:0;margin:0;padding:10px;border:1px solid rgba(100,190,207,.28);border-radius:10px;background:#041722;color:#eaf7fa;font:inherit}.ck-graph-input-grid textarea{min-height:125px;resize:vertical}.ck-graph-input-grid{display:grid;gap:12px}.ck-graph-input-grid>div{display:grid;gap:10px}.ck-graph-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.ck-graph-actions button{margin:0}.ck-graph-status{min-height:22px;color:#83dfe1!important;font-size:13px}.ck-graph-note{font-size:12px;color:#8faeb8!important}.ck-graph-maker #ck-graph-plot-area{width:100%;min-height:420px;border:1px solid rgba(100,190,207,.2);border-radius:14px;background:#fff;overflow:hidden}.ck-graph-maker #ck-graph-plot-area .plot-container{width:100%}@media(max-width:560px){.ck-graph-maker #ck-graph-plot-area{min-height:340px}.ck-graph-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media print{body.ck-print-graph *{visibility:hidden!important}body.ck-print-graph #ck-graph-plot-area,body.ck-print-graph #ck-graph-plot-area *{visibility:visible!important}body.ck-print-graph #ck-graph-plot-area{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:95vh!important;border:0!important}body.ck-print-graph #ck-graph-plot-area .modebar{display:none!important}}
+.ck-graph-print-brand{display:none;align-items:center;gap:12px;padding:8px 14px;color:#142a35;font-family:Arial,sans-serif}.ck-graph-print-brand img{width:42px;height:42px;object-fit:contain}.ck-graph-print-brand strong{display:block;font-size:20px;letter-spacing:.4px}.ck-graph-print-brand span{display:block;font-size:11px;color:#52636b}@media print{body.ck-print-graph *{visibility:hidden!important}body.ck-print-graph #ck-graph-plot-area,body.ck-print-graph #ck-graph-plot-area *{visibility:visible!important}body.ck-print-graph #ck-graph-plot-area{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:95vh!important;border:0!important}body.ck-print-graph #ck-graph-plot-area .ck-graph-print-brand{display:flex!important}body.ck-print-graph #ck-graph-plot-area .modebar{display:none!important}}
 </style>
 
 <script id="ck-graph-maker-script">
@@ -3491,7 +3492,16 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
    const traces=[];
    if(dim==='2d'){
     const pts=rows($('ck-graph-points-2d').value,2);
-    if(pts.length)traces.push({type:'scatter',mode:style,x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Coordinates',marker:{size:9}});
+    const chart=$('ck-graph-charttype').value;
+    if(pts.length){
+     if(chart==='scatter')traces.push({type:'scatter',mode:style,x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Coordinates',marker:{size:9}});
+     else if(chart==='line')traces.push({type:'scatter',mode:'lines+markers',x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),name:'Line data',line:{width:3}});
+     else if(chart==='bar')traces.push({type:'bar',x:pts.map(p=>String(p[0])),y:pts.map(p=>p[1]),name:'Bar data'});
+     else if(chart==='area')traces.push({type:'scatter',mode:'lines',x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),fill:'tozeroy',name:'Area data'});
+     else if(chart==='histogram')traces.push({type:'histogram',x:pts.map(p=>p[1]),name:'Frequency distribution',nbinsx:Math.max(5,Math.min(30,pts.length))});
+     else if(chart==='box')traces.push({type:'box',y:pts.map(p=>p[1]),name:'Statistical distribution',boxpoints:'all',jitter:.35,pointpos:0});
+     else if(chart==='pie')traces.push({type:'pie',labels:pts.map(p=>String(p[0])),values:pts.map(p=>Math.abs(p[1])),name:'Proportions',hole:0});
+    }
     const eq=$('ck-graph-equation-2d').value.trim();
     if(eq){
      const min=Number($('ck-graph-xmin').value),max=Number($('ck-graph-xmax').value),steps=Math.min(2000,Math.max(50,Number($('ck-graph-steps').value)||400));
@@ -3500,7 +3510,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
      traces.push({type:'scatter',mode:'lines',x:xs,y:ys,name:eq,line:{width:3, color:'#0C8F98'},connectgaps:false});
     }
     if(!traces.length)throw Error('Add at least one 2D coordinate or equation.');
-    Plotly.newPlot('ck-graph-plot-area',traces,{paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#132b38'},margin:{l:65,r:25,t:35,b:65},xaxis:{title:xlab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true},yaxis:{title:ylab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true,scaleanchor:null},showlegend:true,legend:{orientation:'h'}},{responsive:true,displaylogo:false});
+    Plotly.newPlot('ck-graph-plot-area',traces,{paper_bgcolor:'#fff',plot_bgcolor:'#fff',font:{color:'#132b38'},margin:{l:65,r:25,t:35,b:65},xaxis:{title:chart==='pie'?'':xlab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true},yaxis:{title:chart==='pie'?'':chart==='histogram'?'Frequency':ylab,zeroline:true,showgrid:true,gridcolor:'#dce5e9',showline:true,scaleanchor:null},showlegend:true,legend:{orientation:'h'}},{responsive:true,displaylogo:false});
    }else{
     const pts=rows($('ck-graph-points-3d').value,3);
     if(pts.length)traces.push({type:'scatter3d',mode:style,x:pts.map(p=>p[0]),y:pts.map(p=>p[1]),z:pts.map(p=>p[2]),name:'3D coordinates',marker:{size:5}});
@@ -3519,7 +3529,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
  $('ck-graph-dimension').addEventListener('change',e=>{const d=e.target.value;$('ck-graph-2d-inputs').hidden=d!=='2d';$('ck-graph-3d-inputs').hidden=d!=='3d';$('ck-graph-zlabel-wrap').hidden=d!=='3d';$('ck-graph-plot-area').replaceChildren();status('Enter values for the selected coordinate system.');});
  $('ck-graph-plot').addEventListener('click',plot);
  $('ck-graph-clear').addEventListener('click',()=>{['ck-graph-points-2d','ck-graph-equation-2d','ck-graph-points-3d','ck-graph-equation-3d'].forEach(id=>$(id).value='');if(window.Plotly)Plotly.purge('ck-graph-plot-area');$('ck-graph-plot-area').replaceChildren();status('Graph inputs cleared.');});
- $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadLibs();document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
+ $('ck-graph-print').addEventListener('click',async()=>{if(!$('ck-graph-plot-area').querySelector('.plot-container')){status('Plot a graph before printing.');return;}try{await loadLibs();const area=$('ck-graph-plot-area');let head=area.querySelector('.ck-graph-print-brand');if(!head){head=document.createElement('div');head.className='ck-graph-print-brand';head.innerHTML='<img src="./assets/campuskit-icon.svg" alt="CampusKit logo"><div><strong>CampusKit</strong><span>Graph Maker · Study Tools</span></div>';area.prepend(head);}document.body.classList.add('ck-print-graph');window.print();document.body.classList.remove('ck-print-graph');}catch(e){status(e.message);}});
 })();
 </script>
 </body>
