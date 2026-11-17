@@ -109,9 +109,14 @@ module.exports = async function handler(req, res) {
     if (req.method === "GET" && typeof req.query?.check === "string") {
       const featureId = req.query.check;
       if (!Object.prototype.hasOwnProperty.call(PRICES, featureId)) return res.status(400).json({ error: "Unknown feature." });
-      const entitlement = await db.collection("users").doc(user.uid).collection("entitlements").doc(featureId).get();
+      const [entitlement, freeAccess] = await Promise.all([
+        db.collection("users").doc(user.uid).collection("entitlements").doc(featureId).get(),
+        db.collection("premiumFreeAccess").doc(user.uid).get()
+      ]);
       const data = entitlement.exists ? entitlement.data() : {};
-      return res.status(200).json({ active: data.status === "active", featureId });
+      const allFeaturesFree = freeAccess.exists && freeAccess.data().active === true;
+      const entitlementActive = data.status === "active" && (!data.expiresAt || data.expiresAt.toDate?.().getTime() > Date.now());
+      return res.status(200).json({ active: allFeaturesFree || entitlementActive, allFeaturesFree, featureId });
     }
 
     const resource = String(req.query?.resource || "");
@@ -140,6 +145,37 @@ module.exports = async function handler(req, res) {
       if (req.method === "DELETE") { const id=String(req.query?.id||""); if(!/^[A-Za-z0-9_-]{8,128}$/.test(id)) return res.status(400).json({error:"Invalid note ID."}); await notes.doc(id).delete(); return res.status(200).json({ok:true,id}); }
       return res.status(405).json({error:"Method not allowed for notes."});
     }
+    if (resource === "free-premium") {
+      const freeAccess = db.collection("premiumFreeAccess");
+      if (req.method === "GET") {
+        const snapshot = await freeAccess.orderBy("grantedAt", "desc").limit(500).get();
+        return res.status(200).json({ accounts: snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data(), grantedAt: doc.data().grantedAt?.toDate?.().toISOString() || doc.data().grantedAt || null })) });
+      }
+      if (req.method === "POST") {
+        const email = String(req.body?.email || "").trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "Enter a valid Google account email." });
+        let target;
+        try { target = await getAuth().getUserByEmail(email); }
+        catch (_) { return res.status(404).json({ error: "No registered CampusKit account found for this email. Ask the user to sign in once, then try again." }); }
+        await freeAccess.doc(target.uid).set({
+          uid: target.uid, email: (target.email || email).toLowerCase(),
+          displayName: target.displayName || null, active: true,
+          grantedAt: FieldValue.serverTimestamp(), grantedBy: user.uid, grantedByEmail: user.email || null
+        }, { merge: true });
+        return res.status(200).json({ ok: true, uid: target.uid, email: target.email || email, active: true });
+      }
+      if (req.method === "DELETE") {
+        const uid = String(req.query?.uid || "");
+        if (!uid || uid === user.uid) return res.status(400).json({ error: "A different user's UID is required." });
+        const ref = freeAccess.doc(uid);
+        const snap = await ref.get();
+        if (!snap.exists) return res.status(404).json({ error: "This account does not have global free Premium access." });
+        await ref.delete();
+        return res.status(200).json({ ok: true, uid, active: false });
+      }
+      return res.status(405).json({ error: "Method not allowed for free Premium access." });
+    }
+
     if (resource === "users") {
       if (req.method === "GET") {
         const result = await getAuth().listUsers(200);
