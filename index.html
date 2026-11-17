@@ -3451,8 +3451,6 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
 .ck-graph-maker{grid-column:1/-1;min-width:0}.ck-graph-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:12px 0}.ck-graph-controls label,.ck-graph-input-grid label{display:grid;gap:6px;color:#c8e4ed;font-size:13px;font-weight:650}.ck-graph-controls input,.ck-graph-controls select,.ck-graph-input-grid input,.ck-graph-input-grid textarea{width:100%;min-width:0;margin:0;padding:10px;border:1px solid rgba(100,190,207,.28);border-radius:10px;background:#041722;color:#eaf7fa;font:inherit}.ck-graph-input-grid textarea{min-height:125px;resize:vertical}.ck-graph-input-grid{display:grid;gap:12px}.ck-graph-input-grid>div{display:grid;gap:10px}.ck-graph-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.ck-graph-actions button{margin:0}.ck-graph-status{min-height:22px;color:#83dfe1!important;font-size:13px}.ck-graph-note{font-size:12px;color:#8faeb8!important}.ck-graph-maker #ck-graph-plot-area{width:100%;min-height:420px;border:1px solid rgba(100,190,207,.2);border-radius:14px;background:#fff;overflow:hidden}.ck-graph-maker #ck-graph-plot-area .plot-container{width:100%}@media(max-width:560px){.ck-graph-maker #ck-graph-plot-area{min-height:340px}.ck-graph-controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media print{body.ck-print-graph *{visibility:hidden!important}body.ck-print-graph #ck-graph-plot-area,body.ck-print-graph #ck-graph-plot-area *{visibility:visible!important}body.ck-print-graph #ck-graph-plot-area{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:95vh!important;border:0!important}body.ck-print-graph #ck-graph-plot-area .modebar{display:none!important}}
 </style>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/mathjs@13.2.0/lib/browser/math.js" defer></script>
 
 <script id="ck-graph-maker-script">
 (()=> {
@@ -3509,7 +3507,7 @@ document.querySelector('.side-nav a[href="#social"]')?.addEventListener('click',
     const eq=$('ck-graph-equation-3d').value.trim();
     if(eq){
      const xr=rangePair($('ck-graph-3dxrange').value,'X'),yr=rangePair($('ck-graph-3dyrange').value,'Y'),steps=Math.min(80,Math.max(10,Number($('ck-graph-3dsteps').value)||35));
-     const x=[],y=[],z=[];for(let i=0;i<=steps;i++){const xv=xr[0]+(xr[1]-xr[0])*i/steps,row=[];for(let j=0;j<=steps;j++){const yv=yr[0]+(yr[1]-yr[0])*j/steps;row.push(expressionValue(eq,{x:xv,y:yv}));}x.push(xv);y.push(yr[0]+(yr[1]-yr[0])*i/steps);z.push(row);}
+     const x=[],y=[],z=[];for(let i=0;i<=steps;i++){x.push(xr[0]+(xr[1]-xr[0])*i/steps);y.push(yr[0]+(yr[1]-yr[0])*i/steps);}for(let j=0;j<=steps;j++){const row=[];for(let i=0;i<=steps;i++)row.push(expressionValue(eq,{x:x[i],y:y[j]}));z.push(row);}
      traces.push({type:'surface',x,y,z, name:eq,showscale:true,opacity:.82});
     }
     if(!traces.length)throw Error('Add at least one 3D coordinate or surface equation.');
