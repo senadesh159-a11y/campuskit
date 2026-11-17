@@ -13,7 +13,8 @@ test("Community navigation replaces Social and removes the standalone Profile ta
   assert.match(html, /<span>Community<\/span>/);
   assert.doesNotMatch(html, /id="ck-profile-nav"/);
   assert.doesNotMatch(html, /class="ck-social-tab" data-social-view="profile"/);
-  assert.match(html, /data-social-view="profile">View profile<\/button>/);
+  assert.match(html, /id="profile-view"/);
+  assert.match(html, /data-ck-open-profile/);
 });
 
 test("Community rooms support creation, joining, leaving and group messages", () => {
