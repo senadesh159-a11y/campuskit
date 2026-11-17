@@ -3256,7 +3256,7 @@ loadLabExperiments("Physics");
    const asset=release.assets.find(a=>/\.apk$/i.test(a.name)&&a.state==='uploaded');
    if(!asset||!asset.browser_download_url||!Number.isFinite(Number(asset.size))||Number(asset.size)<=0){showFallback('The latest Android build is not ready for download yet.');return;}
    const sizeBytes=Number(asset.size);
-   const sizeText=sizeBytes>=1024*1024?(sizeBytes/1024/1024).toFixed(2)+' MB':(sizeBytes/1024).toFixed(1)+' KB';
+   const sizeText=sizeBytes>=1000000?(sizeBytes/1000000).toFixed(2)+' MB ('+(sizeBytes/1024/1024).toFixed(2)+' MiB)':(sizeBytes/1024).toFixed(1)+' KB';
    link.href=asset.browser_download_url;link.setAttribute('download',asset.name);
    link.removeAttribute('aria-disabled');
    link.textContent=(/Android/i.test(navigator.userAgent)?'Download & install APK ':'Download Android APK ')+'↓';
