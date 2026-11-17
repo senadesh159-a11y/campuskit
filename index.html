@@ -2254,6 +2254,8 @@ window.CampusKitCloud = {
     getAuth,
     GoogleAuthProvider,
     browserLocalPersistence,
+    browserSessionPersistence,
+    inMemoryPersistence,
     setPersistence,
     signInWithPopup,
     signOut,
@@ -2283,11 +2285,31 @@ window.CampusKitCloud = {
   };
 
   const app = initializeApp(firebaseConfig);
-  // Keep the Firebase session in first-party browser storage across mobile page
-  // restores. Do not use redirect auth here: some mobile/in-app browsers partition
-  // redirect session storage and lose Firebase's pending sign-in state.
+  // Configure persistence before enabling the login button. Calling the popup
+  // only after an awaited setup can lose the browser's user-gesture activation.
+  // Prefer cross-session local storage, then session storage, then in-memory
+  // persistence for browsers that block durable storage.
   const auth = getAuth(app);
-  const authPersistenceReady = setPersistence(auth, browserLocalPersistence);
+  let authPersistenceMode = "local";
+  const authPersistenceReady = (async () => {
+    const choices = [
+      ["local", browserLocalPersistence],
+      ["session", browserSessionPersistence],
+      ["memory", inMemoryPersistence]
+    ];
+    let lastError = null;
+    for (const [mode, persistence] of choices) {
+      try {
+        await setPersistence(auth, persistence);
+        authPersistenceMode = mode;
+        return mode;
+      } catch (error) {
+        lastError = error;
+        console.warn("CampusKit auth persistence fallback:", mode, error?.code || error?.message || error);
+      }
+    }
+    throw lastError || new Error("No supported authentication persistence is available.");
+  })();
   const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
   window.CampusKitAuth = {
@@ -2623,25 +2645,48 @@ window.CampusKitCloud = {
       return "This website address is not authorized for Google sign-in (" + host + "). Add this exact host in Firebase Console → Authentication → Settings → Authorized domains.";
     }
     if (code === "auth/operation-not-allowed") return "Google sign-in is disabled. Enable Google under Firebase Console → Authentication → Sign-in method.";
-    return "Sign-in failed: " + (code || error?.message || "Unknown error");
+    if (code === "auth/popup-blocked") return "Your browser blocked the Google sign-in window. Allow pop-ups for campuskit-six.vercel.app or open the site directly in Chrome.";
+    if (code === "auth/popup-closed-by-user") return "Google sign-in was closed before completion. Tap Continue with Google to try again.";
+    if (code === "auth/cancelled-popup-request") return "A Google sign-in window is already opening. Finish that window or close it before trying again.";
+    if (code === "auth/network-request-failed" || code === "auth/timeout") return "Network connection interrupted Google sign-in. Check your internet and tap Continue with Google to retry.";
+    if (code === "auth/too-many-requests") return "Google sign-in is temporarily rate-limited. Wait a little and try again.";
+    if (code === "auth/user-disabled") return "This account has been disabled for this service. Contact the CampusKit administrator.";
+    if (code === "auth/web-storage-unsupported") return "This browser is blocking sign-in storage. Open CampusKit in Chrome and allow site data.";
+    if (code === "auth/account-exists-with-different-credential") return "An account already exists with this email using another sign-in method. Use the original sign-in method.";
+    return "Sign-in failed: " + (code || error?.message || "Unknown error") + ". Please try again.";
   }
   provider.setCustomParameters({ prompt: "select_account" });
-  loginBtn.addEventListener("click", async () => {
+  let loginInProgress = false;
+  loginBtn.disabled = true;
+  showStatus("Preparing secure sign-in...");
+  authPersistenceReady.then(mode => {
+    loginBtn.disabled = false;
+    showStatus(mode === "memory"
+      ? "Secure sign-in is ready. This browser may ask you to sign in again after it closes."
+      : "Sign in to open CampusKit and sync your study data.");
+  }).catch(error => {
+    console.error("CampusKit auth persistence setup failed:", error);
+    loginBtn.disabled = false;
+    showStatus("Sign-in storage could not be prepared. Open CampusKit in Chrome and allow site data, then retry.");
+  });
+  // Keep signInWithPopup directly inside the user click handler. This preserves
+  // the user gesture required by mobile browsers and avoids popup-blocked errors.
+  loginBtn.addEventListener("click", () => {
+    if (loginInProgress || loginBtn.disabled) return;
+    loginInProgress = true;
     loginBtn.disabled = true;
     showStatus("Opening Google sign-in...");
-    try {
-      // Wait until durable local persistence is configured before opening Google.
-      await authPersistenceReady;
-      const credential = await signInWithPopup(auth, provider);
+    signInWithPopup(auth, provider).then(credential => {
       if (credential?.user) {
         showStatus("Signed in. Opening your CampusKit workspace...");
       }
-    } catch (error) {
+    }).catch(error => {
       showStatus(explainAuthError(error));
       console.error("Google sign-in error:", error);
-    } finally {
+    }).finally(() => {
+      loginInProgress = false;
       loginBtn.disabled = false;
-    }
+    });
   });
 
   async function campusKitSignOut() {
