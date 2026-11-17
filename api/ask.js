@@ -87,13 +87,14 @@ module.exports = async function handler(req, res) {
     }).format(new Date());
     const usageRef = db.collection("users").doc(decoded.uid).collection("aiUsage").doc(dayKey);
     const premiumRef = db.collection("users").doc(decoded.uid).collection("entitlements").doc("ai-premium");
+    const freeAccessRef = db.collection("premiumFreeAccess").doc(decoded.uid);
     const quotaState = await db.runTransaction(async transaction => {
-      const [usageSnap, premiumSnap] = await Promise.all([
-        transaction.get(usageRef), transaction.get(premiumRef)
+      const [usageSnap, premiumSnap, freeAccessSnap] = await Promise.all([
+        transaction.get(usageRef), transaction.get(premiumRef), transaction.get(freeAccessRef)
       ]);
       const premium = premiumSnap.exists ? premiumSnap.data() : {};
       const expiry = premium.expiresAt && typeof premium.expiresAt.toDate === "function" ? premium.expiresAt.toDate() : null;
-      const isPremium = premium.status === "active" && (!expiry || expiry.getTime() > Date.now());
+      const isPremium = (freeAccessSnap.exists && freeAccessSnap.data().active === true) || (premium.status === "active" && (!expiry || expiry.getTime() > Date.now()));
       const used = Number(usageSnap.exists ? usageSnap.data().count || 0 : 0);
       if (!isPremium && used >= 15) return { allowed: false, used, remaining: 0, premium: false };
       const nextUsed = used + 1;
