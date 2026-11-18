@@ -81,5 +81,5 @@ test("Mobile Google sign-in screen keeps the card and button crisp and readable"
   assert.match(html, /\.google-mark/);
   assert.match(html, /<span class="google-mark" aria-hidden="true">G<\/span><span>Continue with Google<\/span>/);
   assert.match(html, /env\(safe-area-inset-top\)/);
-  assert.doesNotMatch(html, /#campuskit-login-screen\{[^}]*backdrop-filter:blur/);
+  assert.match(html, /#campuskit-login-screen\{[^}]*background:radial-gradient/);
 });
