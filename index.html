@@ -115,22 +115,26 @@ body:not(.authenticated) .side-nav,
 body:not(.authenticated) header,
 body:not(.authenticated) main,
 body:not(.authenticated) footer{display:none!important}
-#campuskit-login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden;background:rgba(5,7,24,.42);backdrop-filter:blur(3px)}
+#campuskit-login-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:max(18px,env(safe-area-inset-top)) 18px max(18px,env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 50% 18%,rgba(0,174,239,.18),transparent 42%),linear-gradient(145deg,#030914 0%,#071a2d 52%,#050b18 100%)}
 body.authenticated #campuskit-login-screen{display:none!important}
-.login-orb{position:absolute;width:min(68vw,520px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(167,139,250,.22);box-shadow:0 0 70px rgba(139,92,246,.12),inset 0 0 70px rgba(59,130,246,.08);animation:loginOrbit 22s linear infinite;pointer-events:none}
-.login-orb:before,.login-orb:after{content:"";position:absolute;border:1px solid rgba(96,165,250,.25);border-radius:50%;inset:12%;transform:rotate(35deg) scaleX(.58)}
-.login-orb:after{inset:25%;transform:rotate(-35deg) scaleX(.68);border-color:rgba(196,181,253,.28)}
+.login-orb{position:absolute;width:min(68vw,520px);aspect-ratio:1;border-radius:50%;border:1px solid rgba(0,190,255,.16);box-shadow:0 0 55px rgba(0,174,239,.08),inset 0 0 55px rgba(0,174,239,.05);animation:loginOrbit 28s linear infinite;pointer-events:none}
+.login-orb:before,.login-orb:after{content:"";position:absolute;border:1px solid rgba(0,190,255,.18);border-radius:50%;inset:12%;transform:rotate(35deg) scaleX(.58)}
+.login-orb:after{inset:25%;transform:rotate(-35deg) scaleX(.68);border-color:rgba(100,190,255,.2)}
 @keyframes loginOrbit{to{transform:rotate(360deg)}}
-.login-card{position:relative;z-index:1;width:min(100%,430px);padding:34px 28px;text-align:center;border:1px solid rgba(196,181,253,.28);border-radius:26px;background:linear-gradient(145deg,rgba(23,21,54,.9),rgba(11,19,48,.84));box-shadow:0 25px 90px rgba(0,0,0,.42);backdrop-filter:blur(22px)}
-.login-logo{width:68px;height:68px;margin:0 auto 14px;overflow:hidden;display:grid;place-items:center;border-radius:22px;font-size:32px;background:linear-gradient(135deg,#8b5cf6,#2563eb);box-shadow:0 10px 35px rgba(32,245,139,.18)}
-.login-logo img{display:block;width:68px;height:68px;object-fit:cover}
-.login-card h1{font-size:clamp(28px,7vw,36px);margin:0;color:#fff;letter-spacing:-.7px}
-.login-card .login-subtitle{margin:8px 0 24px;color:#c8c5e5;font-size:14px}
-#ck-google-login{width:100%;margin:0;padding:13px 16px;border:1px solid rgba(255,255,255,.8);border-radius:12px;background:#fff;color:#222;font-size:15px;font-weight:700;box-shadow:none}
-#ck-google-login:before{content:"G";display:inline-grid;place-items:center;width:22px;height:22px;margin-right:10px;border-radius:50%;background:conic-gradient(#4285f4 0 25%,#34a853 25% 50%,#fbbc05 50% 75%,#ea4335 75%);color:#fff;font-weight:900}
-#ck-status{min-height:20px;color:#d7d2f0}
-.login-privacy{margin:18px 0 0!important;font-size:11px!important;color:#a7a3c6!important}
-@media(max-width:480px){.login-card{padding:28px 20px}.login-orb{width:95vw}}
+.login-card{position:relative;z-index:1;width:min(100%,430px);margin:auto;padding:clamp(25px,6vw,36px) clamp(20px,5vw,30px);text-align:center;border:1px solid rgba(67,190,235,.38);border-radius:24px;background:#081729;box-shadow:0 22px 70px rgba(0,0,0,.58),0 0 38px rgba(0,174,239,.09)}
+.login-logo{width:72px;height:72px;margin:0 auto 16px;overflow:hidden;display:grid;place-items:center;border-radius:20px;font-size:32px;background:#06243a;border:1px solid rgba(0,190,255,.5);box-shadow:0 0 26px rgba(0,174,239,.18)}
+.login-logo img{display:block;width:68px;height:68px;object-fit:contain}
+.login-card h1{font-size:clamp(30px,7vw,38px);line-height:1.2;margin:0;color:#fff;letter-spacing:-.7px;font-weight:800}
+.login-card .login-subtitle{margin:10px 0 25px;color:#d4e5f2;font-size:15px;line-height:1.55}
+#ck-google-login{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:54px;margin:0;padding:13px 16px;border:1px solid #d7e0e8;border-radius:13px;background:#fff;color:#202124;font-size:16px;line-height:1.3;font-weight:700;box-shadow:0 5px 18px rgba(0,0,0,.22);opacity:1;filter:none}
+#ck-google-login:hover{background:#f4f7fb;filter:none;transform:translateY(-1px)}
+#ck-google-login:focus-visible{outline:3px solid #36c9ff;outline-offset:4px}
+#ck-google-login:disabled{opacity:1;background:#edf2f7;color:#263746;cursor:wait;transform:none;filter:none}
+.google-mark{display:inline-grid;place-items:center;width:23px;height:23px;flex:0 0 23px;border-radius:50%;font-family:Arial,sans-serif;font-size:21px;font-weight:800;line-height:1;background:conic-gradient(from -45deg,#4285f4 0 25%,#34a853 25% 50%,#fbbc05 50% 75%,#ea4335 75% 100%);color:#fff}
+#ck-status{min-height:42px;margin:17px 0 0;color:#d8eaf7;font-size:14px;line-height:1.55}
+.login-privacy{margin:15px 0 0!important;font-size:12px!important;color:#a9c3d6!important;line-height:1.5}
+@media(max-width:480px){.login-card{padding:27px 20px;border-radius:20px}.login-orb{width:95vw}}
+@media(prefers-reduced-motion:reduce){.login-orb{animation:none}}
 
 /* ===== CAMPUSKIT LABORATORY ===== */
 #laboratory-section {
@@ -1092,7 +1096,7 @@ footer{color:#7696A2!important}
     <div class="login-logo" aria-hidden="true"><img src="./assets/campuskit-icon.svg" alt="" width="68" height="68"></div>
     <h1 id="loginTitle">CampusKit</h1>
     <p class="login-subtitle">Your college life, organized in one place.</p>
-    <button id="ck-google-login" type="button">Continue with Google</button>
+    <button id="ck-google-login" type="button"><span class="google-mark" aria-hidden="true">G</span><span>Continue with Google</span></button>
     <p id="ck-status" aria-live="polite">Sign in to open your student workspace.</p>
     <p class="login-privacy">Secure sign-in · Your study space starts here</p>
     <span id="ck-user" style="display:none;align-items:center;gap:8px">
