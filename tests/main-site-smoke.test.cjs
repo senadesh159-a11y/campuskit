@@ -73,3 +73,13 @@ test("Main website asset files are present and under the agreed 10 MB per-file c
     assert.ok(fs.statSync(full).size <= 10 * 1024 * 1024, "Asset exceeds 10 MB: " + file);
   }
 });
+
+test("Mobile Google sign-in screen keeps the card and button crisp and readable", () => {
+  assert.match(html, /background:#081729/);
+  assert.match(html, /#ck-google-login\{display:flex;align-items:center;justify-content:center;gap:12px/);
+  assert.match(html, /#ck-google-login:disabled\{opacity:1/);
+  assert.match(html, /\.google-mark/);
+  assert.match(html, /<span class="google-mark" aria-hidden="true">G<\/span><span>Continue with Google<\/span>/);
+  assert.match(html, /env\(safe-area-inset-top\)/);
+  assert.doesNotMatch(html, /#campuskit-login-screen\{[^}]*backdrop-filter:blur/);
+});
